@@ -14,9 +14,7 @@ import {
   CalendarDays,
   ChevronDown,
   ClipboardList,
-  Database,
   FileText,
-  Gavel,
   GraduationCap,
   History,
   Landmark,
@@ -29,6 +27,7 @@ import {
   ShieldCheck,
   Siren,
   Users,
+  MessageCircle,
 } from "lucide-react";
 
 import type { LucideIcon } from "lucide-react";
@@ -36,7 +35,6 @@ import type { LucideIcon } from "lucide-react";
 // ─────────────────────────────────────────────
 // TYPES
 // ─────────────────────────────────────────────
-
 interface SidebarItem {
   title: string;
   href?: string;
@@ -97,16 +95,11 @@ const sidebarItems: SidebarItem[] = [
       },
 
       {
-        title: "Case Laws",
-        href: "/case-laws",
-        icon: Gavel,
-      },
-
-      {
         title: "Quizzes",
         href: "/quizzes",
         icon: GraduationCap,
       },
+      
     ],
   },
 
@@ -119,12 +112,6 @@ const sidebarItems: SidebarItem[] = [
         title: "Threat Detection",
         href: "/security/threat-detection",
         icon: Siren,
-      },
-
-      {
-        title: "Security Alerts",
-        href: "/security/alerts",
-        icon: Bell,
       },
 
       {
@@ -172,21 +159,27 @@ const sidebarItems: SidebarItem[] = [
 
       {
         title: "Audit Logs",
-        href: "/analytics/audit-logs",
+        href: "/analytics/audit_logs",
         icon: ClipboardList,
       },
 
-      {
-        title: "Database Monitoring",
-        href: "/analytics/database",
-        icon: Database,
-      },
+      // {
+      //   title: "Database Monitoring",
+      //   href: "/analytics/database",
+      //   icon: Database,
+      // },
 
       {
         title: "Users Analytics",
         href: "/analytics/user_analytics",
         icon: Users,
       },
+       {
+        title: "Feedbacks Analytics",
+        href: "/feedback",
+        icon: MessageCircle,
+      },
+     
     ],
   },
 
@@ -242,8 +235,8 @@ export default function AdminSidebar() {
           <Image
             src="/image/logo.png"
             alt="KnowSamvidhan Logo"
-            width={40}
-            height={40}
+            width={36}
+            height={36}
             className="rounded-lg object-contain"
           />
         </div>
