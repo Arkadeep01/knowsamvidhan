@@ -12,11 +12,14 @@ import {
 import {
   Bot,
   KeyRound,
+  Laptop,
   Radar,
   RefreshCw,
   Shield,
+  ShieldCheck,
   Siren,
   Zap,
+  AlertTriangle,
 } from "lucide-react";
 
 import {
@@ -152,6 +155,11 @@ export default function ThreatAnalysisPage() {
       badIpScore: 0,
       deviceMismatch: 0,
       aiConfidence: 100,
+      trustedDevices: 0,
+      untrustedDevices: 0,
+      pendingReview: 0,
+      openIncidents: 0,
+      criticalIncidents: 0,
     },
     chartData: [],
     severityDistribution: [],
@@ -159,6 +167,8 @@ export default function ThreatAnalysisPage() {
     heatmap: [],
     registry: [],
     anomaly: { confidence: 0, signals: [] },
+    deviceTrust: { total: 0, trusted: 0, untrusted: 0, pending: 0, devices: [] },
+    incidents: [],
     settings: [],
   };
 
@@ -529,6 +539,88 @@ export default function ThreatAnalysisPage() {
                 </table>
               </div>
             </Panel>
+
+            <div className="grid grid-cols-1 gap-6 xl:grid-cols-2">
+              <Panel
+                title="Device Trust"
+                subtitle="Device security status"
+                isSecure={isSecure}
+              >
+                <div className="space-y-4">
+                  <div className="grid grid-cols-3 gap-4">
+                    <div className="rounded-lg border border-emerald-500/20 bg-emerald-500/5 p-4 text-center">
+                      <Laptop className="mx-auto mb-2 h-6 w-6 text-emerald-400" />
+                      <p className="text-2xl font-black text-emerald-400">{data.deviceTrust?.trusted || 0}</p>
+                      <p className="text-xs text-zinc-500">Trusted</p>
+                    </div>
+                    <div className="rounded-lg border border-amber-500/20 bg-amber-500/5 p-4 text-center">
+                      <Laptop className="mx-auto mb-2 h-6 w-6 text-amber-400" />
+                      <p className="text-2xl font-black text-amber-400">{data.deviceTrust?.pending || 0}</p>
+                      <p className="text-xs text-zinc-500">Pending</p>
+                    </div>
+                    <div className="rounded-lg border border-red-500/20 bg-red-500/5 p-4 text-center">
+                      <Laptop className="mx-auto mb-2 h-6 w-6 text-red-400" />
+                      <p className="text-2xl font-black text-red-400">{data.deviceTrust?.untrusted || 0}</p>
+                      <p className="text-xs text-zinc-500">Untrusted</p>
+                    </div>
+                  </div>
+                  <div className="max-h-40 overflow-y-auto">
+                    {(data.deviceTrust?.devices || []).slice(0, 5).map((device) => (
+                      <div key={device.id} className="flex items-center justify-between border-b border-zinc-800/50 py-2">
+                        <div>
+                          <p className="text-sm text-zinc-300 font-mono text-xs">{device.deviceId?.slice(0, 16)}...</p>
+                          <p className="text-xs text-zinc-500">{device.country || "Unknown"}</p>
+                        </div>
+                        <span className={`rounded-full border px-2 py-0.5 text-xs font-bold ${
+                          device.trustScore >= 70 ? "border-emerald-500/40 bg-emerald-500/15 text-emerald-300" :
+                          device.trustScore >= 30 ? "border-amber-500/40 bg-amber-500/15 text-amber-300" :
+                          "border-red-500/40 bg-red-500/15 text-red-300"
+                        }`}>
+                          {device.trustScore}
+                        </span>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              </Panel>
+
+              <Panel
+                title="Security Incidents"
+                subtitle="Active breach reports"
+                isSecure={isSecure}
+              >
+                <div className="space-y-3">
+                  <div className="grid grid-cols-2 gap-4">
+                    <div className="rounded-lg border border-red-500/20 bg-red-500/5 p-3 text-center">
+                      <AlertTriangle className="mx-auto mb-1 h-5 w-5 text-red-400" />
+                      <p className="text-xl font-black text-red-400">{data.kpis.openIncidents || 0}</p>
+                      <p className="text-xs text-zinc-500">Open</p>
+                    </div>
+                    <div className="rounded-lg border border-orange-500/20 bg-orange-500/5 p-3 text-center">
+                      <Siren className="mx-auto mb-1 h-5 w-5 text-orange-400" />
+                      <p className="text-xl font-black text-orange-400">{data.kpis.criticalIncidents || 0}</p>
+                      <p className="text-xs text-zinc-500">Critical</p>
+                    </div>
+                  </div>
+                  <div className="max-h-40 overflow-y-auto">
+                    {(data.incidents || []).slice(0, 5).map((incident) => (
+                      <div key={incident.id} className="flex items-center justify-between border-b border-zinc-800/50 py-2">
+                        <div>
+                          <p className="text-sm text-zinc-300">{incident.title}</p>
+                          <p className="text-xs text-zinc-500">{incident.incidentNumber}</p>
+                        </div>
+                        <div className="text-right">
+                          <span className={`rounded-full border px-2 py-0.5 text-xs font-bold ${severityColor(incident.severity)}`}>
+                            {incident.severity}
+                          </span>
+                          <p className="text-xs text-zinc-500 mt-1">{incident.recoveryPercent}%</p>
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              </Panel>
+            </div>
           </div>
         </section>
       </main>

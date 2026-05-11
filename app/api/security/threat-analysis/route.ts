@@ -47,6 +47,8 @@ export async function GET() {
       recentPageViews,
       auditSecurityEvents,
       frequencyRows,
+      deviceTrustData,
+      incidents,
     ] = await Promise.all([
       prisma.alert.findMany({
         orderBy: { createdAt: "desc" },
@@ -78,6 +80,14 @@ export async function GET() {
       prisma.alertFrequencyMetric.findMany({
         where: { date: { gte: dayAgo } },
         orderBy: [{ date: "asc" }, { hour: "asc" }],
+      }),
+      prisma.deviceTrust.findMany({
+        orderBy: { trustScore: "asc" },
+        take: 20,
+      }),
+      prisma.securityIncident.findMany({
+        orderBy: { openedAt: "desc" },
+        take: 10,
       }),
     ]);
 
@@ -145,7 +155,7 @@ export async function GET() {
         type: item.label.length > 18 ? item.label.split(" ").slice(0, 2).join(" ") : item.label,
         score,
         severity: severityFromScore(score),
-        lastSeen: `${Math.floor(Math.random() * 60) + 5}m ago`,
+        lastSeen: item.time,
         action: "Block",
       };
     });
@@ -163,6 +173,13 @@ export async function GET() {
         intensity: Math.min(0.95, requests / 5000),
       };
     });
+
+    const trustedDevices = deviceTrustData.filter(d => d.trustScore >= 70).length;
+    const untrustedDevices = deviceTrustData.filter(d => d.trustScore < 30).length;
+    const pendingReview = deviceTrustData.filter(d => d.trustScore >= 30 && d.trustScore < 70).length;
+
+    const openIncidents = incidents.filter(i => i.status !== "Resolved").length;
+    const criticalIncidents = incidents.filter(i => i.severity === "CRITICAL").length;
 
     return NextResponse.json({
       updatedAt: now.toISOString(),
@@ -182,6 +199,11 @@ export async function GET() {
         badIpScore: isSafe ? 0 : clamp(50 + failedOtps * 2, 0, 100),
         deviceMismatch: isSafe ? 0 : recentSessions.filter((s) => !s.userAgent).length,
         aiConfidence: isSafe ? 100 : clamp(70 + criticalAlerts * 3, 0, 100),
+        trustedDevices,
+        untrustedDevices,
+        pendingReview,
+        openIncidents,
+        criticalIncidents,
       },
       chartData,
       severityDistribution,
@@ -200,6 +222,29 @@ export async function GET() {
           { label: "Geo anomalies", value: Math.min(100, registry.length * 10) },
         ],
       },
+      deviceTrust: {
+        total: deviceTrustData.length,
+        trusted: trustedDevices,
+        untrusted: untrustedDevices,
+        pending: pendingReview,
+        devices: deviceTrustData.slice(0, 10).map(d => ({
+          id: d.id,
+          userId: d.userId,
+          deviceId: d.deviceId,
+          trustScore: d.trustScore,
+          country: d.country,
+          lastSeenAt: d.lastSeenAt,
+        })),
+      },
+      incidents: incidents.map(i => ({
+        id: i.id,
+        incidentNumber: i.incidentNumber,
+        title: i.title,
+        severity: i.severity.toLowerCase(),
+        status: i.status,
+        openedAt: i.openedAt,
+        recoveryPercent: i.recoveryPercent,
+      })),
       settings: [
         { key: "device", label: "Device fingerprint mismatch", enabled: true },
         { key: "geo", label: "Geo-location anomaly", enabled: true },
