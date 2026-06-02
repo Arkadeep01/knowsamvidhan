@@ -1,5 +1,6 @@
 "use client";
 
+import Script from "next/script";
 import { useState, useRef, useEffect } from "react";
 import Image from "next/image";
 import Link from "next/link";
@@ -25,6 +26,26 @@ import {
   AlignLeft,
   ArrowUpRight,
 } from "lucide-react";
+
+declare global {
+  interface Window {
+    puter: {
+      ai: {
+        chat: (
+          messages: unknown,
+          options?: {
+            model?: string;
+          }
+        ) => Promise<{
+          message?: {
+            content?: string;
+          };
+          content?: string;
+        }>;
+      };
+    };
+  }
+}
 
 /* ── Types ──────────────────────────────────────────────────────────── */
 type Role = "user" | "ai";
@@ -86,23 +107,6 @@ const suggestions = [
     iconColor: "text-orange-800",
   },
 ];
-
-/* ── Fake AI response generator ─────────────────────────────────────── */
-const fakeResponses: Record<string, string> = {
-  default:
-    "That's a great question about the Constitution of India! The Constitution, adopted on 26 November 1949 and effective from 26 January 1950, is the supreme law of India. It lays down the framework for the country's political system, defines the powers and duties of the government, and guarantees fundamental rights to citizens. Feel free to ask me anything specific — articles, amendments, schedules, or concepts!",
-  "article 21":
-    "**Article 21** of the Indian Constitution guarantees the **Protection of Life and Personal Liberty**. It states: *'No person shall be deprived of his life or personal liberty except according to procedure established by law.'*\n\nOver time, the Supreme Court has expanded its scope through landmark judgments to include the right to livelihood, right to education, right to health, right to privacy (Puttaswamy case, 2017), and many more. It is considered the most expansive and dynamic article of our Constitution.",
-  preamble:
-    "The **Preamble** is the introductory statement of the Constitution of India. It reads:\n\n*'WE, THE PEOPLE OF INDIA, having solemnly resolved to constitute India into a SOVEREIGN SOCIALIST SECULAR DEMOCRATIC REPUBLIC and to secure to all its citizens: JUSTICE, social, economic and political; LIBERTY of thought, expression, belief, faith and worship; EQUALITY of status and of opportunity; and to promote among them all FRATERNITY assuring the dignity of the individual and the unity and integrity of the Nation…'*\n\nThe 42nd Amendment (1976) added the words **Socialist**, **Secular**, and **Integrity**.",
-};
-
-function getAIResponse(input: string): string {
-  const lower = input.toLowerCase();
-  if (lower.includes("article 21")) return fakeResponses["article 21"];
-  if (lower.includes("preamble")) return fakeResponses["preamble"];
-  return fakeResponses["default"];
-}
 
 function now() {
   return new Date().toLocaleTimeString("en-IN", {
@@ -185,10 +189,27 @@ function Bubble({ msg }: { msg: Message }) {
   );
 }
 
+type ChatMessage = {
+  role: "system" |"user" | "assistant";
+  content: string;
+};
+
+const SYSTEM_PROMPT = `
+  You are Samvi, an expert AI guide to the Constitution of India.
+
+  Rules:
+  - Answer only Constitution-related questions.
+  - Explain articles, amendments, rights, duties, judiciary, parliament and constitutional law.
+  - If the question is unrelated, politely redirect the user.
+  - Use concise and accurate answers.
+  - Use markdown formatting.
+`;
+
 /* ══════════════════════════════════════════════════════════════════════
    MAIN PAGE
 ══════════════════════════════════════════════════════════════════════ */
 export default function ChatPage() {
+  const [loading, setLoading] = useState(false);
   const [messages, setMessages] = useState<Message[]>([
     {
       id: "0",
@@ -204,33 +225,142 @@ export default function ChatPage() {
   const inputRef = useRef<HTMLTextAreaElement>(null);
 
   useEffect(() => {
+    const saved = localStorage.getItem("samvi-chat");
+
+    if (saved) {
+      try {
+        const parsed = JSON.parse(saved);
+        
+        type StoredMessage = {
+          role: string;
+          content: string;
+        }
+        
+        const converted: Message[] = parsed.map((msg: StoredMessage, index: number) => ({
+          id: `${index}`,
+          role: msg.role === "assistant" ? "ai" : "user",
+          text: msg.content,
+          time: now(),
+        }));
+
+        setMessages(converted);
+      } catch {}
+    }
+  }, []);
+
+  useEffect(() => {
     bottomRef.current?.scrollIntoView({ behavior: "smooth" });
   }, [messages, typing]);
 
-  const send = (text: string) => {
-    if (!text.trim()) return;
+  useEffect(() => {
+    const storageMessages = messages.map((msg) => ({
+      role: msg.role === "ai" ? "assistant" : "user",
+      content: msg.text,
+    }));
+
+    localStorage.setItem("samvi-chat", JSON.stringify(storageMessages));
+  }, [messages]);
+
+  // ANTROPIC ARCHITECTURAL SEND FUNCTION
+  // const send = (text: string) => {
+  //   if (!text.trim()) return;
+  //   const userMsg: Message = {
+  //     id: Date.now().toString(),
+  //     role: "user",
+  //     text: text.trim(),
+  //     time: now(),
+  //   };
+  //   setMessages((prev) => [...prev, userMsg]);
+  //   setInput("");
+  //   setTyping(true);
+  //   setTimeout(
+  //     () => {
+  //       setTyping(false);
+  //       const aiMsg: Message = {
+  //         id: (Date.now() + 1).toString(),
+  //         role: "ai",
+  //         text: getAIResponse(text),
+  //         time: now(),
+  //       };
+  //       setMessages((prev) => [...prev, aiMsg]);
+  //     },
+  //     1400 + Math.random() * 800,
+  //   );
+  // };
+
+  const send = async (text: string) => {
+    if (!text.trim() || loading) return;
+
     const userMsg: Message = {
       id: Date.now().toString(),
       role: "user",
       text: text.trim(),
       time: now(),
     };
+
     setMessages((prev) => [...prev, userMsg]);
     setInput("");
     setTyping(true);
-    setTimeout(
-      () => {
-        setTyping(false);
-        const aiMsg: Message = {
-          id: (Date.now() + 1).toString(),
-          role: "ai",
-          text: getAIResponse(text),
-          time: now(),
-        };
-        setMessages((prev) => [...prev, aiMsg]);
-      },
-      1400 + Math.random() * 800,
-    );
+    setLoading(true);
+
+    try {
+      if (!window.puter?.ai) {
+        throw new Error("Puter AI not loaded yet");
+      }
+
+      const conversation: ChatMessage[] = [
+        {
+          role: "system",
+          content: SYSTEM_PROMPT,
+        },
+
+        ...messages.map(
+          (msg): ChatMessage => ({
+            role: msg.role === "ai"
+              ? "assistant"
+              : "user",
+            content: msg.text,
+          })
+        ),
+
+        {
+          role: "user",
+          content: text.trim(),
+        },
+      ];
+
+      const response = await window.puter.ai.chat(conversation, {
+        model: "gpt-5.4-nano",
+      });
+
+      const aiText =
+        typeof response?.message?.content === "string"
+          ? response.message.content
+          : typeof response?.content === "string"
+            ? response.content
+            : "No response";
+
+      const aiMsg: Message = {
+        id: (Date.now() + 1).toString(),
+        role: "ai",
+        text: aiText,
+        time: now(),
+      };
+
+      setMessages((prev) => [...prev, aiMsg]);
+    } catch (error) {
+      const errorMsg: Message = {
+        id: (Date.now() + 1).toString(),
+        role: "ai",
+        text: error instanceof Error ? error.message : "Unknown error",
+        time: now(),
+      };
+
+      setMessages((prev) => [...prev, errorMsg]);
+    } finally {
+      setTyping(false);
+      setLoading(false);
+    }
   };
 
   const handleKey = (e: React.KeyboardEvent<HTMLTextAreaElement>) => {
@@ -241,6 +371,8 @@ export default function ChatPage() {
   };
 
   const clearChat = () => {
+    localStorage.removeItem("samvi-chat");
+
     setMessages([
       {
         id: "reset",
@@ -296,7 +428,7 @@ export default function ChatPage() {
                 width={36}
                 height={36}
                 className="object-cover"
-                style={{ width: 'auto', height: 'auto' }}
+                style={{ width: "auto", height: "auto" }}
               />
             </div>
             <div>
@@ -411,6 +543,8 @@ export default function ChatPage() {
           </div>
         </div>
       </aside>
+
+      <Script src="https://js.puter.com/v2/" strategy="afterInteractive" />
 
       {/* ══ MAIN CHAT AREA ═══════════════════════════════════════════ */}
       <div className="relative flex flex-1 flex-col overflow-hidden min-w-0">
@@ -600,6 +734,7 @@ export default function ChatPage() {
               </div>
 
               <textarea
+                disabled={loading}
                 ref={inputRef}
                 value={input}
                 onChange={(e) => setInput(e.target.value)}
@@ -618,7 +753,7 @@ export default function ChatPage() {
               {/* Send button */}
               <button
                 onClick={() => send(input)}
-                disabled={!input.trim() || typing}
+                disabled={!input.trim() || typing || loading}
                 className="
                   group relative mb-0.5 flex h-9 w-9 shrink-0 items-center justify-center
                   overflow-hidden rounded-xl
@@ -633,11 +768,15 @@ export default function ChatPage() {
               >
                 {/* Shimmer */}
                 <span className="absolute inset-0 -skew-x-12 -translate-x-full `] `bg-gradient-to-r from-transparent via-white/20 to-transparent transition-transform duration-500 group-hover:translate-x-[200%]" />
-                <Send
-                  size={14}
-                  strokeWidth={2}
-                  className="relative text-amber-100 -translate-x-px"
-                />
+                {loading ? (
+                  <div className="h-4 w-4 animate-spin rounded-full border-2 border-amber-100 border-t-transparent" />
+                ) : (
+                  <Send
+                    size={14}
+                    strokeWidth={2}
+                    className="relative text-amber-100 -translate-x-px"
+                  />
+                )}
               </button>
             </div>
 
