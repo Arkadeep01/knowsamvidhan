@@ -1,7 +1,7 @@
 "use client";
 
 import Script from "next/script";
-import { useState, useRef, useEffect } from "react";
+import { useState, useRef, useEffect, Fragment } from "react";
 import Image from "next/image";
 import Link from "next/link";
 import {
@@ -26,6 +26,26 @@ import {
   AlignLeft,
   ArrowUpRight,
 } from "lucide-react";
+import { motion } from "framer-motion";
+
+interface Conversation {
+  id: string;
+  title?: string;
+  createdAt: string;
+  updatedAt: string;
+  _count: { messages: number };
+}
+
+interface StoredMessage {
+  id: string;
+  role: "user" | "assistant";
+  content: string;
+  createdAt: string;
+}
+
+interface ConversationDetail extends Conversation {
+  messages: StoredMessage[];
+}
 
 declare global {
   interface Window {
@@ -49,6 +69,8 @@ declare global {
 
 /* ── Types ──────────────────────────────────────────────────────────── */
 type Role = "user" | "ai";
+
+type Suggestion = string;
 interface Message {
   id: string;
   role: Role;
@@ -113,6 +135,31 @@ function now() {
     hour: "2-digit",
     minute: "2-digit",
   });
+}
+
+function welcomeMessage(): Message {
+  return {
+    id: "0",
+    role: "ai",
+    text: "Namaste! I'm **Samvi**, your AI guide to the Constitution of India.\n\nAsk me anything — articles, amendments, fundamental rights, schedules, or any constitutional concept. I'm here to make learning simple and insightful.",
+    time: now(),
+  };
+}
+
+function toUiMessages(storedMessages: StoredMessage[]): Message[] {
+  if (storedMessages.length === 0) {
+    return [welcomeMessage()];
+  }
+
+  return storedMessages.map((msg) => ({
+    id: msg.id,
+    role: msg.role === "assistant" ? "ai" : "user",
+    text: msg.content,
+    time: new Date(msg.createdAt).toLocaleTimeString("en-IN", {
+      hour: "2-digit",
+      minute: "2-digit",
+    }),
+  }));
 }
 
 /* ── Typing indicator ───────────────────────────────────────────────── */
@@ -189,6 +236,44 @@ function Bubble({ msg }: { msg: Message }) {
   );
 }
 
+/* ── Suggestion chips component ─────────────────────── */
+
+type SuggestionChipsProps = {
+  suggestions: Suggestion[];
+  onSelect: (suggestion: Suggestion) => void;
+};
+
+const chipVariants = {
+  hidden: { opacity: 0, y: 10 },
+  visible: (i: number) => ({
+    opacity: 1,
+    y: 0,
+    transition: { delay: i * 0.1, duration: 0.3 },
+  }),
+};
+
+function SuggestionChips({ suggestions, onSelect }: SuggestionChipsProps) {
+  return (
+    <div className="flex flex-wrap gap-2 mt-2">
+      {suggestions.map((s, i) => (
+        <motion.button
+          key={s}
+          custom={i}
+          variants={chipVariants}
+          initial="hidden"
+          animate="visible"
+          whileHover={{ scale: 1.05 }}
+          whileTap={{ scale: 0.95 }}
+          className="rounded-full border border-amber-800/30 bg-amber-100 px-3 py-1 text-sm text-amber-900"
+          onClick={() => onSelect(s)}
+        >
+          {s}
+        </motion.button>
+      ))}
+    </div>
+  );
+}
+
 type ChatMessage = {
   role: "system" |"user" | "assistant";
   content: string;
@@ -204,6 +289,70 @@ const SYSTEM_PROMPT = `
   - Use concise and accurate answers.
   - Use markdown formatting.
 `;
+/* ---- Suggestion generation helpers ---- */
+function parseSuggestions(raw: string): Suggestion[] {
+  try {
+    const parsed = JSON.parse(raw);
+    if (Array.isArray(parsed)) {
+      return parsed.map((s) => String(s));
+    }
+    if (parsed && typeof parsed === "object" && Array.isArray((parsed as any).questions)) {
+      return (parsed as any).questions.map((s: any) => String(s));
+    }
+  } catch {
+    // ignore errors
+  }
+  return [];
+}
+
+/** Generate 7 follow‑up suggestions */
+async function generateSuggestions(userQuestion: string, aiAnswer: string): Promise<Suggestion[]> {
+  const systemPrompt = `
+You are creating follow‑up learning questions for students studying the Constitution of India.
+
+Generate exactly 7 short follow‑up questions.
+
+Requirements:
+* Directly related to the previous answer.
+* Encourage deeper understanding.
+* Less than 8 words each.
+* No numbering.
+* No explanations.
+* No duplicates.
+
+Return ONLY valid JSON:
+[
+  "Question 1",
+  "Question 2",
+  "Question 3",
+  "Question 4",
+  "Question 5",
+  "Question 6",
+  "Question 7"
+]
+`;
+
+  try {
+    const response = await window.puter.ai.chat(
+      [
+        { role: "system", content: systemPrompt },
+        { role: "user", content: `User question:\n${userQuestion}\n\nAI answer:\n${aiAnswer}` },
+      ],
+      { model: "gpt-5.4-nano" }
+    );
+
+    const raw = typeof response?.message?.content === "string"
+      ? response.message.content
+      : typeof response?.content === "string"
+        ? response.content
+        : "";
+
+    return parseSuggestions(raw).slice(0, 7);
+  } catch (e) {
+    console.error("Suggestion generation failed:", e);
+    return [];
+  }
+}
 
 /* ══════════════════════════════════════════════════════════════════════
    MAIN PAGE
@@ -221,45 +370,80 @@ export default function ChatPage() {
   const [input, setInput] = useState("");
   const [typing, setTyping] = useState(false);
   const [sidebarOpen, setSidebarOpen] = useState(false);
+  const [conversations, setConversations] = useState<Conversation[]>([]);
+  const [activeConversationId, setActiveConversationId] = useState<string | null>(null);
+  const [user, setUser] = useState<{ id: string; name?: string; email: string } | null>(null);
+  const [followUpSuggestions, setFollowUpSuggestions] = useState<Suggestion[]>([]);
+  const [showAllSuggestions, setShowAllSuggestions] = useState(false);
   const bottomRef = useRef<HTMLDivElement>(null);
   const inputRef = useRef<HTMLTextAreaElement>(null);
 
   useEffect(() => {
-    const saved = localStorage.getItem("samvi-chat");
-
-    if (saved) {
+    const loadProfileAndConversations = async () => {
       try {
-        const parsed = JSON.parse(saved);
-        
-        type StoredMessage = {
-          role: string;
-          content: string;
+        const profileRes = await fetch("/api/auth/profile");
+        if (profileRes.ok) {
+          const profile = await profileRes.json();
+          setUser(profile.user);
         }
-        
-        const converted: Message[] = parsed.map((msg: StoredMessage, index: number) => ({
-          id: `${index}`,
-          role: msg.role === "assistant" ? "ai" : "user",
-          text: msg.content,
-          time: now(),
-        }));
 
-        setMessages(converted);
-      } catch {}
-    }
+        const conversationsRes = await fetch("/api/conversations");
+        if (conversationsRes.ok) {
+          const conversationsData = await conversationsRes.json();
+          setConversations(conversationsData);
+          
+          if (conversationsData.length > 0) {
+            setActiveConversationId(conversationsData[0].id);
+          }
+        }
+      } catch (error) {
+        console.error("Failed to load profile/conversations:", error);
+      }
+    };
+
+    loadProfileAndConversations();
   }, []);
+
+  useEffect(() => {
+    if (activeConversationId) {
+      const saved = localStorage.getItem(`samvi-chat-${activeConversationId}`);
+      if (saved) {
+        try {
+          const parsed = JSON.parse(saved);
+          const converted: Message[] = parsed.map((msg: { role: string; content: string }, index: number) => ({
+            id: `${index}`,
+            role: msg.role === "assistant" ? "ai" : "user",
+            text: msg.content,
+            time: now(),
+          }));
+          setMessages(converted);
+        } catch (error) {
+          console.error("Failed to parse saved messages:", error);
+        }
+      } else {
+        setMessages([{
+          id: "0",
+          role: "ai",
+          text: "Namaste! I'm **Samvi**, your AI guide to the Constitution of India.\n\nAsk me anything — articles, amendments, fundamental rights, schedules, or any constitutional concept. I'm here to make learning simple and insightful.",
+          time: now(),
+        }]);
+      }
+    }
+  }, [activeConversationId]);
 
   useEffect(() => {
     bottomRef.current?.scrollIntoView({ behavior: "smooth" });
   }, [messages, typing]);
 
   useEffect(() => {
-    const storageMessages = messages.map((msg) => ({
-      role: msg.role === "ai" ? "assistant" : "user",
-      content: msg.text,
-    }));
-
-    localStorage.setItem("samvi-chat", JSON.stringify(storageMessages));
-  }, [messages]);
+    if (activeConversationId) {
+      const storageMessages = messages.map((msg) => ({
+        role: msg.role === "ai" ? "assistant" : "user",
+        content: msg.text,
+      }));
+      localStorage.setItem(`samvi-chat-${activeConversationId}`, JSON.stringify(storageMessages));
+    }
+  }, [messages, activeConversationId]);
 
   // ANTROPIC ARCHITECTURAL SEND FUNCTION
   // const send = (text: string) => {
@@ -290,6 +474,10 @@ export default function ChatPage() {
 
   const send = async (text: string) => {
     if (!text.trim() || loading) return;
+
+    // Reset previous follow‑up suggestions for a new turn
+    setFollowUpSuggestions([]);
+    setShowAllSuggestions(false);
 
     const userMsg: Message = {
       id: Date.now().toString(),
@@ -348,6 +536,30 @@ export default function ChatPage() {
       };
 
       setMessages((prev) => [...prev, aiMsg]);
+
+      // Generate follow‑up suggestions based on the latest exchange
+      try {
+        console.log("AI response:", aiText);
+        const suggestions = await generateSuggestions(text.trim(), aiText);
+        console.log("Suggestions response:", suggestions);
+        setFollowUpSuggestions(suggestions);
+      } catch (sErr) {
+        console.error("Failed to generate suggestions:", sErr);
+      }
+
+      // Sync messages to database if user is logged in
+      if (user && activeConversationId) {
+        await fetch(`/api/conversations/${activeConversationId}/messages`, {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ role: "user", content: text.trim() }),
+        });
+        await fetch(`/api/conversations/${activeConversationId}/messages`, {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ role: "assistant", content: aiText }),
+        });
+      }
     } catch (error) {
       const errorMsg: Message = {
         id: (Date.now() + 1).toString(),
@@ -370,26 +582,46 @@ export default function ChatPage() {
     }
   };
 
-  const clearChat = () => {
-    localStorage.removeItem("samvi-chat");
+  const clearChat = async () => {
+    if (activeConversationId) {
+      await fetch(`/api/conversations/${activeConversationId}`, {
+        method: "DELETE",
+      });
+      
+      // Remove from conversations list
+      setConversations(prev => prev.filter(conv => conv.id !== activeConversationId));
+    }
 
-    setMessages([
-      {
-        id: "reset",
-        role: "ai",
-        text: "Chat cleared. Ready for your next constitutional question.",
-        time: now(),
-      },
-    ]);
+    // Create new conversation
+    if (user) {
+      const response = await fetch("/api/conversations", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ title: "New Conversation" }),
+      });
+      
+      if (response.ok) {
+        const newConversation = await response.json();
+        setActiveConversationId(newConversation.id);
+        setConversations(prev => [newConversation, ...prev]);
+      }
+    } else {
+      setActiveConversationId(null);
+    }
+
+setMessages([
+  {
+    id: "reset",
+    role: "ai",
+    text: "Chat cleared. Ready for your next constitutional question.",
+    time: now(),
+  },
+]);
+
+// Reset suggestions after chat clear
+setFollowUpSuggestions([]);
+setShowAllSuggestions(false);
   };
-
-  const history = [
-    { label: "Article 21 — Right to Life", time: "Today", icon: Hash },
-    { label: "Fundamental Rights overview", time: "Today", icon: Scale },
-    { label: "42nd Amendment explained", time: "Yesterday", icon: RefreshCw },
-    { label: "Directive Principles vs FR", time: "2 days ago", icon: Layers },
-    { label: "Preamble deep dive", time: "3 days ago", icon: AlignLeft },
-  ];
 
   return (
     <div className="flex h-screen w-full overflow-hidden bg-[#f7f5f2] font-[system-ui]">
@@ -467,73 +699,84 @@ export default function ChatPage() {
           </button>
         </div>
 
-        {/* History */}
-        <div className="flex-1 overflow-y-auto px-3 pb-4">
-          <p className="mb-2 px-2 text-[9px] font-bold uppercase tracking-[2px] text-slate-400">
-            Recent Chats
-          </p>
-          <div className="flex flex-col gap-0.5">
-            {history.map((h, i) => {
-              const Icon = h.icon;
-              return (
-                <button
-                  key={i}
-                  className={`
-                    group flex w-full items-center gap-2.5 rounded-xl px-3 py-2.5 text-left
-                    transition-all duration-150
-                    ${
-                      i === 0
-                        ? "bg-amber-950/6 border-[1.5px] border-amber-800/25"
-                        : "hover:bg-slate-50 border-[1.5px] border-transparent"
-                    }
-                  `}
-                >
-                  <Icon
-                    size={13}
-                    strokeWidth={2}
-                    className={
-                      i === 0
-                        ? "text-amber-800 shrink-0"
-                        : "text-slate-400 shrink-0 group-hover:text-slate-600"
-                    }
-                  />
-                  <div className="flex-1 min-w-0">
-                    <span
-                      className={`block text-[12px] font-medium leading-snug truncate ${
-                        i === 0
-                          ? "text-amber-900"
-                          : "text-slate-700 group-hover:text-slate-900"
-                      }`}
-                    >
-                      {h.label}
-                    </span>
-                    <span className="flex items-center gap-1 text-[10px] text-slate-400 mt-0.5">
-                      <Clock size={9} strokeWidth={2} />
-                      {h.time}
-                    </span>
-                  </div>
-                  <ChevronRight
-                    size={12}
-                    strokeWidth={2}
-                    className="text-slate-300 group-hover:text-slate-500 shrink-0 transition-colors"
-                  />
-                </button>
-              );
-            })}
+          {/* History */}
+          <div className="flex-1 overflow-y-auto px-3 pb-4">
+            <p className="mb-2 px-2 text-[9px] font-bold uppercase tracking-[2px] text-slate-400">
+              Recent Chats
+            </p>
+            <div className="flex flex-col gap-0.5">
+              {conversations.map((conv) => {
+                const isActive = conv.id === activeConversationId;
+                const title = conv.title || `Chat ${new Date(conv.updatedAt).toLocaleDateString()}`;
+                const date = new Date(conv.updatedAt);
+                const timeStr = date.toLocaleDateString() === new Date().toLocaleDateString()
+                  ? "Today"
+                  : date.toLocaleDateString() === new Date(Date.now() - 86400000).toLocaleDateString()
+                  ? "Yesterday"
+                  : `${Math.floor((Date.now() - date.getTime()) / 86400000)} days ago`;
+
+                return (
+                  <button
+                    key={conv.id}
+                    onClick={() => setActiveConversationId(conv.id)}
+                    className={`
+                      group flex w-full items-center gap-2.5 rounded-xl px-3 py-2.5 text-left
+                      transition-all duration-150
+                      ${
+                        isActive
+                          ? "bg-amber-950/6 border-[1.5px] border-amber-800/25"
+                          : "hover:bg-slate-50 border-[1.5px] border-transparent"
+                      }
+                    `}
+                  >
+                    <Hash
+                      size={13}
+                      strokeWidth={2}
+                      className={
+                        isActive
+                          ? "text-amber-800 shrink-0"
+                          : "text-slate-400 shrink-0 group-hover:text-slate-600"
+                      }
+                    />
+                    <div className="flex-1 min-w-0">
+                      <span
+                        className={`block text-[12px] font-medium leading-snug truncate ${
+                          isActive
+                            ? "text-amber-900"
+                            : "text-slate-700 group-hover:text-slate-900"
+                        }`}
+                      >
+                        {title}
+                      </span>
+                      <span className="flex items-center gap-1 text-[10px] text-slate-400 mt-0.5">
+                        <Clock size={9} strokeWidth={2} />
+                        {timeStr} · {conv._count.messages} messages
+                      </span>
+                    </div>
+                    <ChevronRight
+                      size={12}
+                      strokeWidth={2}
+                      className="text-slate-300 group-hover:text-slate-500 shrink-0 transition-colors"
+                    />
+                  </button>
+                );
+              })}
+            </div>
           </div>
-        </div>
 
         {/* Sidebar footer */}
         <div className="border-t-[1.5px] border-slate-200 px-4 py-3">
           <div className="flex items-center gap-2.5 rounded-xl border-[1.5px] border-transparent p-2 hover:border-slate-200 hover:bg-slate-50 transition-all cursor-pointer">
             <div className="flex h-8 w-8 items-center justify-center rounded-full bg-amber-900 border-[1.5px] border-amber-800 text-[11px] font-bold text-amber-100 shadow-sm shrink-0">
-              U
+              {user ? user.name?.[0]?.toUpperCase() || "U" : "G"}
             </div>
             <div className="flex-1 min-w-0">
               <p className="text-[12.5px] font-semibold text-slate-800 truncate">
-                Guest User
+                {user ? user.name || user.email : "Guest User"}
               </p>
-              <p className="text-[10px] text-slate-400">Free plan</p>
+              <p className="text-[10px] text-slate-400">
+                {user ? "Paid plan" : "Free plan"}
+              </p>
             </div>
             <Settings
               size={13}
@@ -687,25 +930,43 @@ export default function ChatPage() {
             </div>
           )}
 
-          {/* Messages */}
-          <div className="flex flex-col gap-5">
-            {messages.map((msg) => (
-              <Bubble key={msg.id} msg={msg} />
-            ))}
+{/* Messages */}
+<div className="flex flex-col gap-5">
+  {messages.map((msg, idx) => (
+    <Fragment key={msg.id}>
+      <Bubble msg={msg} />
+      {msg.role === "ai" && idx === messages.length - 1 && followUpSuggestions.length > 0 && (
+        <div className="pl-12">
+          <SuggestionChips
+            suggestions={showAllSuggestions ? followUpSuggestions : followUpSuggestions.slice(0, 4)}
+            onSelect={send}
+          />
+          {!showAllSuggestions && followUpSuggestions.length > 4 && (
+            <button
+              onClick={() => setShowAllSuggestions(true)}
+              className="mt-1 text-sm text-amber-800 underline"
+            >
+              Show More
+            </button>
+          )}
+        </div>
+      )}
+    </Fragment>
+  ))}
 
-            {/* Typing indicator */}
-            {typing && (
-              <div className="flex items-end gap-3">
-                <div className="flex h-8 w-8 shrink-0 items-center justify-center rounded-full border-[1.5px] border-amber-800/50 bg-amber-950/6">
-                  <Zap size={14} strokeWidth={2} className="text-amber-800" />
-                </div>
-                <div className="rounded-2xl rounded-bl-sm border-[1.5px] border-slate-200 bg-white shadow-sm">
-                  <TypingDots />
-                </div>
-              </div>
-            )}
-            <div ref={bottomRef} />
-          </div>
+  {/* Typing indicator */}
+  {typing && (
+    <div className="flex items-end gap-3">
+      <div className="flex h-8 w-8 shrink-0 items-center justify-center rounded-full border-[1.5px] border-amber-800/50 bg-amber-950/6">
+        <Zap size={14} strokeWidth={2} className="text-amber-800" />
+      </div>
+      <div className="rounded-2xl rounded-bl-sm border-[1.5px] border-slate-200 bg-white shadow-sm">
+        <TypingDots />
+      </div>
+    </div>
+  )}
+  <div ref={bottomRef} />
+</div>
         </div>
 
         {/* ── INPUT BAR ── */}
