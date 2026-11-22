@@ -257,6 +257,57 @@ model ChatMessage {
   metadata Json?
 }
 
+model EvaluationRun {
+  id String @id @default(uuid())
+  benchmarkVersion String
+  modelId String
+  promptVersion String
+  retrievalK Int
+  totalCases Int
+  passedCases Int
+  failedCases Int
+  skippedCases Int
+  citationAccuracy Decimal
+  groundingRate Decimal
+  unsupportedClaimRate Decimal
+  unverifiableCitationRate Decimal
+  citationVerificationCoverage Decimal
+  retrievalRelevance Decimal
+  evidenceSufficiency Decimal
+  evaluationFailureRate Decimal
+  averageLatencyMs Int
+  status String
+  startedAt DateTime
+  completedAt DateTime?
+  cases EvaluationCaseResult[]
+  @@index([benchmarkVersion])
+  @@index([status])
+  @@index([startedAt])
+}
+
+model EvaluationCaseResult {
+  id String @id @default(uuid())
+  evaluationRunId String
+  benchmarkCaseId String
+  query String
+  generatedAnswer Text?
+  citations Text[]
+  verificationStatus String
+  verificationDetails Json?
+  retrievalStatus String
+  retrievalDetails Json?
+  generationStatus String
+  generationDetails Json?
+  evaluationError Text?
+  skippedReason String
+  startedAt DateTime @default(now())
+  completedAt DateTime?
+  
+  @@index([evaluationRunId])
+  @@index([benchmarkCaseId])
+  @@index([verificationStatus])
+}
+
 model ChatbotQuery {
   id        String   @id @default(uuid())
   category  String
