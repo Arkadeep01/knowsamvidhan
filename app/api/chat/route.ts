@@ -1,19 +1,16 @@
 import { NextRequest, NextResponse } from "next/server";
 
-/* ------------------------------------------------------------------
-   FUTURE PRODUCTION CONFIG (COMMENTED OUT)
+import { GoogleGenAI } from "@google/genai";
 
-const ANTHROPIC_API = "https://api.anthropic.com/v1/messages";
-const ANTHROPIC_VERSION = "2023-06-01";
+const ai = new GoogleGenAI({
+  apiKey: process.env.GEMINI_API_KEY!,
+});
 
-const MODELS = {
-  classifier: "claude-haiku-4-5-20251001",
-  responder: "claude-sonnet-4-20250514",
-} as const;
+const PRIMARY_MODEL = "gemini-3.5-flash-lite";
+const FALLBACK_MODEL = "gemini-3.5-flash";
 
-------------------------------------------------------------------- */
-
-export const runtime = "edge";
+const MAX_ATTEMPTS = 2;
+const BACKOFF_MS = 800;
 
 interface ApiMessage {
   role: "user" | "assistant";
@@ -25,7 +22,7 @@ interface RequestBody {
 }
 
 const LIMITS = {
-  maxMessageLength: 2000,
+  maxMessageLength: 4000,
   maxMessages: 40,
 } as const;
 
@@ -130,6 +127,116 @@ function sanitizeMessages(
   return cleaned.slice(-LIMITS.maxMessages);
 }
 
+async function generateWithGemini(
+  messages: ApiMessage[],
+  model: string,
+  attempt = 1
+): Promise<{
+  success: boolean;
+  response: unknown;
+  isFallbackUsed: boolean;
+  error?: string;
+}> {
+  try {
+    const lastUserMessage =
+      messages[messages.length - 1]?.content ?? "";
+
+    const systemInstruction =
+      "You are Samvi, a constitutional AI assistant knowledgeable about the Constitution of India. Provide accurate, grounded responses with citations to articles, cases, and amendments when applicable. Use a helpful, educational tone.";
+
+    const response = await ai.models.generateContent({
+      model,
+      contents: [
+        {
+          role: "user",
+          parts: [{ text: systemInstruction }, { text: lastUserMessage }],
+        },
+      ],
+    });
+
+    return {
+      success: true,
+      response,
+      isFallbackUsed: false,
+    };
+  } catch (error) {
+    const oError = error as { error: { code?: string }; message?: string };
+    const errorCode = oError.error?.code;
+    const errorMessage = oError.message || "Unknown error";
+
+    // Non-recoverable errors: don't fallback (auth, invalid request, forbidden)
+    if (
+      errorCode === 400 ||
+      errorCode === 401 ||
+      errorCode === 403 ||
+      errorCode === 422 ||
+      errorCode === 404
+    ) {
+      return {
+        success: false,
+        response: null,
+        isFallbackUsed: false,
+        error: `Non-recoverable error (attempt ${attempt}): ${errorCode || 'unknown'}`,
+      };
+    }
+
+    // Transient errors (503, 429, overloaded): attempt fallback on first attempt only
+    if (attempt < MAX_ATTEMPTS) {
+      const isTransient =
+        errorCode === 503 ||
+        errorCode === 429 ||
+        errorMessage.includes("high demand") ||
+        errorMessage.includes("overloaded");
+
+      if (isTransient) {
+        // Brief backoff before fallback attempt
+        await new Promise((r) => setTimeout(r, BACKOFF_MS));
+
+        // Try fallback model
+        try {
+          const fallbackResponse = await ai.models.generateContent({
+            model: FALLBACK_MODEL,
+            contents: [
+              {
+                role: "user",
+                parts: [{ text: "You are Samvi, a constitutional AI assistant knowledgeable about the Constitution of India. Provide accurate, grounded responses with citations to articles, cases, and amendments when applicable. Use a helpful, educational tone." },],
+              }
+            ],
+          });
+
+          return {
+            success: true,
+            response: fallbackResponse,
+            isFallbackUsed: true,
+          };
+        } catch (fallbackError) {
+          const oFallbackError = fallbackError as { message?: string };
+          return {
+            success: false,
+            response: null,
+            isFallbackUsed: false,
+            error: `Fallback model also failed: ${oFallbackError.message || 'unknown'}`,
+          };
+        }
+      }
+
+      return {
+        success: false,
+        response: null,
+        isFallbackUsed: false,
+        error: `Transient error (attempt ${attempt}): ${errorCode || 'unknown'}`,
+      };
+    }
+
+    return {
+      success: false,
+      response: null,
+      isFallbackUsed: false,
+      error: `Max attempts reached: ${errorCode || 'unknown'}`,
+    };
+  }
+}
+
 export async function POST(req: NextRequest) {
   let body: unknown;
 
@@ -166,12 +273,93 @@ export async function POST(req: NextRequest) {
   const latestUserMessage =
     messages[messages.length - 1]?.content ?? "";
 
+  const generation = await generateWithGemini(
+    messages,
+    PRIMARY_MODEL
+  );
+
+  if (!generation.success) {
+    const errorReason = generation.error || "Generation failed";
+
+    // Do not fallback for non-recoverable errors (400, 401, 403, 422, 404)
+    if (generation.isFallbackUsed === false) {
+      // Check if it's a model unavailability error that might warrant fallback
+      const isModelUnavailable =
+        generation.error?.includes("503") ||
+        generation.error?.includes("429") ||
+        generation.error?.includes("not available");
+
+      if (isModelUnavailable) {
+        // Attempt fallback for model unavailability
+        const fallbackGeneration = await generateWithGemini(
+          messages,
+          FALLBACK_MODEL,
+          1
+        );
+
+        if (fallbackGeneration.success) {
+          const responseText =
+            fallbackGeneration.response?.candidates?.[0]?.content?.parts?.[0]?.text ||
+            "Response generated via fallback model.";
+
+          return NextResponse.json({
+            success: true,
+            provider: "gemini",
+            model: FALLBACK_MODEL,
+            fallback: true,
+            message: responseText,
+            prompt: latestUserMessage,
+          });
+        }
+      }
+
+      return NextResponse.json(
+        {
+          error: errorReason,
+        },
+        {
+          status: 500,
+        }
+      );
+    }
+
+    // Fallback was used successfully
+    if (generation.isFallbackUsed === true) {
+      const responseText =
+        generation.response?.candidates?.[0]?.content?.parts?.[0]?.text ||
+        "Response generated.";
+
+      return NextResponse.json({
+        success: true,
+        provider: "gemini",
+        model: FALLBACK_MODEL,
+        fallback: true,
+        message: responseText,
+        prompt: latestUserMessage,
+      });
+    }
+
+    // Fallback was attempted but failed; return original error
+    return NextResponse.json(
+      {
+        error: errorReason,
+      },
+      {
+        status: 500,
+      }
+    );
+  }
+
+  const responseText =
+    generation.response?.candidates?.[0]?.content?.parts?.[0]?.text ||
+    "Response generated.";
+
   return NextResponse.json({
     success: true,
-    provider: "puter",
-    demoMode: true,
-    message:
-      "Frontend should send this prompt directly to Puter AI.",
+    provider: "gemini",
+    model: generation.isFallbackUsed ? FALLBACK_MODEL : PRIMARY_MODEL,
+    fallback: generation.isFallbackUsed,
+    message: responseText,
     prompt: latestUserMessage,
   });
 }

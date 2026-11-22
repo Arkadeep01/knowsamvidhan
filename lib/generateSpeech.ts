@@ -1,12 +1,12 @@
 import { GoogleGenAI } from "@google/genai";
 
 export const ai = new GoogleGenAI({
-  apiKey: process.env.NEXT_PUBLIC_GEMINI_API_KEY!,
+  apiKey: process.env.GEMINI_API_KEY!,
 });
 
 export const GEMINI_MODELS = [
   "gemini-2.5-flash-preview-tts",
-  "gemini-2.5-pro-preview-tts",
+  "gemini-3.1-flash-tts-preview",
 ];
 
 export function pcmToWav(

@@ -84,7 +84,7 @@ const SEMANTIC_VERIFICATION_THRESHOLD = 0.65;
    ====================================================================== */
 
 const AI = new GoogleGenAI({
-  apiKey: process.env.NEXT_PUBLIC_GEMINI_API_KEY,
+  apiKey: process.env.GEMINI_API_KEY,
 });
 
 /* ======================================================================

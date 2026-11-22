@@ -14,8 +14,12 @@ async function tryGeminiProviders(
   text: string,
   voiceName: string
 ) {
+  const attemptedModels: string[] = [];
+
   for (const model of GEMINI_MODELS) {
     try {
+      attemptedModels.push(model);
+
       console.log(
         `[TTS] Trying Gemini model: ${model}`
       );
@@ -39,7 +43,7 @@ async function tryGeminiProviders(
     }
   }
 
-  return null;
+  return { attemptedModels, error: new Error("All Gemini models failed") };
 }
 
 async function tryGrokProvider(
@@ -183,13 +187,12 @@ export async function POST(
      --------------------------------
     */
 
-    const geminiResult =
-      await tryGeminiProviders(
+const geminiResult = await tryGeminiProviders(
         text,
         voiceName
       );
 
-    if (geminiResult) {
+    if (geminiResult.audio) {
       return NextResponse.json({
         provider:
           geminiResult.provider,
@@ -200,8 +203,19 @@ export async function POST(
 
     /*
      --------------------------------
-     GROK FALLBACK
+      GEMINI FALLBACK LOGGING
+      --------------------------------
+    */
+    const attemptedModels = (geminiResult as { attemptedModels?: string[] })
+  .attemptedModels;
+console.log(
+  `[TTS] Gemini models attempted: ${attemptedModels?.join(", ") || "none"}`
+);
+
+    /*
      --------------------------------
+      GROK FALLBACK
+      --------------------------------
     */
 
     console.log(
