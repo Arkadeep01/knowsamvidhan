@@ -67,7 +67,7 @@ declare global {
   }
 }
 
-/* ── Types ──────────────────────────────────────────────────────────── */
+/* â”€â”€ Types â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€ */
 type Role = "user" | "ai";
 
 type Suggestion = string;
@@ -78,7 +78,7 @@ interface Message {
   time: string;
 }
 
-/* ── Suggested prompts ──────────────────────────────────────────────── */
+/* â”€â”€ Suggested prompts â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€ */
 const suggestions = [
   {
     icon: Hash,
@@ -115,7 +115,7 @@ const suggestions = [
   {
     icon: Landmark,
     label: "What are Directive Principles?",
-    sub: "Part IV — DPSP",
+    sub: "Part IV â€” DPSP",
     color:
       "border-violet-800/40 bg-violet-950/5 text-violet-900 hover:border-violet-800/70 hover:bg-violet-950/10",
     iconColor: "text-violet-800",
@@ -141,7 +141,7 @@ function welcomeMessage(): Message {
   return {
     id: "0",
     role: "ai",
-    text: "Namaste! I'm **Samvi**, your AI guide to the Constitution of India.\n\nAsk me anything — articles, amendments, fundamental rights, schedules, or any constitutional concept. I'm here to make learning simple and insightful.",
+    text: "Namaste! I'm **Samvi**, your AI guide to the Constitution of India.\n\nAsk me anything â€” articles, amendments, fundamental rights, schedules, or any constitutional concept. I'm here to make learning simple and insightful.",
     time: now(),
   };
 }
@@ -162,7 +162,7 @@ function toUiMessages(storedMessages: StoredMessage[]): Message[] {
   }));
 }
 
-/* ── Typing indicator ───────────────────────────────────────────────── */
+/* â”€â”€ Typing indicator â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€ */
 function TypingDots() {
   return (
     <div className="flex items-center gap-1.5 px-4 py-3.5">
@@ -177,12 +177,145 @@ function TypingDots() {
   );
 }
 
-/* ── Message bubble ─────────────────────────────────────────────────── */
+/* â”€â”€ Message bubble â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€ */
 function Bubble({ msg }: { msg: Message }) {
   const isAI = msg.role === "ai";
+  const metadata = msg._metadata || {};
+  const verification = metadata.verification;
+
+  // Parse citation and verification info from metadata
+  const citationStatus = verification?.status;
+  const provenance = verification?.provenance || {};
+  const evidencePassages = verification?.evidencePassages || [];
+  const explanation = verification?.explanation || "";
+
   return (
     <div
-      className={`flex items-end gap-3 ${isAI ? "flex-row" : "flex-row-reverse"}`}
+      className={"flex items-end gap-3 " + (isAI ? "flex-row" : "flex-row-reverse")}
+    >
+      {/* Avatar */}
+      {isAI ? (
+        <div className="relative flex h-8 w-8 shrink-0 items-center justify-center overflow-hidden rounded-full border-[1.5px] border-amber-800/50 bg-amber-950/8 shadow-sm">
+          <Zap size={14} strokeWidth={2} className="text-amber-800" />
+        </div>
+      ) : (
+        <div className="flex h-8 w-8 shrink-0 items-center justify-center rounded-full border-[1.5px] border-slate-300 bg-slate-100 shadow-sm">
+          <span className="text-[11px] font-bold text-slate-600 tracking-tight">
+            U
+          </span>
+        </div>
+      )}
+
+      <div
+        className={"flex max-w-[75%] sm:max-w-[68%] flex-col gap-1 " + (isAI ? "items-start" : "items-end")}
+      >
+        <div
+          className={"relative rounded-2xl px-4 py-3 text-[13.5px] leading-[1.8] " + (isAI ? "rounded-bl-sm bg-white border-[1.5px] border-slate-200 text-slate-800 shadow-sm" : "rounded-br-sm bg-amber-900 text-amber-50 shadow-md")}
+        >
+          {/* Display verification status badge for AI messages */}
+          {isAI && citationStatus && (
+            <div
+              className={"absolute top-2 right-2 flex items-center gap-2 px-2 py-1 text-[9px] font-medium rounded border " + (citationStatus === "VERIFIED" ? "bg-green-100 text-green-800 border-green-300" : citationStatus === "PARTIALLY_SUPPORTED" ? "bg-amber-100 text-amber-800 border-amber-300" : citationStatus === "UNSUPPORTED" ? "bg-red-100 text-red-800 border-red-300" : "bg-gray-100 text-gray-800 border-gray-300")}
+            >
+              {citationStatus}
+            </div>
+          )}
+
+          {msg.text.split("\n").map((line, i) => (
+            <p key={i} className={line === "" ? "h-2" : ""}>
+              {line.split(/(\*\*[^*]+\*\*)/g).map((chunk, j) => (
+                chunk.startsWith("\*\*") && chunk.endsWith("\*\*") ? (
+                  <strong key={j} className={isAI ? "font-semibold text-slate-900" : "font-semibold"}>
+                    {chunk.slice(2, -2)}
+                  </strong>
+                ) : chunk.startsWith("*") && chunk.endsWith("*") ? (
+                  <em key={j} className="italic opacity-80">
+                    {chunk.slice(1, -1)}
+                  </em>
+                ) : (
+                  citationStatus &&
+                  (chunk.includes("Article") ||
+                    chunk.includes("article") ||
+                    chunk.includes("Amendment") ||
+                    chunk.includes("amendment") ||
+                    chunk.includes("v.") ||
+                    chunk.includes("vs") ||
+                    chunk.includes("Judgment") ||
+                    chunk.includes("judgment")) &&
+                  !chunk.startsWith("<") && !chunk.startsWith(">") ? (
+                    <span key={j} className="relative inline-block pr-2">
+                      {chunk}
+                      {/* Citation type indicator - very subtle */}
+                      {isAI && provenance.sourceType && (
+                        <span key={`cite-type-${j}`} className="text-[xxs] opacity-40">
+                          {provenance.sourceType}
+                        </span>
+                      )}
+                    </span>
+                  ) : chunk
+                )
+              ))}
+            </p>
+          ))}
+          {/* Evidence passage display - for AI messages with verification */}
+          {isAI && evidencePassages.length > 0 && (
+            <div
+              className={"mt-3 p-3 text-[10px] text-slate-500 rounded-sm border-t-2 " + (citationStatus === "VERIFIED" || citationStatus === "PARTIALLY_SUPPORTED" ? "bg-amber-50 border-amber-200" : citationStatus === "UNSUPPORTED" ? "bg-red-50 border-red-200" : "bg-gray-50 border-gray-200")}
+            >
+              {citationStatus === "VERIFIED" ? (
+                <div className="flex items-start gap-2">
+                  <Landmark size={8} strokeWidth={1.5} className="text-amber-600 flex-shrink-0 mt-0.5" />
+                  <span className="flex-1">
+                    <strong>Supported by constitutional text:</strong> {evidencePassages[0]}
+                  </span>
+                </div>
+              ) : citationStatus === "PARTIALLY_SUPPORTED" ? (
+                <div className="flex items-start gap-2">
+                  <Layers size={8} strokeWidth={1.5} className="text-amber-600 flex-shrink-0 mt-0.5" />
+                  <span className="flex-1">
+                    <strong>Partial support:</strong> {evidencePassages[0]}
+                  </span>
+                )
+              : citationStatus === "UNSUPPORTED" ? (
+                <div className="flex items-start gap-2">
+                  <X size={8} strokeWidth={1.5} className="text-rose-600 flex-shrink-0 mt-0.5" />
+                  <span className="flex-1">
+                    <strong>Not supported:</strong> {evidencePassages[0]}
+                  </span>
+                )
+              : (
+                <div className="flex items-start gap-2">
+                  <Clock size={8} strokeWidth={1.5} className="text-slate-600 flex-shrink-0 mt-0.5" />
+                  <span className="flex-1">
+                    <strong>Unverified:</strong> {evidencePassages[0]}
+                  </span>
+                </div>
+              )}
+            </div>
+          )}
+          {/* Citations reference line - for AI messages */}
+          {isAI && citationStatus && provenance.articleClauseRef && (
+            <div
+              className={"mt-2 pt-2 border-t border-slate-200/30 text-[10px] text-slate-400 flex flex-col gap-1"}
+            >
+              <span>
+                {provenance.sourceTitle || "Citation"}
+                {provenance.articleClauseRef ? " · " + provenance.articleClauseRef : ""}
+                {provenance.court ? " (" + provenance.court + ")" : ""}
+                {provenance.judgmentYear ? " (" + provenance.judgmentYear + ")" : ""}
+              </span>
+              {explanation && (
+                <div className="mt-1 text-[xxs] opacity-70">
+                  {explanation}
+                </div>
+              )}
+            </div>
+          )}
+        </div>
+        <span className="text-[10px] text-slate-400 px-1">{msg.time}</span>
+      </div>
+    </div>
+  );
     >
       {/* Avatar */}
       {isAI ? (
@@ -236,7 +369,7 @@ function Bubble({ msg }: { msg: Message }) {
   );
 }
 
-/* ── Suggestion chips component ─────────────────────── */
+/* â”€â”€ Suggestion chips component â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€ */
 
 type SuggestionChipsProps = {
   suggestions: Suggestion[];
@@ -305,12 +438,12 @@ function parseSuggestions(raw: string): Suggestion[] {
   return [];
 }
 
-/** Generate 7 follow‑up suggestions */
+/** Generate 7 followâ€‘up suggestions */
 async function generateSuggestions(userQuestion: string, aiAnswer: string): Promise<Suggestion[]> {
   const systemPrompt = `
-You are creating follow‑up learning questions for students studying the Constitution of India.
+You are creating followâ€‘up learning questions for students studying the Constitution of India.
 
-Generate exactly 7 short follow‑up questions.
+Generate exactly 7 short followâ€‘up questions.
 
 Requirements:
 * Directly related to the previous answer.
@@ -354,16 +487,16 @@ Return ONLY valid JSON:
   }
 }
 
-/* ══════════════════════════════════════════════════════════════════════
+/* â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
    MAIN PAGE
-══════════════════════════════════════════════════════════════════════ */
+â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â• */
 export default function ChatPage() {
   const [loading, setLoading] = useState(false);
   const [messages, setMessages] = useState<Message[]>([
     {
       id: "0",
       role: "ai",
-      text: "Namaste! I'm **Samvi**, your AI guide to the Constitution of India.\n\nAsk me anything — articles, amendments, fundamental rights, schedules, or any constitutional concept. I'm here to make learning simple and insightful.",
+      text: "Namaste! I'm **Samvi**, your AI guide to the Constitution of India.\n\nAsk me anything â€” articles, amendments, fundamental rights, schedules, or any constitutional concept. I'm here to make learning simple and insightful.",
       time: now(),
     },
   ]);
@@ -405,30 +538,99 @@ export default function ChatPage() {
   }, []);
 
   useEffect(() => {
-    if (activeConversationId) {
-      const saved = localStorage.getItem(`samvi-chat-${activeConversationId}`);
-      if (saved) {
-        try {
-          const parsed = JSON.parse(saved);
-          const converted: Message[] = parsed.map((msg: { role: string; content: string }, index: number) => ({
-            id: `${index}`,
+    if (!activeConversationId) {
+      setMessages([{
+        id: "0",
+        role: "ai",
+        text: "Namaste! I'm **Samvi**, your AI guide to the Constitution of India.\n\nAsk me anything â€” articles, amendments, fundamental rights, schedules, or any constitutional concept. I'm here to make learning simple and insightful.",
+        time: now(),
+      }]);
+      return;
+    }
+
+    // Try to fetch messages from the backend DB first (includes verification metadata)
+    fetch("/api/conversations/" + activeConversationId)
+      .then((res) => res.json())
+      .then((conv) => {
+        if (conv && conv.messages && conv.messages.length > 0) {
+          // DB messages include metadata - use those
+          const converted: Message[] = conv.messages.map((msg: any, index: number) => ({
+            id: msg.id || `${index}`,
             role: msg.role === "assistant" ? "ai" : "user",
             text: msg.content,
-            time: now(),
+            time: new Date(msg.createdAt).toLocaleTimeString("en-IN", {
+              hour: "2-digit",
+              minute: "2-digit",
+            }),
+            _metadata: msg.metadata || {},
           }));
           setMessages(converted);
-        } catch (error) {
-          console.error("Failed to parse saved messages:", error);
+        } else {
+          // Fall back to localStorage
+          const saved = localStorage.getItem(`samvi-chat-${activeConversationId}`);
+          if (saved) {
+            try {
+              const parsed = JSON.parse(saved);
+              const converted: Message[] = parsed.map((msg: { role: string; content: string }, index: number) => ({
+                id: `${index}`,
+                role: msg.role === "assistant" ? "ai" : "user",
+                text: msg.content,
+                time: now(),
+                _metadata: {}, // no metadata in old localStorage format
+              }));
+              setMessages(converted);
+            } catch (error) {
+              console.error("Failed to parse saved messages:", error);
+              setMessages([{
+                id: "0",
+                role: "ai",
+                text: "Namaste! I'm **Samvi**, your AI guide to the Constitution of India.\n\nAsk me anything â€” articles, amendments, fundamental rights, schedules, or any constitutional concept. I'm here to make learning simple and insightful.",
+                time: now(),
+              }]);
+            }
+          } else {
+            setMessages([{
+              id: "0",
+              role: "ai",
+              text: "Namaste! I'm **Samvi**, your AI guide to the Constitution of India.\n\nAsk me anything â€” articles, amendments, fundamental rights, schedules, or any constitutional concept. I'm here to make learning simple and insightful.",
+              time: now(),
+            }]);
+          }
         }
-      } else {
-        setMessages([{
-          id: "0",
-          role: "ai",
-          text: "Namaste! I'm **Samvi**, your AI guide to the Constitution of India.\n\nAsk me anything — articles, amendments, fundamental rights, schedules, or any constitutional concept. I'm here to make learning simple and insightful.",
-          time: now(),
-        }]);
-      }
-    }
+      })
+      .catch((err) => {
+        console.error("Failed to fetch conversation from DB, falling back to localStorage:", err);
+        // Fall back to localStorage
+        const saved = localStorage.getItem(`samvi-chat-${activeConversationId}`);
+        if (saved) {
+          try {
+            const parsed = JSON.parse(saved);
+            const converted: Message[] = parsed.map((msg: { role: string; content: string }, index: number) => ({
+              id: `${index}`,
+              role: msg.role === "assistant" ? "ai" : "user",
+              text: msg.content,
+              time: now(),
+              _metadata: {}, // no metadata in old localStorage format
+            }));
+            setMessages(converted);
+          } catch (error) {
+            console.error("Failed to parse saved messages:", error);
+            setMessages([{
+              id: "0",
+              role: "ai",
+              text: "Namaste! I'm **Samvi**, your AI guide to the Constitution of India.\n\nAsk me anything â€” articles, amendments, fundamental rights, schedules, or any constitutional concept. I'm here to make learning simple and insightful.",
+              time: now(),
+            }]);
+          }
+        } else {
+          setMessages([{
+            id: "0",
+            role: "ai",
+            text: "Namaste! I'm **Samvi**, your AI guide to the Constitution of India.\n\nAsk me anything â€” articles, amendments, fundamental rights, schedules, or any constitutional concept. I'm here to make learning simple and insightful.",
+            time: now(),
+          }]);
+        }
+      });
   }, [activeConversationId]);
 
   useEffect(() => {
@@ -440,6 +642,7 @@ export default function ChatPage() {
       const storageMessages = messages.map((msg) => ({
         role: msg.role === "ai" ? "assistant" : "user",
         content: msg.text,
+        _metadata: msg._metadata || {},
       }));
       localStorage.setItem(`samvi-chat-${activeConversationId}`, JSON.stringify(storageMessages));
     }
@@ -475,7 +678,7 @@ export default function ChatPage() {
   const send = async (text: string) => {
     if (!text.trim() || loading) return;
 
-    // Reset previous follow‑up suggestions for a new turn
+    // Reset previous followâ€‘up suggestions for a new turn
     setFollowUpSuggestions([]);
     setShowAllSuggestions(false);
 
@@ -537,7 +740,7 @@ export default function ChatPage() {
 
       setMessages((prev) => [...prev, aiMsg]);
 
-      // Generate follow‑up suggestions based on the latest exchange
+      // Generate followâ€‘up suggestions based on the latest exchange
       try {
         console.log("AI response:", aiText);
         const suggestions = await generateSuggestions(text.trim(), aiText);
@@ -548,17 +751,35 @@ export default function ChatPage() {
       }
 
       // Sync messages to database if user is logged in
+      // and capture verification metadata from assistant message response
       if (user && activeConversationId) {
         await fetch(`/api/conversations/${activeConversationId}/messages`, {
           method: "POST",
           headers: { "Content-Type": "application/json" },
           body: JSON.stringify({ role: "user", content: text.trim() }),
         });
-        await fetch(`/api/conversations/${activeConversationId}/messages`, {
+        const assistantResp = await fetch(`/api/conversations/${activeConversationId}/messages`, {
           method: "POST",
           headers: { "Content-Type": "application/json" },
           body: JSON.stringify({ role: "assistant", content: aiText }),
         });
+        const assistantData = await assistantResp.json();
+        
+        // Store verification metadata in localStorage if available
+        if (assistantData?.metadata?.verification) {
+          const storageMessages = messages.map((msg) => ({
+            role: msg.role === "ai" ? "assistant" : "user",
+            content: msg.text,
+            _metadata: msg._metadata || {},
+          }));
+          // Update the last message (assistant) with verification metadata
+          storageMessages[storageMessages.length - 1]._metadata =
+            assistantData.metadata.verification;
+          localStorage.setItem(
+            `samvi-chat-${activeConversationId}`,
+            JSON.stringify(storageMessages)
+          );
+        }
       }
     } catch (error) {
       const errorMsg: Message = {
@@ -625,7 +846,7 @@ setShowAllSuggestions(false);
 
   return (
     <div className="flex h-screen w-full overflow-hidden bg-[#f7f5f2] font-[system-ui]">
-      {/* ══ SIDEBAR ══════════════════════════════════════════════════ */}
+      {/* â•â• SIDEBAR â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â• */}
       {sidebarOpen && (
         <div
           className="fixed inset-0 z-30 bg-black/25 backdrop-blur-[2px] lg:hidden"
@@ -750,7 +971,7 @@ setShowAllSuggestions(false);
                       </span>
                       <span className="flex items-center gap-1 text-[10px] text-slate-400 mt-0.5">
                         <Clock size={9} strokeWidth={2} />
-                        {timeStr} · {conv._count.messages} messages
+                        {timeStr} Â· {conv._count.messages} messages
                       </span>
                     </div>
                     <ChevronRight
@@ -789,7 +1010,7 @@ setShowAllSuggestions(false);
 
       <Script src="https://js.puter.com/v2/" strategy="afterInteractive" />
 
-      {/* ══ MAIN CHAT AREA ═══════════════════════════════════════════ */}
+      {/* â•â• MAIN CHAT AREA â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â• */}
       <div className="relative flex flex-1 flex-col overflow-hidden min-w-0">
         {/* Subtle dot grid background */}
         <div
@@ -801,7 +1022,7 @@ setShowAllSuggestions(false);
           }}
         />
 
-        {/* ── TOP HEADER ── */}
+        {/* â”€â”€ TOP HEADER â”€â”€ */}
         <header className="relative z-10 flex items-center justify-between border-b-[1.5px] border-slate-200 bg-white/85 px-4 py-3 backdrop-blur-xl sm:px-6">
           {/* Accent line */}
           <div className="absolute top-0 left-0 right-0 h-0.5 bg-amber-800" />
@@ -840,7 +1061,7 @@ setShowAllSuggestions(false);
                     fill="currentColor"
                     className="text-emerald-500"
                   />
-                  Online · Constitutional Expert
+                  Online Â· Constitutional Expert
                 </p>
               </div>
             </div>
@@ -865,7 +1086,7 @@ setShowAllSuggestions(false);
           </div>
         </header>
 
-        {/* ── MESSAGES ── */}
+        {/* â”€â”€ MESSAGES â”€â”€ */}
         <div className="relative flex-1 overflow-y-auto px-4 py-6 sm:px-6 lg:px-10">
           {/* Empty state suggestions */}
           {messages.length === 1 && (
@@ -969,7 +1190,7 @@ setShowAllSuggestions(false);
 </div>
         </div>
 
-        {/* ── INPUT BAR ── */}
+        {/* â”€â”€ INPUT BAR â”€â”€ */}
         <div className="relative border-t-[1.5px] border-slate-200 bg-white/90 px-4 py-3 backdrop-blur-xl sm:px-6">
           <div className="absolute top-0 left-0 right-0 h-px `bg-gradient-to-r` from-transparent via-amber-800/20 to-transparent" />
 
@@ -1000,7 +1221,7 @@ setShowAllSuggestions(false);
                 value={input}
                 onChange={(e) => setInput(e.target.value)}
                 onKeyDown={handleKey}
-                placeholder="Ask about any Article, Amendment, or constitutional concept…"
+                placeholder="Ask about any Article, Amendment, or constitutional conceptâ€¦"
                 rows={1}
                 className="flex-1 resize-none bg-transparent py-1.5 text-[13.5px] text-slate-800 placeholder-slate-400 outline-none leading-relaxed"
                 style={{ maxHeight: "120px" }}
@@ -1047,7 +1268,7 @@ setShowAllSuggestions(false);
                 <kbd className="rounded border-[1.5px] border-slate-200 bg-slate-50 px-1 py-0.5 font-mono text-[9px] text-slate-500">
                   Enter
                 </kbd>{" "}
-                to send ·{" "}
+                to send Â·{" "}
                 <kbd className="rounded border-[1.5px] border-slate-200 bg-slate-50 px-1 py-0.5 font-mono text-[9px] text-slate-500">
                   Shift+Enter
                 </kbd>{" "}
