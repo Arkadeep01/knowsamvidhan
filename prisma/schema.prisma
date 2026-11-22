@@ -40,7 +40,7 @@ model RegistrationOTP {
   otpHash      String
   attempts     Int      @default(0)
   expiresAt    DateTime
-  createdAt    DateTime @default(now())
+  createdAt    DateTime @default(now__)
   updatedAt    DateTime @updatedAt
 
   @@index([email])
@@ -54,7 +54,7 @@ model Part {
   range        String
   articles     Int
   description  String?
-  createdAt    DateTime  @default(now())
+  createdAt    DateTime  @default(now__)
   articlesList Article[]
 }
 
@@ -69,8 +69,8 @@ model Article {
   tags              String?
   featured          Boolean  @default(false)
   partId            String
-  createdAt         DateTime @default(now())
-  part              Part     @relation(fields: [partId], references: [id])
+  createdAt         DateTime @default(now__)
+  part              Part     @relation(fields: [partId], references: [id], onDelete: Cascade)
   clauses           Clause[]
 }
 
@@ -78,7 +78,7 @@ model Clause {
   id           String   @id @default(uuid())
   clauseNumber String
   text         String
-  createdAt    DateTime @default(now())
+  createdAt    DateTime @default(now__)
   articleId    String
   article      Article  @relation(fields: [articleId], references: [id], onDelete: Cascade)
 }
@@ -99,11 +99,10 @@ model Preamble {
 model Schedule {
   id          String   @id @default(uuid())
   shortId     String
-  schedule    String
   title       String
   description String?
   topics      String   @default("")
-  createdAt   DateTime @default(now())
+  createdAt   DateTime @default(now__)
   updatedAt   DateTime @updatedAt
   slug        String   @unique
   tagDetails  String   @default("[]")
@@ -116,8 +115,7 @@ model Amendment {
   title           String
   summary         String
   whyItMatters    String?
-  relatedArticles String?
-  createdAt       DateTime @default(now())
+  createdAt       DateTime @default(now__)
   updatedAt       DateTime @updatedAt
 }
 
@@ -126,7 +124,7 @@ model Quiz {
   title       String
   level       String
   status      String            @default("draft")
-  createdAt   DateTime          @default(now())
+  createdAt   DateTime          @default(now__)
   updatedAt   DateTime          @updatedAt
   description String?
   timeMinutes Int               @default(10)
@@ -144,7 +142,7 @@ model Question {
   correctAnswer String
   explanation   String?
   order         Int      @default(0)
-  createdAt     DateTime @default(now())
+  createdAt     DateTime @default(now__)
   quizId        String
   quiz          Quiz     @relation(fields: [quizId], references: [id], onDelete: Cascade)
 }
@@ -156,7 +154,7 @@ model UserQuizAttempt {
   score       Int
   totalQ      Int
   answers     String
-  submittedAt DateTime @default(now())
+  submittedAt DateTime @default(now__)
   quiz        Quiz     @relation(fields: [quizId], references: [id], onDelete: Cascade)
   user        User     @relation(fields: [userId], references: [id], onDelete: Cascade)
 
@@ -171,7 +169,7 @@ model Feedback {
   rating     Int
   name       String?
   comment    String?
-  createdAt  DateTime @default(now())
+  createdAt  DateTime @default(now__)
   showOnSite Boolean  @default(false)
   user       User     @relation(fields: [userId], references: [id], onDelete: Cascade)
 
@@ -185,11 +183,15 @@ model RefreshToken {
   userId    String
   expiresAt DateTime
   revoked   Boolean  @default(false)
-  createdAt DateTime @default(now())
+  createdAt DateTime @default(now__)
   updatedAt DateTime @updatedAt
   sessionId String
   session   Session  @relation(fields: [sessionId], references: [id], onDelete: Cascade)
   user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId])
+  @@index([expiresAt])
+  @@index([createdAt])
 }
 
 model Session {
@@ -198,13 +200,14 @@ model Session {
   ipAddress     String?
   userAgent     String?
   isActive      Boolean        @default(true)
-  createdAt     DateTime       @default(now())
+  createdAt     DateTime       @default(now__)
   expiresAt     DateTime
   refreshTokens RefreshToken[]
   user          User           @relation(fields: [userId], references: [id], onDelete: Cascade)
 
   @@index([userId])
   @@index([expiresAt])
+  @@index([createdAt])
 }
 
 model PageView {
@@ -214,7 +217,7 @@ model PageView {
   ipAddress String?
   userAgent String?
   source    String?
-  visitedAt DateTime @default(now())
+  visitedAt DateTime @default(now__)
 
   @@index([visitedAt])
   @@index([source])
@@ -224,7 +227,7 @@ model TrafficSource {
   id        String   @id @default(uuid())
   name      String
   value     Int
-  createdAt DateTime @default(now())
+  createdAt DateTime @default(now__)
 }
 
 model DailyAnalytics {
@@ -232,7 +235,7 @@ model DailyAnalytics {
   date      DateTime @unique
   dau       Int
   mau       Int
-  createdAt DateTime @default(now())
+  createdAt DateTime @default(now__)
 
   @@index([date])
 }
@@ -241,7 +244,14 @@ model Conversation {
   id String @id @default(uuid())
   title String?
   userId String?
-  createdAt DateTime @default(now())
+  isGuest Boolean @default(false)
+  guestSessionId String?
+  isArchived Boolean @default(false)
+  archivedAt DateTime?
+  deletedAt DateTime?
+  isPinned Boolean @default(false)
+  topic String?
+  createdAt DateTime @default(now__)
   updatedAt DateTime @updatedAt
   messages ChatMessage[]
   user User? @relation(fields: [userId], references: [id])
@@ -251,14 +261,17 @@ model ChatMessage {
   id String @id @default(uuid())
   role String
   content String
-  createdAt DateTime @default(now())
+  createdAt DateTime @default(now__)
   conversationId String
   conversation Conversation @relation(fields: [conversationId], references: [id], onDelete: Cascade)
   metadata Json?
+  editedAt DateTime?
+  isEdited Boolean @default(false)
+  parentMessageId String?
 }
 
 model EvaluationRun {
-  id String @id @default(uuid())
+  id String @id @default(uuid__)
   benchmarkVersion String
   modelId String
   promptVersion String
@@ -279,19 +292,19 @@ model EvaluationRun {
   status String
   startedAt DateTime
   completedAt DateTime?
-  cases EvaluationCaseResult[]
+
   @@index([benchmarkVersion])
   @@index([status])
   @@index([startedAt])
 }
 
 model EvaluationCaseResult {
-  id String @id @default(uuid())
+  id String @id @default(uuid__)
   evaluationRunId String
   benchmarkCaseId String
   query String
-  generatedAnswer Text?
-  citations Text[]
+  generatedAnswer String?
+  citations String[]
   verificationStatus String
   verificationDetails Json?
   retrievalStatus String
@@ -300,9 +313,9 @@ model EvaluationCaseResult {
   generationDetails Json?
   evaluationError Text?
   skippedReason String
-  startedAt DateTime @default(now())
+  startedAt DateTime @default(now__)
   completedAt DateTime?
-  
+
   @@index([evaluationRunId])
   @@index([benchmarkCaseId])
   @@index([verificationStatus])
@@ -313,7 +326,7 @@ model ChatbotQuery {
   category  String
   resolved  Boolean  @default(false)
   question  String?
-  createdAt DateTime @default(now())
+  createdAt DateTime @default(now__)
 
   @@index([category])
   @@index([createdAt])
@@ -335,8 +348,8 @@ model AuditLog {
   ipAddress   String?
   userAgent   String?
   metadata    Json?
-  createdAt   DateTime      @default(now())
-  actor       User?         @relation(fields: [actorId], references: [id])
+  createdAt   DateTime      @default(now__)
+  actor       User? @relation(fields: [actorId], references: [id])
 
   @@index([createdAt])
   @@index([scope])
@@ -353,7 +366,7 @@ model Alert {
   description    String
   serviceName    String
   serviceIcon    String?
-  createdAt      DateTime              @default(now())
+  createdAt      DateTime              @default(now__)
   updatedAt      DateTime              @updatedAt
   acknowledgedAt DateTime?
   dismissedAt    DateTime?
@@ -372,6 +385,11 @@ model AlertCategory {
   color       String
   metrics     AlertCategoryMetric[]
   alerts      Alert[]               @relation("AlertToAlertCategory")
+
+  @@index([name])
+  @@index([color])
+  @@index([metrics])
+  @@index([alerts])
 }
 
 model AlertCategoryMetric {
@@ -380,7 +398,7 @@ model AlertCategoryMetric {
   categoryId String
   count      Int
   total      Int
-  date       DateTime      @default(now())
+  date       DateTime      @default(now__)
   alert      Alert         @relation(fields: [alertId], references: [id], onDelete: Cascade)
   category   AlertCategory @relation(fields: [categoryId], references: [id], onDelete: Cascade)
 
@@ -395,7 +413,7 @@ model AlertFrequencyMetric {
   date           DateTime
   totalAlerts    Int
   criticalAlerts Int
-  createdAt      DateTime @default(now())
+  createdAt      DateTime @default(now__)
 
   @@unique([hour, date])
   @@index([date])
@@ -406,7 +424,7 @@ model AlertHistoricalMetric {
   date          DateTime @unique
   openedCount   Int
   resolvedCount Int
-  createdAt     DateTime @default(now())
+  createdAt     DateTime @default(now__)
 }
 
 model AlertHeatmapMetric {
@@ -414,7 +432,7 @@ model AlertHeatmapMetric {
   dayOfWeek  Int
   hour       Int
   alertCount Int
-  date       DateTime @default(now())
+  date       DateTime @default(now__)
 
   @@unique([dayOfWeek, hour, date])
   @@index([date])
@@ -427,7 +445,7 @@ model User {
   password            String
   role                Role                 @default(USER)
   status              Status               @default(ACTIVE)
-  createdAt           DateTime             @default(now())
+  createdAt           DateTime             @default(now__)
   updatedAt           DateTime             @updatedAt
   avatar              String?
   lastLogin           DateTime?
@@ -435,7 +453,6 @@ model User {
   auditLogs           AuditLog[]
   feedbacks           Feedback[]
   passwordResetTokens PasswordResetToken[]
-  posts               Post[]
   refreshTokens       RefreshToken[]
   sessions            Session[]
   quizAttempts        UserQuizAttempt[]
@@ -444,153 +461,6 @@ model User {
   @@index([email])
   @@index([role])
   @@index([status])
-}
-
-model SecurityRiskAssessment {
-  id            String           @id @default(uuid())
-  userId        String?
-  emailHash     String?
-  ipAddress     String?
-  country       String?
-  deviceId      String?
-  userAgent     String?
-  riskScore     Int
-  trustScore    Int
-  decision      SecurityDecision
-  signals       Json
-  behaviorScore Int              @default(0)
-  modelVersion  String           @default("cyberguard-v4.2")
-  createdAt     DateTime         @default(now())
-
-  @@index([userId])
-  @@index([ipAddress])
-  @@index([decision])
-  @@index([createdAt])
-}
-
-model BehavioralProfile {
-  id             String   @id @default(uuid())
-  userId         String
-  deviceId       String?
-  baseline       Json
-  sampleCount    Int      @default(0)
-  anomalyScore   Int      @default(0)
-  classification String   @default("human")
-  lastObservedAt DateTime @default(now())
-  createdAt      DateTime @default(now())
-  updatedAt      DateTime @updatedAt
-
-  @@unique([userId, deviceId])
-  @@index([anomalyScore])
-  @@index([lastObservedAt])
-}
-
-model JwtRevocation {
-  id          String   @id @default(uuid())
-  jti         String   @unique
-  userId      String?
-  sessionId   String?
-  deviceId    String?
-  reason      String
-  revokedById String?
-  expiresAt   DateTime
-  createdAt   DateTime @default(now())
-
-  @@index([userId])
-  @@index([sessionId])
-  @@index([expiresAt])
-}
-
-model DeviceTrust {
-  id            String    @id @default(uuid())
-  userId        String
-  deviceId      String
-  trustScore    Int       @default(50)
-  userAgentHash String?
-  ipPrefix      String?
-  country       String?
-  lastSeenAt    DateTime  @default(now())
-  trustedUntil  DateTime?
-  createdAt     DateTime  @default(now())
-  updatedAt     DateTime  @updatedAt
-
-  @@unique([userId, deviceId])
-  @@index([trustScore])
-  @@index([lastSeenAt])
-}
-
-model PiiVaultRecord {
-  id             String    @id @default(uuid())
-  ownerType      String
-  ownerId        String
-  fieldName      String
-  encryptedValue String
-  maskedValue    String
-  keyVersion     String
-  lastAccessedBy String?
-  lastAccessedAt DateTime?
-  createdAt      DateTime  @default(now())
-  updatedAt      DateTime  @updatedAt
-
-  @@unique([ownerType, ownerId, fieldName])
-  @@index([maskedValue])
-  @@index([lastAccessedAt])
-}
-
-model RateLimitEvent {
-  id           String    @id @default(uuid())
-  key          String
-  ipAddress    String?
-  userId       String?
-  endpoint     String?
-  attempts     Int
-  delayMs      Int       @default(0)
-  blockedUntil DateTime?
-  fingerprint  String?
-  createdAt    DateTime  @default(now())
-
-  @@index([key])
-  @@index([ipAddress])
-  @@index([blockedUntil])
-  @@index([createdAt])
-}
-
-model ThreatIntelligenceEvent {
-  id          String        @id @default(uuid())
-  type        ThreatType
-  severity    AlertSeverity
-  confidence  Int
-  ipAddress   String?
-  country     String?
-  endpoint    String?
-  payloadHash String?
-  prediction  Json?
-  mitigated   Boolean       @default(false)
-  createdAt   DateTime      @default(now())
-
-  @@index([type])
-  @@index([severity])
-  @@index([ipAddress])
-  @@index([createdAt])
-}
-
-model SecurityIncident {
-  id              String        @id @default(uuid())
-  incidentNumber  String        @unique
-  title           String
-  severity        AlertSeverity
-  status          String        @default("Investigating")
-  rootCause       Json?
-  timeline        Json          @default("[]")
-  recoveryPercent Int           @default(0)
-  openedAt        DateTime      @default(now())
-  resolvedAt      DateTime?
-  createdAt       DateTime      @default(now())
-  updatedAt       DateTime      @updatedAt
-
-  @@index([severity])
-  @@index([status])
-  @@index([openedAt])
 }
 
 enum AuditScope {
@@ -608,19 +478,6 @@ enum AuditSeverity {
   MEDIUM
   HIGH
   CRITICAL
-}
-
-enum AlertStatus {
-  OPEN
-  ACKED
-  DISMISSED
-}
-
-enum AlertSeverity {
-  CRITICAL
-  HIGH
-  MEDIUM
-  LOW
 }
 
 enum Role {

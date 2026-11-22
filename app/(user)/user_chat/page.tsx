@@ -33,7 +33,43 @@ interface Conversation {
   title?: string;
   createdAt: string;
   updatedAt: string;
+  isGuest?: boolean;
+  guestSessionId?: string;
   _count: { messages: number };
+}
+
+interface StoredMessage {
+  id: string;
+  role: "user" | "assistant";
+  content: string;
+  createdAt: string;
+  _metadata?: Record<string, unknown>;
+  isEditing?: boolean;
+  parentMessageId?: string;
+  branchFrom?: string;
+}
+
+/* Guest session management */
+const GUEST_SESSION_STORAGE_KEY = "samvi-guest-session-id";
+
+function getGuestSessionId(): string | null {
+  if (typeof window === "undefined") return null;
+  return localStorage.getItem(GUEST_SESSION_STORAGE_KEY);
+}
+
+function setGuestSessionId(id: string) {
+  if (typeof window === "undefined") return;
+  localStorage.setItem(GUEST_SESSION_STORAGE_KEY, id);
+}
+
+/* Generate a new stable guest session ID if one doesn't exist */
+function initializeGuestSession(): string {
+  const existingId = getGuestSessionId();
+  if (existingId) return existingId;
+  
+  const newId = `guest_${Math.random().toString(36).substring(2, 15)}_${Date.now().toString(36)}`;
+  setGuestSessionId(newId);
+  return newId;
 }
 
 interface StoredMessage {
@@ -67,7 +103,8 @@ declare global {
   }
 }
 
-/* â”€â”€ Types â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€ */
+/* Types */
+
 type Role = "user" | "ai";
 
 type Suggestion = string;
@@ -78,7 +115,8 @@ interface Message {
   time: string;
 }
 
-/* â”€â”€ Suggested prompts â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€ */
+/* Suggested prompts */
+
 const suggestions = [
   {
     icon: Hash,
@@ -115,7 +153,7 @@ const suggestions = [
   {
     icon: Landmark,
     label: "What are Directive Principles?",
-    sub: "Part IV â€” DPSP",
+    sub: "Part IV — DPSP",
     color:
       "border-violet-800/40 bg-violet-950/5 text-violet-900 hover:border-violet-800/70 hover:bg-violet-950/10",
     iconColor: "text-violet-800",
@@ -141,7 +179,7 @@ function welcomeMessage(): Message {
   return {
     id: "0",
     role: "ai",
-    text: "Namaste! I'm **Samvi**, your AI guide to the Constitution of India.\n\nAsk me anything â€” articles, amendments, fundamental rights, schedules, or any constitutional concept. I'm here to make learning simple and insightful.",
+    text: "Namaste! I'm **Samvi**, your AI guide to the Constitution of India.\n\nAsk me anything — articles, amendments, fundamental rights, schedules, or any constitutional concept. I'm here to make learning simple and insightful.",
     time: now(),
   };
 }
@@ -152,17 +190,21 @@ function toUiMessages(storedMessages: StoredMessage[]): Message[] {
   }
 
   return storedMessages.map((msg) => ({
-    id: msg.id,
+    id: msg.id || `${index}`,
     role: msg.role === "assistant" ? "ai" : "user",
     text: msg.content,
     time: new Date(msg.createdAt).toLocaleTimeString("en-IN", {
       hour: "2-digit",
       minute: "2-digit",
     }),
+    isEditing: msg.isEditing || false,
+    parentMessageId: msg.parentMessageId,
+    branchFrom: msg.branchFrom,
   }));
 }
 
-/* â”€â”€ Typing indicator â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€ */
+/* Typing indicator */
+
 function TypingDots() {
   return (
     <div className="flex items-center gap-1.5 px-4 py-3.5">
@@ -177,7 +219,8 @@ function TypingDots() {
   );
 }
 
-/* â”€â”€ Message bubble â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€ */
+/* Message bubble */
+
 function Bubble({ msg }: { msg: Message }) {
   const isAI = msg.role === "ai";
   const metadata = msg._metadata || {};
@@ -188,6 +231,10 @@ function Bubble({ msg }: { msg: Message }) {
   const provenance = verification?.provenance || {};
   const evidencePassages = verification?.evidencePassages || [];
   const explanation = verification?.explanation || "";
+
+  // Edit/regenerate controls show for user's own messages (not the AI welcome message)
+  const canEdit = !isAI && msg.id !== "0" && !msg.isEditing;
+  const canRegenerate = isAI && msg._metadata?.verification;
 
   return (
     <div
@@ -206,33 +253,119 @@ function Bubble({ msg }: { msg: Message }) {
         </div>
       )}
 
+      {msg.isEditing && !isAI ? (
+        /* Edit form for user message */
+        <div
+          className={"flex max-w-[75%] sm:max-w-[68%] flex-col gap-1 " + (isAI ? "items-start" : "items-end")}
+        >
+          <div
+            className={"relative rounded-2xl px-4 py-3 text-[13.5px] leading-[1.8] " + (isAI ? "rounded-bl-sm bg-white border-[1.5px] border-slate-200 text-slate-800 shadow-sm" : "rounded-br-sm bg-amber-900 text-amber-50 shadow-md")}
+          >
+            <textarea
+              defaultValue={msg.text}
+              className={"w-full rounded-blg bg-white border border-slate-300 py-2 px-3 text-[13.5px] leading-[1.8] focus:outline-none focus:border-amber-500"}
+              rows={3}
+              style={{ minHeight: 50 }}
+            />
+            <div className="flex gap-2 mt-2">
+              <button
+                onClick={() => setMsgEditing(null)}
+                className="flex-1 rounded bg-gray-200 px-3 py-1 text-sm text-slate-600 hover:bg-gray-300 cancel-edit"
+              >
+                Cancel
+              </button>
+              <button
+                onClick={handleSaveEdit}
+                className="rounded bg-amber-600 px-3 py-1 text-sm text-white hover:bg-amber-500 save-edit"
+              >
+                Save
+              </button>
+            </div>
+          </div>
+        </div>
+      ) : canEdit && (
+        /* Edit button for user message */
+        <div
+          className="absolute top-2 right-2 flex items-center gap-2"
+        >
+          <button
+            onClick={() => setMsgEditing(msg.id)}
+            className="rounded bg-amber-600 px-2 py-1 text-xs text-white hover:bg-amber-500 transition-colors"
+            title="Edit message"
+          >
+            <Edit size={12} strokeWidth={1.5} className="text-amber-100" />
+          </button>
+        </div>
+      ) : canRegenerate && (
+        /* Regenerate button for AI message */
+        <div
+          className="absolute top-2 right-2 flex items-center gap-2"
+        >
+          <button
+            onClick={() => handleRegenerate(msg.id)}
+            className="rounded bg-amber-600 px-2 py-1 text-xs text-white hover:bg-amber-500 transition-colors"
+            title="Regenerate response"
+          >
+            <RefreshCw size={12} strokeWidth={1.5} className="text-amber-100" />
+          </button>
+        </div>
+      )}
+
       <div
         className={"flex max-w-[75%] sm:max-w-[68%] flex-col gap-1 " + (isAI ? "items-start" : "items-end")}
       >
         <div
           className={"relative rounded-2xl px-4 py-3 text-[13.5px] leading-[1.8] " + (isAI ? "rounded-bl-sm bg-white border-[1.5px] border-slate-200 text-slate-800 shadow-sm" : "rounded-br-sm bg-amber-900 text-amber-50 shadow-md")}
         >
-          {/* Display verification status badge for AI messages */}
-          {isAI && citationStatus && (
-            <div
-              className={"absolute top-2 right-2 flex items-center gap-2 px-2 py-1 text-[9px] font-medium rounded border " + (citationStatus === "VERIFIED" ? "bg-green-100 text-green-800 border-green-300" : citationStatus === "PARTIALLY_SUPPORTED" ? "bg-amber-100 text-amber-800 border-amber-300" : citationStatus === "UNSUPPORTED" ? "bg-red-100 text-red-800 border-red-300" : "bg-gray-100 text-gray-800 border-gray-300")}
-            >
-              {citationStatus}
-            </div>
-          )}
+{/* Display verification status badge for AI messages */}
+  {isAI && citationStatus && (
+    <div
+      className={"absolute top-2 right-2 flex items-center gap-2 px-2 py-1 text-[9px] font-medium rounded border " + (citationStatus === "VERIFIED" ? "bg-green-100 text-green-800 border-green-300" : citationStatus === "PARTIALLY_SUPPORTED" ? "bg-amber-100 text-amber-800 border-amber-300" : citationStatus === "UNSUPPORTED" ? "bg-red-100 text-red-800 border-red-300" : "bg-gray-100 text-gray-800 border-gray-300")}
+    >
+      {citationStatus}
+    </div>
+  )}
+
+  {isAI && !msg.isEditing && (
+    <div
+      className="absolute top-2 right-2 flex items-center gap-2 px-2 py-1 text-[10px] text-slate-400"
+      style={{ zIndex: 10 }}
+    >
+      <button
+        onClick={() => setFeedbackState({ msgId: msg.id, rating: 5, comment: "" })}
+        className="rounded bg-green-100 px-2 py-1 text-green-800 hover:bg-green-200 transition-colors"
+        title="Thumbs up"
+      >
+        <RotateCw size={12} strokeWidth={1.5} className="text-green-600" />
+      </button>
+      <button
+        onClick={() => setFeedbackState({ msgId: msg.id, rating: 1, comment: "" })}
+        className="rounded bg-red-100 px-2 py-1 text-red-800 hover:bg-red-200 transition-colors"
+        title="Thumbs down"
+      >
+        <XMark size={12} strokeWidth={1.5} className="text-red-600" />
+      </button>
+    </div>
+  )}
 
           {msg.text.split("\n").map((line, i) => (
             <p key={i} className={line === "" ? "h-2" : ""}>
-              {line.split(/(\*\*[^*]+\*\*)/g).map((chunk, j) => (
-                chunk.startsWith("\*\*") && chunk.endsWith("\*\*") ? (
-                  <strong key={j} className={isAI ? "font-semibold text-slate-900" : "font-semibold"}>
-                    {chunk.slice(2, -2)}
-                  </strong>
-                ) : chunk.startsWith("*") && chunk.endsWith("*") ? (
-                  <em key={j} className="italic opacity-80">
-                    {chunk.slice(1, -1)}
-                  </em>
-                ) : (
+              {line.split(/(\*\*[^*]+\*\*)/g).map((chunk, j) => {
+                if (chunk.startsWith("**") && chunk.endsWith("**")) {
+                  return (
+                    <strong key={j} className={isAI ? "font-semibold text-slate-900" : "font-semibold"}>
+                      {chunk.slice(2, -2)}
+                    </strong>
+                  );
+                }
+                if (chunk.startsWith("*") && chunk.endsWith("*")) {
+                  return (
+                    <em key={j} className="italic opacity-80">
+                      {chunk.slice(1, -1)}
+                    </em>
+                  );
+                }
+                if (
                   citationStatus &&
                   (chunk.includes("Article") ||
                     chunk.includes("article") ||
@@ -242,21 +375,25 @@ function Bubble({ msg }: { msg: Message }) {
                     chunk.includes("vs") ||
                     chunk.includes("Judgment") ||
                     chunk.includes("judgment")) &&
-                  !chunk.startsWith("<") && !chunk.startsWith(">") ? (
+                  !chunk.startsWith("<") &&
+                  !chunk.startsWith(">")
+                ) {
+                  return (
                     <span key={j} className="relative inline-block pr-2">
                       {chunk}
-                      {/* Citation type indicator - very subtle */}
                       {isAI && provenance.sourceType && (
                         <span key={`cite-type-${j}`} className="text-[xxs] opacity-40">
                           {provenance.sourceType}
                         </span>
                       )}
                     </span>
-                  ) : chunk
-                )
-              ))}
+                  );
+                }
+                return chunk;
+              })}
             </p>
           ))}
+
           {/* Evidence passage display - for AI messages with verification */}
           {isAI && evidencePassages.length > 0 && (
             <div
@@ -316,60 +453,9 @@ function Bubble({ msg }: { msg: Message }) {
       </div>
     </div>
   );
-    >
-      {/* Avatar */}
-      {isAI ? (
-        <div className="relative flex h-8 w-8 shrink-0 items-center justify-center overflow-hidden rounded-full border-[1.5px] border-amber-800/50 bg-amber-950/8 shadow-sm">
-          <Zap size={14} strokeWidth={2} className="text-amber-800" />
-        </div>
-      ) : (
-        <div className="flex h-8 w-8 shrink-0 items-center justify-center rounded-full border-[1.5px] border-slate-300 bg-slate-100 shadow-sm">
-          <span className="text-[11px] font-bold text-slate-600 tracking-tight">
-            U
-          </span>
-        </div>
-      )}
-
-      <div
-        className={`flex max-w-[75%] sm:max-w-[68%] flex-col gap-1 ${isAI ? "items-start" : "items-end"}`}
-      >
-        <div
-          className={`relative rounded-2xl px-4 py-3 text-[13.5px] leading-[1.8] ${
-            isAI
-              ? "rounded-bl-sm bg-white border-[1.5px] border-slate-200 text-slate-800 shadow-sm"
-              : "rounded-br-sm bg-amber-900 text-amber-50 shadow-md"
-          }`}
-        >
-          {msg.text.split("\n").map((line, i) => (
-            <p key={i} className={line === "" ? "h-2" : ""}>
-              {line.split(/(\*\*[^*]+\*\*)/g).map((chunk, j) =>
-                chunk.startsWith("**") && chunk.endsWith("**") ? (
-                  <strong
-                    key={j}
-                    className={
-                      isAI ? "font-semibold text-slate-900" : "font-semibold"
-                    }
-                  >
-                    {chunk.slice(2, -2)}
-                  </strong>
-                ) : chunk.startsWith("*") && chunk.endsWith("*") ? (
-                  <em key={j} className="italic opacity-80">
-                    {chunk.slice(1, -1)}
-                  </em>
-                ) : (
-                  chunk
-                ),
-              )}
-            </p>
-          ))}
-        </div>
-        <span className="text-[10px] text-slate-400 px-1">{msg.time}</span>
-      </div>
-    </div>
-  );
 }
 
-/* â”€â”€ Suggestion chips component â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€ */
+/* Suggestion chips component */
 
 type SuggestionChipsProps = {
   suggestions: Suggestion[];
@@ -408,7 +494,7 @@ function SuggestionChips({ suggestions, onSelect }: SuggestionChipsProps) {
 }
 
 type ChatMessage = {
-  role: "system" |"user" | "assistant";
+  role: "system" | "user" | "assistant";
   content: string;
 };
 
@@ -422,7 +508,9 @@ const SYSTEM_PROMPT = `
   - Use concise and accurate answers.
   - Use markdown formatting.
 `;
+
 /* ---- Suggestion generation helpers ---- */
+
 function parseSuggestions(raw: string): Suggestion[] {
   try {
     const parsed = JSON.parse(raw);
@@ -438,12 +526,12 @@ function parseSuggestions(raw: string): Suggestion[] {
   return [];
 }
 
-/** Generate 7 followâ€‘up suggestions */
+/** Generate 7 follow-up suggestions */
 async function generateSuggestions(userQuestion: string, aiAnswer: string): Promise<Suggestion[]> {
   const systemPrompt = `
-You are creating followâ€‘up learning questions for students studying the Constitution of India.
+You are creating follow-up learning questions for students studying the Constitution of India.
 
-Generate exactly 7 short followâ€‘up questions.
+Generate exactly 7 short follow-up questions.
 
 Requirements:
 * Directly related to the previous answer.
@@ -487,16 +575,15 @@ Return ONLY valid JSON:
   }
 }
 
-/* â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
-   MAIN PAGE
-â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â• */
+/* Main PAGE */
+
 export default function ChatPage() {
   const [loading, setLoading] = useState(false);
   const [messages, setMessages] = useState<Message[]>([
     {
       id: "0",
       role: "ai",
-      text: "Namaste! I'm **Samvi**, your AI guide to the Constitution of India.\n\nAsk me anything â€” articles, amendments, fundamental rights, schedules, or any constitutional concept. I'm here to make learning simple and insightful.",
+      text: "Namaste! I'm **Samvi**, your AI guide to the Constitution of India.\n\nAsk me anything — articles, amendments, fundamental rights, schedules, or any constitutional concept. I'm here to make learning simple and insightful.",
       time: now(),
     },
   ]);
@@ -508,11 +595,17 @@ export default function ChatPage() {
   const [user, setUser] = useState<{ id: string; name?: string; email: string } | null>(null);
   const [followUpSuggestions, setFollowUpSuggestions] = useState<Suggestion[]>([]);
   const [showAllSuggestions, setShowAllSuggestions] = useState(false);
+  const [feedbackState, setFeedbackState] = useState<{ msgId: string; rating: number; comment: string } | null>(null);
   const bottomRef = useRef<HTMLDivElement>(null);
   const inputRef = useRef<HTMLTextAreaElement>(null);
+  const [editingMsgId, setMsgEditing] = useState<string | null>(null);
+  const [editText, setEditText] = useState("");
 
   useEffect(() => {
-    const loadProfileAndConversations = async () => {
+    const initializeAndLoad = async () => {
+      // Initialize stable guest session ID (survives page reloads)
+      initializeGuestSession();
+
       try {
         const profileRes = await fetch("/api/auth/profile");
         if (profileRes.ok) {
@@ -534,15 +627,22 @@ export default function ChatPage() {
       }
     };
 
-    loadProfileAndConversations();
+    initializeAndLoad();
   }, []);
+
+  // Trigger guest-to-account migration when user logs in
+  useEffect(() => {
+    if (user) {
+      migrateGuestConversations();
+    }
+  }, [user]);
 
   useEffect(() => {
     if (!activeConversationId) {
       setMessages([{
         id: "0",
         role: "ai",
-        text: "Namaste! I'm **Samvi**, your AI guide to the Constitution of India.\n\nAsk me anything â€” articles, amendments, fundamental rights, schedules, or any constitutional concept. I'm here to make learning simple and insightful.",
+        text: "Namaste! I'm **Samvi**, your AI guide to the Constitution of India.\n\nAsk me anything — articles, amendments, fundamental rights, schedules, or any constitutional concept. I'm here to make learning simple and insightful.",
         time: now(),
       }]);
       return;
@@ -562,6 +662,9 @@ export default function ChatPage() {
               hour: "2-digit",
               minute: "2-digit",
             }),
+            isEditing: false,
+            parentMessageId: msg.parentMessageId,
+            branchFrom: msg.branchFrom,
             _metadata: msg.metadata || {},
           }));
           setMessages(converted);
@@ -576,6 +679,9 @@ export default function ChatPage() {
                 role: msg.role === "assistant" ? "ai" : "user",
                 text: msg.content,
                 time: now(),
+                isEditing: false,
+                parentMessageId: msg.parentMessageId,
+                branchFrom: msg.branchFrom,
                 _metadata: {}, // no metadata in old localStorage format
               }));
               setMessages(converted);
@@ -584,7 +690,7 @@ export default function ChatPage() {
               setMessages([{
                 id: "0",
                 role: "ai",
-                text: "Namaste! I'm **Samvi**, your AI guide to the Constitution of India.\n\nAsk me anything â€” articles, amendments, fundamental rights, schedules, or any constitutional concept. I'm here to make learning simple and insightful.",
+                text: "Namaste! I'm **Samvi**, your AI guide to the Constitution of India.\n\nAsk me anything — articles, amendments, fundamental rights, schedules, or any constitutional concept. I'm here to make learning simple and insightful.",
                 time: now(),
               }]);
             }
@@ -592,7 +698,7 @@ export default function ChatPage() {
             setMessages([{
               id: "0",
               role: "ai",
-              text: "Namaste! I'm **Samvi**, your AI guide to the Constitution of India.\n\nAsk me anything â€” articles, amendments, fundamental rights, schedules, or any constitutional concept. I'm here to make learning simple and insightful.",
+              text: "Namaste! I'm **Samvi**, your AI guide to the Constitution of India.\n\nAsk me anything — articles, amendments, fundamental rights, schedules, or any constitutional concept. I'm here to make learning simple and insightful.",
               time: now(),
             }]);
           }
@@ -610,6 +716,9 @@ export default function ChatPage() {
               role: msg.role === "assistant" ? "ai" : "user",
               text: msg.content,
               time: now(),
+              isEditing: false,
+              parentMessageId: msg.parentMessageId,
+              branchFrom: msg.branchFrom,
               _metadata: {}, // no metadata in old localStorage format
             }));
             setMessages(converted);
@@ -618,7 +727,7 @@ export default function ChatPage() {
             setMessages([{
               id: "0",
               role: "ai",
-              text: "Namaste! I'm **Samvi**, your AI guide to the Constitution of India.\n\nAsk me anything â€” articles, amendments, fundamental rights, schedules, or any constitutional concept. I'm here to make learning simple and insightful.",
+              text: "Namaste! I'm **Samvi**, your AI guide to the Constitution of India.\n\nAsk me anything — articles, amendments, fundamental rights, schedules, or any constitutional concept. I'm here to make learning simple and insightful.",
               time: now(),
             }]);
           }
@@ -626,7 +735,7 @@ export default function ChatPage() {
           setMessages([{
             id: "0",
             role: "ai",
-            text: "Namaste! I'm **Samvi**, your AI guide to the Constitution of India.\n\nAsk me anything â€” articles, amendments, fundamental rights, schedules, or any constitutional concept. I'm here to make learning simple and insightful.",
+            text: "Namaste! I'm **Samvi**, your AI guide to the Constitution of India.\n\nAsk me anything — articles, amendments, fundamental rights, schedules, or any constitutional concept. I'm here to make learning simple and insightful.",
             time: now(),
           }]);
         }
@@ -642,6 +751,9 @@ export default function ChatPage() {
       const storageMessages = messages.map((msg) => ({
         role: msg.role === "ai" ? "assistant" : "user",
         content: msg.text,
+        isEditing: msg.isEditing || false,
+        parentMessageId: msg.parentMessageId,
+        branchFrom: msg.branchFrom,
         _metadata: msg._metadata || {},
       }));
       localStorage.setItem(`samvi-chat-${activeConversationId}`, JSON.stringify(storageMessages));
@@ -678,7 +790,7 @@ export default function ChatPage() {
   const send = async (text: string) => {
     if (!text.trim() || loading) return;
 
-    // Reset previous followâ€‘up suggestions for a new turn
+    // Reset previous follow-up suggestions for a new turn
     setFollowUpSuggestions([]);
     setShowAllSuggestions(false);
 
@@ -740,7 +852,7 @@ export default function ChatPage() {
 
       setMessages((prev) => [...prev, aiMsg]);
 
-      // Generate followâ€‘up suggestions based on the latest exchange
+      // Generate follow-up suggestions based on the latest exchange
       try {
         console.log("AI response:", aiText);
         const suggestions = await generateSuggestions(text.trim(), aiText);
@@ -750,15 +862,20 @@ export default function ChatPage() {
         console.error("Failed to generate suggestions:", sErr);
       }
 
-      // Sync messages to database if user is logged in
-      // and capture verification metadata from assistant message response
-      if (user && activeConversationId) {
-        await fetch(`/api/conversations/${activeConversationId}/messages`, {
+      // Sync messages to database
+      // If user is logged in, sync to their authenticated conversation
+      // If user is guest, sync to the guest conversation (created in DB with isGuest flag)
+      // If no user and no guest session, only persist to localStorage
+      const syncConversationId = user ? activeConversationId : getGuestSessionId();
+
+      if (syncConversationId) {
+        // User message
+        await fetch(`/api/conversations/${syncConversationId}/messages`, {
           method: "POST",
           headers: { "Content-Type": "application/json" },
           body: JSON.stringify({ role: "user", content: text.trim() }),
         });
-        const assistantResp = await fetch(`/api/conversations/${activeConversationId}/messages`, {
+        const assistantResp = await fetch(`/api/conversations/${syncConversationId}/messages`, {
           method: "POST",
           headers: { "Content-Type": "application/json" },
           body: JSON.stringify({ role: "assistant", content: aiText }),
@@ -776,10 +893,21 @@ export default function ChatPage() {
           storageMessages[storageMessages.length - 1]._metadata =
             assistantData.metadata.verification;
           localStorage.setItem(
-            `samvi-chat-${activeConversationId}`,
+            `samvi-chat-${syncConversationId}`,
             JSON.stringify(storageMessages)
           );
         }
+      } else {
+        // Persist only to localStorage for new guest conversations
+        const storageMessages = messages.map((msg) => ({
+          role: msg.role === "ai" ? "assistant" : "user",
+          content: msg.text,
+          _metadata: msg._metadata || {},
+        }));
+        localStorage.setItem(
+          `samvi-chat-${Date.now()}`,
+          JSON.stringify(storageMessages)
+        );
       }
     } catch (error) {
       const errorMsg: Message = {
@@ -803,16 +931,74 @@ export default function ChatPage() {
     }
   };
 
-  const clearChat = async () => {
-    if (activeConversationId) {
-      await fetch(`/api/conversations/${activeConversationId}`, {
-        method: "DELETE",
+  // Guest-to-account migration function
+  async function migrateGuestConversations() {
+    const guestSessionId = getGuestSessionId();
+    if (!guestSessionId) return;
+  
+    try {
+      const migrationRes = await fetch(`/api/conversations/migrate`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ guestSessionId }),
       });
-      
-      // Remove from conversations list
-      setConversations(prev => prev.filter(conv => conv.id !== activeConversationId));
+  
+      const result = await migrationRes.json();
+  
+      if (result.alreadyMigrated) {
+        // Conversations already migrated - refresh UI
+        const conversationsRes = await fetch("/api/conversations");
+        if (conversationsRes.ok) {
+          const data = await conversationsRes.json();
+          setConversations(data);
+          if (data.length > 0 && activeConversationId === null) {
+            setActiveConversationId(data[0].id);
+          }
+        }
+        return;
+      }
+  
+      if (result.success && result.migratedConversations > 0) {
+        // Refresh conversation list to include migrated conversations
+        const conversationsRes = await fetch("/api/conversations");
+        if (conversationsRes.ok) {
+          const data = await conversationsRes.json();
+          setConversations(data);
+          if (data.length > 0 && activeConversationId === null) {
+            setActiveConversationId(data[0].id);
+          }
+        }
+      }
+    } catch (error) {
+      console.error("Guest migration failed:", error);
     }
+  }
 
+const clearChat = async () => {
+    // If there's an active conversation, show confirmation and archive/delete
+    if (activeConversationId) {
+      const shouldClear = user
+        ? window.confirm("Clear this conversation and start a new one?")
+        : window.confirm("Archive this conversation and start a new one?");
+      
+      if (shouldClear) {
+        if (user) {
+          // Authenticated user: soft-delete conversation (isArchived)
+          await fetch(`/api/conversations/${activeConversationId}`, {
+            method: "DELETE",
+          });
+        } else {
+          // Guest user: archive the guest conversation in DB
+          await fetch(`/api/conversations/${activeConversationId}`, {
+            method: "DELETE",
+          });
+        }
+        
+        // Remove from conversations list
+        setConversations(prev => prev.filter(conv => conv.id !== activeConversationId));
+      }
+    }
+    
     // Create new conversation
     if (user) {
       const response = await fetch("/api/conversations", {
@@ -823,6 +1009,26 @@ export default function ChatPage() {
       
       if (response.ok) {
         const newConversation = await response.json();
+        setActiveConversationId(newConversation.id);
+        setConversations(prev => [newConversation, ...prev]);
+      }
+    } else if (!user && getGuestSessionId()) {
+      // Guest user: create new guest conversation in DB
+      const guestSessionId = getGuestSessionId();
+      const response = await fetch("/api/conversations", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ title: "New Conversation", guestSessionId }),
+      });
+      
+      if (response.ok) {
+        const newConversation = await response.json();
+        // Archive the old conversation if it exists
+        if (activeConversationId) {
+          await fetch(`/api/conversations/${activeConversationId}`, {
+            method: "DELETE",
+          });
+        }
         setActiveConversationId(newConversation.id);
         setConversations(prev => [newConversation, ...prev]);
       }
@@ -846,7 +1052,7 @@ setShowAllSuggestions(false);
 
   return (
     <div className="flex h-screen w-full overflow-hidden bg-[#f7f5f2] font-[system-ui]">
-      {/* â•â• SIDEBAR â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â• */}
+      {/* Sidebar */}
       {sidebarOpen && (
         <div
           className="fixed inset-0 z-30 bg-black/25 backdrop-blur-[2px] lg:hidden"
@@ -920,70 +1126,94 @@ setShowAllSuggestions(false);
           </button>
         </div>
 
-          {/* History */}
-          <div className="flex-1 overflow-y-auto px-3 pb-4">
-            <p className="mb-2 px-2 text-[9px] font-bold uppercase tracking-[2px] text-slate-400">
-              Recent Chats
-            </p>
-            <div className="flex flex-col gap-0.5">
-              {conversations.map((conv) => {
-                const isActive = conv.id === activeConversationId;
-                const title = conv.title || `Chat ${new Date(conv.updatedAt).toLocaleDateString()}`;
-                const date = new Date(conv.updatedAt);
-                const timeStr = date.toLocaleDateString() === new Date().toLocaleDateString()
-                  ? "Today"
-                  : date.toLocaleDateString() === new Date(Date.now() - 86400000).toLocaleDateString()
-                  ? "Yesterday"
-                  : `${Math.floor((Date.now() - date.getTime()) / 86400000)} days ago`;
+        {/* History */}
+        <div className="flex-1 overflow-y-auto px-3 pb-4">
+          <p className="mb-2 px-2 text-[9px] font-bold uppercase tracking-[2px] text-slate-400">
+            Recent Chats
+          </p>
+          <div className="flex flex-col gap-0.5">
+            {conversations.map((conv) => {
+              const isActive = conv.id === activeConversationId;
+              const title = conv.title || `Chat ${new Date(conv.updatedAt).toLocaleDateString()}`;
+              const date = new Date(conv.updatedAt);
+              const timeStr = date.toLocaleDateString() === new Date().toLocaleDateString()
+                ? "Today"
+                : date.toLocaleDateString() === new Date(Date.now() - 86400000).toLocaleDateString()
+                ? "Yesterday"
+                : `${Math.floor((Date.now() - date.getTime()) / 86400000)} days ago`;
+              const isArchived = conv.isArchived;
 
-                return (
-                  <button
-                    key={conv.id}
-                    onClick={() => setActiveConversationId(conv.id)}
-                    className={`
-                      group flex w-full items-center gap-2.5 rounded-xl px-3 py-2.5 text-left
-                      transition-all duration-150
-                      ${
+              // Menu items for archived conversations
+              const archivedMenu = isArchived ? (
+                <div className="absolute right-0 w-48 mt-2 origin-top-left bg-white rounded-sm shadow-lg py-1 z-50 border border-slate-200">
+                  <div className="rounded-sm px-2 py-1 text-sm text-slate-500">
+                    <RefreshCw>
+                      size={10} strokeWidth={1.5} className="text-slate-400"
+                    /> Restored
+                  </div>
+                  <hr className="my-1 border-b border-slate-100" />
+                  <div className="rounded-sm px-2 py-1 text-sm text-slate-500">
+                    <Trash2>
+                      size={10} strokeWidth={1.5} className="text-red-500"
+                    /> Permanently delete
+                  </div>
+                </div>
+              ) : null;
+
+              return (
+                <button
+                  key={conv.id}
+                  onClick={() => setActiveConversationId(conv.id)}
+                  className={`
+                    group flex w-full items-center gap-2.5 rounded-xl px-3 py-2.5 text-left
+                    transition-all duration-150
+                    {
+                      isActive
+                        ? "bg-amber-950/6 border-[1.5px] border-amber-800/25"
+                        : "hover:bg-slate-50 border-[1.5px] border-transparent"
+                    }
+                  `}
+                >
+                  <Hash
+                    size={13}
+                    strokeWidth={2}
+                    className={
+                      isActive
+                        ? "text-amber-800 shrink-0"
+                        : "text-slate-400 shrink-0 group-hover:text-slate-600"
+                    }
+                  />
+                  <div className="flex-1 min-w-0">
+                    <span
+                      className={`block text-[12px] font-medium leading-snug truncate {
                         isActive
-                          ? "bg-amber-950/6 border-[1.5px] border-amber-800/25"
-                          : "hover:bg-slate-50 border-[1.5px] border-transparent"
-                      }
-                    `}
-                  >
-                    <Hash
-                      size={13}
-                      strokeWidth={2}
-                      className={
-                        isActive
-                          ? "text-amber-800 shrink-0"
-                          : "text-slate-400 shrink-0 group-hover:text-slate-600"
-                      }
-                    />
-                    <div className="flex-1 min-w-0">
-                      <span
-                        className={`block text-[12px] font-medium leading-snug truncate ${
-                          isActive
-                            ? "text-amber-900"
-                            : "text-slate-700 group-hover:text-slate-900"
-                        }`}
-                      >
-                        {title}
+                          ? "text-amber-900"
+                          : "text-slate-700 group-hover:text-slate-900"
+                      }`}
+                    >
+                      {title}
+                    </span>
+                    {isArchived && (
+                      <span className="text-[10px] text-amber-400">
+                        <Clock size={9} strokeWidth={2} /> Archived
                       </span>
-                      <span className="flex items-center gap-1 text-[10px] text-slate-400 mt-0.5">
-                        <Clock size={9} strokeWidth={2} />
-                        {timeStr} Â· {conv._count.messages} messages
-                      </span>
-                    </div>
-                    <ChevronRight
-                      size={12}
-                      strokeWidth={2}
-                      className="text-slate-300 group-hover:text-slate-500 shrink-0 transition-colors"
-                    />
-                  </button>
-                );
-              })}
-            </div>
+                    )}
+                    <span className="flex items-center gap-1 text-[10px] text-slate-400 mt-0.5">
+                      <Clock size={9} strokeWidth={2} />
+                      {timeStr} · {conv._count.messages} messages
+                    </span>
+                  </div>
+                  <ChevronRight
+                    size={12}
+                    strokeWidth={2}
+                    className="text-slate-300 group-hover:text-slate-500 shrink-0 transition-colors"
+                  />
+                  {archivedMenu}
+                </button>
+              );
+            })}
           </div>
+        </div>
 
         {/* Sidebar footer */}
         <div className="border-t-[1.5px] border-slate-200 px-4 py-3">
@@ -1010,7 +1240,7 @@ setShowAllSuggestions(false);
 
       <Script src="https://js.puter.com/v2/" strategy="afterInteractive" />
 
-      {/* â•â• MAIN CHAT AREA â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â• */}
+      {/* Main chat area */}
       <div className="relative flex flex-1 flex-col overflow-hidden min-w-0">
         {/* Subtle dot grid background */}
         <div
@@ -1022,7 +1252,7 @@ setShowAllSuggestions(false);
           }}
         />
 
-        {/* â”€â”€ TOP HEADER â”€â”€ */}
+        {/* Top header */}
         <header className="relative z-10 flex items-center justify-between border-b-[1.5px] border-slate-200 bg-white/85 px-4 py-3 backdrop-blur-xl sm:px-6">
           {/* Accent line */}
           <div className="absolute top-0 left-0 right-0 h-0.5 bg-amber-800" />
@@ -1086,7 +1316,7 @@ setShowAllSuggestions(false);
           </div>
         </header>
 
-        {/* â”€â”€ MESSAGES â”€â”€ */}
+        {/* Messages */}
         <div className="relative flex-1 overflow-y-auto px-4 py-6 sm:px-6 lg:px-10">
           {/* Empty state suggestions */}
           {messages.length === 1 && (
@@ -1151,29 +1381,30 @@ setShowAllSuggestions(false);
             </div>
           )}
 
-{/* Messages */}
-<div className="flex flex-col gap-5">
-  {messages.map((msg, idx) => (
-    <Fragment key={msg.id}>
-      <Bubble msg={msg} />
-      {msg.role === "ai" && idx === messages.length - 1 && followUpSuggestions.length > 0 && (
-        <div className="pl-12">
-          <SuggestionChips
-            suggestions={showAllSuggestions ? followUpSuggestions : followUpSuggestions.slice(0, 4)}
-            onSelect={send}
-          />
-          {!showAllSuggestions && followUpSuggestions.length > 4 && (
-            <button
-              onClick={() => setShowAllSuggestions(true)}
-              className="mt-1 text-sm text-amber-800 underline"
-            >
-              Show More
-            </button>
-          )}
-        </div>
-      )}
-    </Fragment>
-  ))}
+  {/* Messages */}
+  <div className="flex flex-col gap-5">
+    {messages.map((msg, idx) => (
+      <Fragment key={msg.id}>
+        <Bubble msg={msg} />
+        {msg.role === "ai" && idx === messages.length - 1 && followUpSuggestions.length > 0 && (
+          <div className="pl-12">
+            <SuggestionChips
+              suggestions={showAllSuggestions ? followUpSuggestions : followUpSuggestions.slice(0, 4)}
+              onSelect={send}
+            />
+            {!showAllSuggestions && followUpSuggestions.length > 4 && (
+              <button
+                onClick={() => setShowAllSuggestions(true)}
+                className="mt-1 text-sm text-amber-800 underline"
+              >
+                Show More
+              </button>
+            )}
+          </div>
+        )}
+      </Fragment>
+    ))}
+  }
 
   {/* Typing indicator */}
   {typing && (
@@ -1187,10 +1418,9 @@ setShowAllSuggestions(false);
     </div>
   )}
   <div ref={bottomRef} />
-</div>
         </div>
 
-        {/* â”€â”€ INPUT BAR â”€â”€ */}
+        {/* Input bar */}
         <div className="relative border-t-[1.5px] border-slate-200 bg-white/90 px-4 py-3 backdrop-blur-xl sm:px-6">
           <div className="absolute top-0 left-0 right-0 h-px `bg-gradient-to-r` from-transparent via-amber-800/20 to-transparent" />
 
@@ -1198,90 +1428,35 @@ setShowAllSuggestions(false);
             <div
               className="
                 flex items-end gap-2.5 rounded-2xl
-                border-[1.5px] border-slate-300
-                bg-white p-2
-                shadow-sm
-                transition-all duration-200
-                focus-within:border-amber-800/60
-                focus-within:shadow-[0_0_0_3px_rgba(120,53,15,0.08)]
+                bg-white/80
+                backdrop-blur-sm
+                px-4
+                py-3
               "
             >
-              {/* Doc icon */}
-              <div className="mb-1 flex h-8 w-8 shrink-0 items-center justify-center rounded-xl border-[1.5px] border-slate-200 bg-slate-50">
-                <FileText
-                  size={14}
-                  strokeWidth={2}
-                  className="text-slate-500"
-                />
-              </div>
-
               <textarea
-                disabled={loading}
-                ref={inputRef}
+                className="
+                  flex-1 rounded-lg border border-slate-300 focus:outline-none focus:border-amber-500 py-2 px-3 text-[13px] leading-relaxed resize-none
+                  min-h-[48px]
+                "
                 value={input}
                 onChange={(e) => setInput(e.target.value)}
                 onKeyDown={handleKey}
-                placeholder="Ask about any Article, Amendment, or constitutional conceptâ€¦"
+                placeholder="Ask Samvi about the Constitution..."
                 rows={1}
-                className="flex-1 resize-none bg-transparent py-1.5 text-[13.5px] text-slate-800 placeholder-slate-400 outline-none leading-relaxed"
-                style={{ maxHeight: "120px" }}
-                onInput={(e) => {
-                  const el = e.currentTarget;
-                  el.style.height = "auto";
-                  el.style.height = Math.min(el.scrollHeight, 120) + "px";
-                }}
               />
-
-              {/* Send button */}
               <button
-                onClick={() => send(input)}
-                disabled={!input.trim() || typing || loading}
                 className="
-                  group relative mb-0.5 flex h-9 w-9 shrink-0 items-center justify-center
-                  overflow-hidden rounded-xl
-                  bg-amber-900
-                  border-[1.5px] border-amber-800
-                  transition-all duration-200
-                  disabled:opacity-35
-                  enabled:hover:-translate-y-0.5
-                  enabled:hover:shadow-md
-                  enabled:active:scale-95
+                  rounded-lg bg-amber-600 px-4 py-2 text-white hover:bg-amber-500 transition-colors
+                  disabled:opacity-50 disabled:cursor-not-allowed
                 "
+                disabled={loading}
+                type="submit"
               >
-                {/* Shimmer */}
-                <span className="absolute inset-0 -skew-x-12 -translate-x-full `] `bg-gradient-to-r from-transparent via-white/20 to-transparent transition-transform duration-500 group-hover:translate-x-[200%]" />
-                {loading ? (
-                  <div className="h-4 w-4 animate-spin rounded-full border-2 border-amber-100 border-t-transparent" />
-                ) : (
-                  <Send
-                    size={14}
-                    strokeWidth={2}
-                    className="relative text-amber-100 -translate-x-px"
-                  />
-                )}
+                Send
               </button>
-            </div>
-
-            {/* Hint row */}
-            <div className="mt-2 flex items-center justify-between px-1">
-              <span className="text-[10.5px] text-slate-400">
-                <kbd className="rounded border-[1.5px] border-slate-200 bg-slate-50 px-1 py-0.5 font-mono text-[9px] text-slate-500">
-                  Enter
-                </kbd>{" "}
-                to send Â·{" "}
-                <kbd className="rounded border-[1.5px] border-slate-200 bg-slate-50 px-1 py-0.5 font-mono text-[9px] text-slate-500">
-                  Shift+Enter
-                </kbd>{" "}
-                for new line
-              </span>
-              <span className="text-[10.5px] text-slate-400">
-                Powered by{" "}
-                <span className="font-semibold text-amber-800">Samvi AI</span>
-              </span>
             </div>
           </div>
         </div>
-      </div>
-    </div>
   );
 }

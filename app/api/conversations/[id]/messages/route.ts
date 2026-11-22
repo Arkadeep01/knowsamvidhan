@@ -1,7 +1,7 @@
 import { NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
 import { getUserSession } from "@/lib/auth";
-import { verifyCitationPipeline, CitationType } from "@/lib/verification";
+import { verifyCitationPipeline, CitationType, buildVerificationMetadata } from "@/lib/verification";
 
 type MessageMetadata = {
   model?: string;
@@ -35,12 +35,17 @@ type MessageMetadata = {
     evidencePassages: string[];
     explanation: string;
   };
+  originalContent?: string;
 };
 
 interface MessageBody {
   role: string;
   content: string;
   metadata?: MessageMetadata;
+}
+
+interface EditMessageBody {
+  content: string;
 }
 
 async function extractCitationsFromText(text: string): Promise<{ type: string; value: string; extracted?: any }[]> {
@@ -201,6 +206,271 @@ export async function POST(
           content,
           conversationId: id,
           metadata: metadata || {},
+        },
+      });
+      return NextResponse.json(message);
+    } catch (innerError) {
+      return NextResponse.json(
+        { error: "Failed to add message and verification" },
+        { status: 500 }
+      );
+    }
+  }
+}
+
+/* ------------------------------------------------------------------
+   PATCH /api/conversations/[id]/messages/[mid] — Edit message
+   Updates content, marks isEdited=true, stores original in metadata
+   ------------------------------------------------------------------ */
+export async function PATCH(
+  req: Request,
+  { params }: { params: Promise<{ id: string; mid: string }> }
+) {
+  try {
+    const session = await getUserSession();
+    if (!session) {
+      return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+    }
+
+    const { id, mid } = await params;
+    const body = (await req.json()) as EditMessageBody;
+
+    if (!body.content) {
+      return NextResponse.json(
+        { error: "Content is required" },
+        { status: 400 }
+      );
+    }
+
+    // Fetch existing message to get current metadata
+    const existingMessage = await prisma.chatMessage.findUnique({
+      where: { id: mid },
+    });
+
+    const mergedMetadata: Record<string, unknown> = {
+      ...(existingMessage?.metadata || {}),
+      originalContent: existingMessage?.content,
+    };
+
+    const message = await prisma.chatMessage.update({
+      where: { id: mid },
+      data: {
+        content: body.content,
+        isEdited: true,
+        editedAt: new Date(),
+        metadata: mergedMetadata,
+      },
+    });
+
+    await prisma.conversation.update({
+      where: { id },
+      data: { updatedAt: new Date() },
+    });
+
+    return NextResponse.json(message);
+  } catch (error) {
+    console.error("PATCH EDIT ERROR:", error);
+    return NextResponse.json(
+      { error: "Failed to edit message" },
+      { status: 500 }
+    );
+  }
+}
+
+/* ------------------------------------------------------------------
+   POST /api/conversations/[id]/messages/[mid]/regenerate — Regenerate
+   Creates a new branch from the message with fresh verification metadata
+   ------------------------------------------------------------------ */
+export async function POST(
+  req: Request,
+  { params }: { params: Promise<{ id: string; mid: string }> }
+) {
+  try {
+    const session = await getUserSession();
+    if (!session) {
+      return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+    }
+
+    const { id, mid } = await params;
+    const body = (await req.json()) as { regenerate?: boolean };
+
+    if (body?.regenerate) {
+      // Fetch the original message and its metadata
+      const originalMessage = await prisma.chatMessage.findUnique({
+        where: { id: mid },
+        include: { conversation: true },
+      });
+
+      if (!originalMessage || originalMessage.role !== "assistant") {
+        return NextResponse.json(
+          { error: "Cannot regenerate non-assistant message or message not found" },
+          { status: 400 }
+        );
+      }
+
+      // Build conversation context up to the original message
+      const messagesContext = await prisma.chatMessage.findMany({
+        where: {
+          conversationId: id,
+        },
+        orderBy: { createdAt: "asc" },
+      });
+
+      // Find the last user message in context
+      const userMessages = messagesContext.filter((m) => m.role === "user");
+      const lastUserMessage = userMessages.at(-1)?.content;
+
+      if (!lastUserMessage) {
+        return NextResponse.json(
+          { error: "No user message found in conversation context" },
+          { status: 400 }
+        );
+      }
+
+      // Generate fresh response with Gemini
+      const ai = new GoogleGenAI({
+        apiKey: process.env.GEMINI_API_KEY!,
+      });
+
+      const systemInstruction =
+        "You are Samvi, a constitutional AI assistant knowledgeable about the Constitution of India. Provide accurate, grounded responses with citations to articles, cases, and amendments when applicable. Use a helpful, educational tone.";
+
+      try {
+        const response = await ai.models.generateContent({
+          model: "gemini-3.5-flash-lite",
+          contents: [
+            {
+              role: "user",
+              parts: [{ text: systemInstruction }, { text: lastUserMessage }],
+            },
+          ],
+        });
+
+        const freshVerificationResults = await verifyCitationPipeline(
+          (response as any).text || "",
+          [], // retrievedEvidence
+          { articles: [], amendments: [], cases: [] }
+        );
+
+        const verificationMetadata = buildVerificationMetadata(freshVerificationResults);
+
+        const newMessage = await prisma.chatMessage.create({
+          data: {
+            role: "assistant",
+            content: (response as any).text || "",
+            conversationId: id,
+            metadata: {
+              ...verificationMetadata,
+              parentMessageId: mid,
+              branchFrom: mid,
+            },
+          },
+        });
+
+        await prisma.conversation.update({
+          where: { id },
+          data: { updatedAt: new Date() },
+        });
+
+        return NextResponse.json(newMessage);
+      } catch (error) {
+        console.error("REGENERATE ERROR:", error);
+        return NextResponse.json(
+          { error: "Failed to regenerate message" },
+          { status: 500 }
+        );
+      }
+    }
+
+    // Default: add new message with verification (existing behavior)
+    const { role, content } = body;
+
+    if (!role || !content) {
+      return NextResponse.json(
+        { error: "Role and content are required" },
+        { status: 400 }
+      );
+    }
+
+    // Step 1: Extract citations from the content
+    const extractedCitations = await extractCitationsFromText(content);
+
+    // Step 2: Run verification pipeline
+    const { articles, amendments } = await prisma.$transaction(async (tx) => {
+      const articles = await tx.article.findMany({});
+      const amendments = await tx.amendment.findMany({});
+      return { articles, amendments };
+    });
+
+    // Build case database from Prisma - query a sample of cases or use stored data
+    const cases: any[] = [];
+
+    const verificationResults = await verifyCitationPipeline(
+      content,
+      [], // retrievedEvidence - would come from RAG in full implementation
+      { articles, amendments, cases }
+    );
+
+    // Step 3: Build metadata with verification results
+    const verificationMetadata = verificationResults.map((result) => ({
+      status: result.status,
+      provenance: {
+        sourceType: result.provenance.sourceType,
+        sourceTitle: result.provenance.sourceTitle,
+        articleClauseRef: result.provenance.articleClauseRef,
+        court: result.provenance.court,
+        judgmentYear: result.provenance.judgmentYear,
+        amendmentNumber: result.provenance.amendmentNumber,
+        constitutionalVersion: result.provenance.constitutionalVersion,
+        originalPassage: result.provenance.originalPassage,
+        sourceUrl: result.provenance.sourceUrl,
+        retrievalId: result.provenance.retrievalId,
+        verifiedAt: result.provenance.verifiedAt,
+        verificationStatus: result.provenance.verificationStatus,
+      },
+      evidencePassages: result.evidencePassages,
+      explanation: result.explanation,
+    }));
+
+    // Step 4: Preserve existing metadata if present, merge with verification
+    const mergedMetadata: Record<string, unknown> = {
+      ...(body.metadata || {}),
+      verification: verificationMetadata,
+    };
+
+    // Step 5: Create message with merged metadata
+    const message = await prisma.$transaction(async (tx) => {
+      const newMessage = await tx.chatMessage.create({
+        data: {
+          role,
+          content,
+          conversationId: id,
+          metadata: mergedMetadata,
+        },
+      });
+
+      await tx.conversation.update({
+        where: { id },
+        data: { updatedAt: new Date() },
+      });
+
+      return newMessage;
+    });
+
+    return NextResponse.json(message);
+  } catch (error) {
+    console.error("POST MESSAGE ERROR:", error);
+    // Even if verification fails, preserve the original message without verification metadata
+    try {
+      const { id, mid } = await params;
+      const body = (await req.json()) as { role?: string; content?: string };
+      const { role, content } = body;
+      const message = await prisma.chatMessage.create({
+        data: {
+          role,
+          content,
+          conversationId: id,
+          metadata: body.metadata || {},
         },
       });
       return NextResponse.json(message);

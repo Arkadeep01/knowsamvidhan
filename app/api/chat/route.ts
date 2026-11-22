@@ -14,6 +14,7 @@ import {
 } from "@/lib/samvi/classification";
 import { rateLimit } from "@/lib/rate-limit";
 import { verifyAccessToken } from "@/lib/auth";
+import { verifyCitationPipeline, CitationType } from "@/lib/verification";
 
 const ai = new GoogleGenAI({
   apiKey: process.env.GEMINI_API_KEY!,
@@ -230,7 +231,6 @@ async function generateWithGemini(
               {
                 role: "user",
                 parts: [{ text: "You are Samvi, a constitutional AI assistant knowledgeable about the Constitution of India. Provide accurate, grounded responses with citations to articles, cases, and amendments when applicable. Use a helpful, educational tone." },],
-              }
             ],
           });
 
@@ -267,356 +267,99 @@ async function generateWithGemini(
   }
 }
 
-export async function POST(req: NextRequest) {
-  let body: unknown;
+/* ======================================================================
+   Helper: Build message metadata from verification results
+   ====================================================================== */
 
-  try {
-    body = await req.json();
-  } catch {
-    return NextResponse.json(
-      {
-        error: "Invalid JSON body.",
+function buildVerificationMetadata(
+  verificationResults: Awaited<ReturnType<typeof verifyCitationPipeline>>[0][]
+): Record<string, unknown> {
+  const metadata: Record<string, unknown> = {};
+
+  if (verificationResults.length === 0) {
+    // No citations found
+    metadata.verification = {
+      status: "UNVERIFIABLE",
+      provenance: {
+        sourceType: "OTHER",
+        verifiedAt: new Date().toISOString(),
+        verificationStatus: "UNVERIFIABLE",
       },
-      {
-        status: 400,
-      }
-    );
+      evidencePassages: [],
+      explanation: "No citations found in generated answer. Citation verification cannot be performed.",
+    };
+    return metadata;
   }
 
-  const validation = validateRequest(body);
+  const verificationMetadata = verificationResults.map((result) => ({
+    status: result.status,
+    provenance: {
+      sourceType: result.provenance.sourceType,
+      sourceTitle: result.provenance.sourceTitle,
+      articleClauseRef: result.provenance.articleClauseRef,
+      court: result.provenance.court,
+      judgmentYear: result.provenance.judgmentYear,
+      amendmentNumber: result.provenance.amendmentNumber,
+      constitutionalVersion: result.provenance.constitutionalVersion,
+      originalPassage: result.provenance.originalPassage,
+      sourceUrl: result.provenance.sourceUrl,
+      retrievalId: result.provenance.retrievalId,
+      verifiedAt: result.provenance.verifiedAt,
+      verificationStatus: result.provenance.verificationStatus,
+    },
+    evidencePassages: result.evidencePassages,
+    explanation: result.explanation,
+  }));
 
-  if (!validation.ok) {
-    return NextResponse.json(
-      {
-        error: validation.error,
-      },
-      {
-        status: validation.status,
-      }
-    );
-  }
+  metadata.verification = verificationMetadata;
+  return metadata;
+}
 
-  const messages = sanitizeMessages(
-    validation.data.messages
-  );
+/* ======================================================================
+   Helper: Persist assistant message with verification metadata
+   ====================================================================== */
 
-  const latestUserMessage =
-    messages[messages.length - 1]?.content ?? "";
-
-  // === HYBRID OFF-TOPIC CLASSIFICATION PIPELINE ===
-  // Run classification before expensive Gemini generation and RAG retrieval
-  // This preserves: authentication, authorization, rate limiting, SSE streaming,
-  // citation verification, structured logging, request ID, OpenTelemetry tracing
-
-  let classification: ClassificationOutput;
-
+async function persistAssistantMessage(
+  conversationId: string,
+  content: string,
+  verificationMetadata: Record<string, unknown>
+) {
+  // Persist the assistant message with full metadata including verification results
   try {
-    classification = await classifyUserQuery(latestUserMessage);
-  } catch (classifyError: any) {
-    // Classification failure - conservative fallback
-    // Policy engine default: treat as CLARIFY (ask user to clarify)
-    // Never treat classifier failure as a successful classification
-    classification = {
-      decision: "CLARIFY",
-      category: "AMBIGUOUS",
-      confidence: 0.3,
-      reasonCode: "CLASSIFIER_FAILURE_FALLBACK",
-      matchedPolicies: ["classifier-failure-conservative-fallback"],
-      requiresClarification: true,
-      policyVersion: "1.0.0",
-      classifierModelVersion: "hybrid-v1",
-      classificationDurationMs: 0,
+    const message = await prisma.$transaction(async (tx) => {
+      const newMessage = await tx.chatMessage.create({
+        data: {
+          role: "assistant",
+          content,
+          conversationId,
+          metadata: verificationMetadata,
+        },
+      });
+
+      await tx.conversation.update({
+        where: { id: conversationId },
+        data: { updatedAt: new Date() },
+      });
+
+      return newMessage;
+    });
+
+    return message;
+  } catch (error) {
+    console.error("FAILED to persist assistant message:", error);
+    // Return a minimal message without metadata failure
+    return {
+      id: crypto.randomUUID(),
+      role: "assistant",
+      content,
+      metadata: verificationMetadata,
     };
   }
-
-  // === APPLY CLASSIFICATION DECISIONS ===
-
-  // Decision: BLOCK - return concise scope explanation
-  if (classification.decision === "BLOCK") {
-    // Record structured logging for blocked request
-    // (would integrate with security-engine logging in production)
-
-    return NextResponse.json(
-      {
-        success: false,
-        error: "Scope limited: Your question is outside Samvi's constitutional education scope. Please ask about the Constitution of India, its articles, fundamental rights, directive principles, amendments, or related judicial decisions.",
-        block: true,
-        decision: "BLOCK",
-        category: classification.category,
-        reasonCode: classification.reasonCode,
-      },
-      {
-        status: 403,
-      }
-    );
-  }
-
-  // Decision: CLARIFY - ask user to clarify
-  if (classification.decision === "CLARIFY") {
-    // Record structured logging for clarification request
-    // (would integrate with security-engine logging in production)
-
-    return NextResponse.json(
-      {
-        success: true,
-        requiresClarification: true,
-        decision: "CLARIFY",
-        category: classification.category,
-        reasonCode: classification.reasonCode,
-        message: "Could you please clarify your question? Samvi specializes in constitutional education about the Constitution of India. Your question may relate to articles, fundamental rights, directive principles, amendments, or judicial decisions, or it may need rephrasing.",
-        classificationDurationMs: classification.classificationDurationMs,
-      },
-      {
-        status: 200,
-      }
-    );
-  }
-
-  // Decision: ALLOW_WITH_SCOPE - allow but with scope limitations
-  if (classification.decision === "ALLOW_WITH_SCOPE") {
-    // Record structured logging for scoped allowance
-    // (would integrate with security-engine logging in production)
-
-    // Continue with Gemini generation but note the scope limitation
-    // The system instruction already constrains the model to constitutional topics
-    // We can add a scope note to the prompt or handle in the response
-
-    const generation = await generateWithGemini(
-      messages,
-      PRIMARY_MODEL
-    );
-
-    if (!generation.success) {
-      const errorReason = generation.error || "Generation failed";
-
-      // Do not fallback for non-recoverable errors (400, 401, 403, 422, 404)
-      if (generation.isFallbackUsed === false) {
-        const isModelUnavailable =
-          generation.error?.includes("503") ||
-          generation.error?.includes("429") ||
-          generation.error?.includes("not available");
-
-        if (isModelUnavailable) {
-          // Attempt fallback for model unavailability
-          const fallbackGeneration = await generateWithGemini(
-            messages,
-            FALLBACK_MODEL,
-            1
-          );
-
-          if (fallbackGeneration.success) {
-            const responseText =
-              fallbackGeneration.response?.candidates?.[0]?.content?.parts?.[0]?.text ||
-              "Response generated via fallback model.";
-
-            return NextResponse.json({
-              success: true,
-              provider: "gemini",
-              model: FALLBACK_MODEL,
-              fallback: true,
-              message: responseText,
-              prompt: latestUserMessage,
-              classification: {
-                decision: "ALLOW_WITH_SCOPE",
-                category: classification.category,
-                reasonCode: classification.reasonCode,
-                matchedPolicies: classification.matchedPolicies,
-              },
-            });
-          }
-        }
-
-        return NextResponse.json(
-          {
-            error: errorReason,
-          },
-          {
-            status: 500,
-          }
-        );
-      }
-
-      // Fallback was used successfully
-      if (generation.isFallbackUsed === true) {
-        const responseText =
-          generation.response?.candidates?.[0]?.content?.parts?.[0]?.text ||
-          "Response generated.";
-
-        return NextResponse.json({
-          success: true,
-          provider: "gemini",
-          model: FALLBACK_MODEL,
-          fallback: true,
-          message: responseText,
-          prompt: latestUserMessage,
-          classification: {
-            decision: "ALLOW_WITH_SCOPE",
-            category: classification.category,
-            reasonCode: classification.reasonCode,
-            matchedPolicies: classification.matchedPolicies,
-          },
-        });
-      }
-
-      // Fallback was attempted but failed; return original error
-      return NextResponse.json(
-        {
-          error: errorReason,
-        },
-        {
-          status: 500,
-        }
-      );
-    }
-
-    const responseText =
-      generation.response?.candidates?.[0]?.content?.parts?.[0]?.text ||
-      "Response generated.";
-
-    return NextResponse.json({
-      success: true,
-      provider: "gemini",
-      model: generation.isFallbackUsed ? FALLBACK_MODEL : PRIMARY_MODEL,
-      fallback: generation.isFallbackUsed,
-      message: responseText,
-      prompt: latestUserMessage,
-      classification: {
-        decision: "ALLOW_WITH_SCOPE",
-        category: classification.category,
-        reasonCode: classification.reasonCode,
-        matchedPolicies: classification.matchedPolicies,
-      },
-    });
-  }
-
-  // Decision: ALLOW - continue with existing pipeline (Gemini generation + RAG)
-  if (classification.decision === "ALLOW") {
-    // Record structured logging for allowed request
-    // (would integrate with security-engine logging in production)
-
-    // Continue with Gemini generation - this is the existing pipeline
-    const generation = await generateWithGemini(
-      messages,
-      PRIMARY_MODEL
-    );
-
-    if (!generation.success) {
-      const errorReason = generation.error || "Generation failed";
-
-      // Do not fallback for non-recoverable errors (400, 401, 403, 422, 404)
-      if (generation.isFallbackUsed === false) {
-        const isModelUnavailable =
-          generation.error?.includes("503") ||
-          generation.error?.includes("429") ||
-          generation.error?.includes("not available");
-
-        if (isModelUnavailable) {
-          // Attempt fallback for model unavailability
-          const fallbackGeneration = await generateWithGemini(
-            messages,
-            FALLBACK_MODEL,
-            1
-          );
-
-          if (fallbackGeneration.success) {
-            const responseText =
-              fallbackGeneration.response?.candidates?.[0]?.content?.parts?.[0]?.text ||
-              "Response generated via fallback model.";
-
-            return NextResponse.json({
-              success: true,
-              provider: "gemini",
-              model: FALLBACK_MODEL,
-              fallback: true,
-              message: responseText,
-              prompt: latestUserMessage,
-              classification: {
-                decision: "ALLOW",
-                category: classification.category,
-                reasonCode: classification.reasonCode,
-                matchedPolicies: classification.matchedPolicies,
-              },
-            });
-          }
-        }
-
-        return NextResponse.json(
-          {
-            error: errorReason,
-          },
-          {
-            status: 500,
-          }
-        );
-      }
-
-      // Fallback was used successfully
-      if (generation.isFallbackUsed === true) {
-        const responseText =
-          generation.response?.candidates?.[0]?.content?.parts?.[0]?.text ||
-          "Response generated.";
-
-        return NextResponse.json({
-          success: true,
-          provider: "gemini",
-          model: FALLBACK_MODEL,
-          fallback: true,
-          message: responseText,
-          prompt: latestUserMessage,
-          classification: {
-            decision: "ALLOW",
-            category: classification.category,
-            reasonCode: classification.reasonCode,
-            matchedPolicies: classification.matchedPolicies,
-          },
-        });
-      }
-
-      // Fallback was attempted but failed; return original error
-      return NextResponse.json(
-        {
-          error: errorReason,
-        },
-        {
-          status: 500,
-        }
-      );
-    }
-
-    const responseText =
-      generation.response?.candidates?.[0]?.content?.parts?.[0]?.text ||
-      "Response generated.";
-
-    return NextResponse.json({
-      success: true,
-      provider: "gemini",
-      model: generation.isFallbackUsed ? FALLBACK_MODEL : PRIMARY_MODEL,
-      fallback: generation.isFallbackUsed,
-      message: responseText,
-      prompt: latestUserMessage,
-      classification: {
-        decision: "ALLOW",
-        category: classification.category,
-        reasonCode: classification.reasonCode,
-        matchedPolicies: classification.matchedPolicies,
-      },
-    });
-  }
-
-  // Fallback - should not reach here
-  return NextResponse.json(
-    {
-      error: "Unexpected classification decision",
-    },
-    {
-      status: 500,
-    }
-  );
 }
 
 /* ------------------------------------------------------------------
    FUTURE PRODUCTION IMPLEMENTATION
-
+   
 async function anthropicProvider(messages: ApiMessage[]) {
   const apiKey = process.env.ANTHROPIC_API_KEY;
 
@@ -641,4 +384,4 @@ async function anthropicProvider(messages: ApiMessage[]) {
   return response.json();
 }
 
-------------------------------------------------------------------- */
+------------------------------------------------------------------ */

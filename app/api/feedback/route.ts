@@ -1,39 +1,87 @@
 import { NextResponse } from "next/server";
-import { getUserSession } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
+import { getUserSession } from "@/lib/auth";
 
-// DELETE /api/admin/feedback/hidden
-// Deletes all feedback where showOnSite = false
-export async function DELETE() {
+export async function POST(
+  req: Request
+) {
   try {
-    // ✅ Auth check
     const session = await getUserSession();
-    if (!session) {
-      return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+    const body = await req.json();
+    const { conversationId, rating, category, comment } = body;
+
+    // Validate required fields
+    if (rating === undefined || rating === null) {
+      return NextResponse.json(
+        { error: "Rating is required" },
+        { status: 400 }
+      );
     }
 
-    const user = await prisma.user.findUnique({
-      where: { id: session.id },
-      select: { id: true, role: true, status: true, isDeleted: true },
-    });
-
-    if (!user || user.isDeleted || user.status !== "ACTIVE" || user.role !== "ADMIN") {
-      return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+    if (category === undefined || category === null) {
+      return NextResponse.json(
+        { error: "Category is required" },
+        { status: 400 }
+      );
     }
 
-    // ✅ Delete all not-shown feedback
-    const result = await prisma.feedback.deleteMany({
-      where: { showOnSite: false },
+    // Rating must be 1-5
+    if (rating < 1 || rating > 5) {
+      return NextResponse.json(
+        { error: "Rating must be between 1 and 5" },
+        { status: 400 }
+      );
+    }
+
+    // Category must be a valid option
+    const validCategories = ["general", "quality", "correctness", "helpfulness", "privacy"];
+    if (!validCategories.includes(category)) {
+      return NextResponse.json(
+        { error: "Invalid category" },
+        { status: 400 }
+      );
+    }
+
+    // Determine userId - authenticated user or guest
+    let userId: string | null = null;
+    if (session) {
+      userId = session.id;
+    } else {
+      // For guest conversations, we store feedback without userId
+      // and rely on conversationId + guestSessionId tracking
+      const guestConv = await prisma.conversation.findFirst({
+        where: { id: conversationId, isGuest: true },
+        select: { guestSessionId: true },
+      });
+      // We'll store null userId for guest feedback; frontend tracks guest session
+      userId = null;
+    }
+
+    // Create feedback entry
+    const feedback = await prisma.feedback.create({
+      data: {
+        userId,
+        rating,
+        category,
+        comment: comment || null,
+        conversationId,
+      },
     });
 
-    return NextResponse.json({
-      message: `Deleted ${result.count} feedback entries`,
-      count: result.count,
-    });
+    // Check if this is negative feedback that should be flagged for admin review
+    if (rating <= 2) {
+      // Flag for admin review by setting showOnSite to true or creating an alert
+      await prisma.feedback.update({
+        where: { id: feedback.id },
+        data: { showOnSite: true },
+      });
+    }
+
+    return NextResponse.json(feedback);
   } catch (error) {
-    console.error("Admin feedback DELETE hidden error:", error);
+    console.error("FEEDBACK ERROR:", error);
     return NextResponse.json(
-      { error: "Failed to delete feedback" },
+      { error: "Failed to submit feedback" },
       { status: 500 }
     );
   }
