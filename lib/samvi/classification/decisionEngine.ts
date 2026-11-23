@@ -14,7 +14,11 @@ import type {
   BypassAttempt,
   PolicyMatch,
 } from "./types";
-import { classifyWithPolicyEngine, SemanticClassification as SemanticResult } from "./policyEngine";
+import {
+  classifyWithPolicyEngine,
+  detectBypassAttempt,
+  SemanticClassification as SemanticResult,
+} from "./policyEngine";
 import { semanticClassifyQuery } from "./semanticClassifier";
 
 /**
@@ -28,13 +32,13 @@ import { semanticClassifyQuery } from "./semanticClassifier";
  * @param options Optional semantic classification result
  * @returns Final ClassificationOutput with decision and metadata
  */
-export function finalDecisionEngine(
+export async function finalDecisionEngine(
   query: string,
   options: {
     semanticResult?: SemanticClassification;
     bypassAttempt?: BypassAttempt;
   } = {}
-): ClassificationOutput {
+): Promise<ClassificationOutput> {
   const startMs = Date.now();
 
   // Step 1: Run deterministic policy engine (always runs, independent of classifier)
@@ -44,7 +48,7 @@ export function finalDecisionEngine(
   let semanticResult = options.semanticResult;
   if (!semanticResult) {
     // Run semantic classification with policy info for reconciliation
-    semanticResult = await semanticClassifyQuery(query, policyResult.matched ? undefined : undefined);
+    semanticResult = await semanticClassifyQuery(query);
   }
 
   // Step 3: Detect bypass attempts
@@ -65,29 +69,24 @@ export function finalDecisionEngine(
 
     return {
       decision: "BLOCK",
-      category: "OUT_OF_SCOPE",
+      category: "UNRELATED",
       confidence: bypassSupportsBlock ? bypassAttempt.confidence : policyResult.confidence,
       reasonCode: "PROMPT_INJECTION_DETECTED",
       matchedPolicies: ["policy-final-authority", ...policyResult.matchedPolicies],
       requiresClarification: false,
       policyVersion: "1.0.0",
-      classifierModelVersion: semanticResult?.classifierModelVersion || "hybrid-v1",
+      classifierModelVersion: "hybrid-v1",
       classificationDurationMs: Date.now() - startMs,
     };
   }
 
   // If policy engine says ALLOW, classifier may suggest ALLOW_WITH_SCOPE or CLARIFY
   // but policy engine final authority means we at minimum ALLOW
-  let decision = policyResult.decision;
+  let decision: ClassificationDecision = policyResult.decision;
   let category = policyResult.category;
   let reasonCode = policyResult.reasonCode;
   let matchedPolicies = [...policyResult.matchedPolicies];
   let requiresClarification = policyResult.requiresClarification;
-  let allowScope = policyResult.classificationDurationMs; // reuse field? no, use separate
-
-  // Actually, let me use the policyResult's allowScope concept differently
-  // The policyResult already has the right structure - let me build on it
-
   // --- Reconcile semantic classifier results ---
 
   // If policy says ALLOW but classifier says BLOCK/CLARIFY, policy wins
@@ -113,7 +112,7 @@ export function finalDecisionEngine(
     } else if (classifierSupportsBlock) {
       // Classifier says block but policy says allow - policy has final authority, keep ALLOW
       // but mark with reason code indicating classifier concern
-      reasonCode = "CLASSIFIER_CONCERN_OVERIDDEN";
+      reasonCode = "CLASSIFIER_CONCERN_OVERRIDDEN";
       matchedPolicies = [...matchedPolicies, "classifier-concern-overridden"];
     }
     // If classifier says ALLOW_WITH_SCOPE and policy says ALLOW, combine to ALLOW_WITH_SCOPE
@@ -125,7 +124,6 @@ export function finalDecisionEngine(
       category = semanticResult.category;
       reasonCode = semanticResult.reasonCodes[0] || "RELEVANT_EDUCATIONAL_QUERY";
       matchedPolicies = [...matchedPolicies, "semantic-scope-allow"];
-      allowScope = true;
       requiresClarification = false;
     }
   }
@@ -136,14 +134,14 @@ export function finalDecisionEngine(
     if (semanticResult.intent !== "ALLOW") {
       // Classifier doesn't see scope needed - policy still wins, keep ALLOW_WITH_SCOPE
       // but add note
-      reasonCode = "POLICY_SCOPE_DECISION";
+      reasonCode = "RELEVANT_EDUCATIONAL_QUERY";
     }
   }
 
   // If policy says CLARIFY, checker may override to BLOCK if bypass detected
   if (decision === "CLARIFY" && bypassAttempt.detected && bypassAttempt.confidence > 0.7) {
     decision = "BLOCK";
-    category = "OUT_OF_SCOPE";
+    category = "UNRELATED";
     reasonCode = "PROMPT_INJECTION_DETECTED";
     matchedPolicies = [...matchedPolicies, "bypass-block-clarify"];
     requiresClarification = false;
@@ -152,8 +150,8 @@ export function finalDecisionEngine(
   // If policy says CLARIFY and classifier says BLOCK with high confidence, block
   if (decision === "CLARIFY" && semanticResult && semanticResult.intent === "BLOCK" && semanticResult.confidence > 0.7) {
     decision = "BLOCK";
-    category = "OUT_OF_SCOPE";
-    reasonCode = "CLASSIFIER_BLOCK_OVERRIDE";
+    category = "UNRELATED";
+    reasonCode = "POLICY_VIOLATION";
     matchedPolicies = [...matchedPolicies, "classifier-block-clarify-overridden"];
     requiresClarification = false;
   }
@@ -165,7 +163,7 @@ export function finalDecisionEngine(
   ) {
     decision = "CLARIFY";
     category = "AMBIGUOUS";
-    reasonCode = "NO_POLICY_MATCH";
+    reasonCode = "AMBIGUOUS_INTENT";
     matchedPolicies = ["conservative-fallback"];
     requiresClarification = true;
   }
@@ -177,11 +175,11 @@ export function finalDecisionEngine(
     decision,
     category,
     confidence: finalConfidence,
-    reasonCode: reasonCode || "NO_REASON_CODE",
+    reasonCode: reasonCode || "AMBIGUOUS_INTENT",
     matchedPolicies,
     requiresClarification,
     policyVersion: "1.0.0",
-    classifierModelVersion: semanticResult?.classifierModelVersion || "hybrid-v1",
+    classifierModelVersion: "hybrid-v1",
     classificationDurationMs: Date.now() - startMs,
   };
 }

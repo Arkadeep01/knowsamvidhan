@@ -15,7 +15,7 @@ export async function GET(req: NextRequest) {
 
     const where: Record<string, unknown> = {};
     if (level && level !== "all") where.level = level;
-    if (search) where.title = { contains: search, mode: "insensitive" };
+    if (search) where.title = { contains: search };
 
     const [quizzes, total] = await Promise.all([
       prisma.quiz.findMany({

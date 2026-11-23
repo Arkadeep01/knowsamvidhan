@@ -1,7 +1,8 @@
 import { NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
 import { getUserSession } from "@/lib/auth";
-import { verifyCitationPipeline, CitationType, buildVerificationMetadata } from "@/lib/verification";
+import { verifyCitationPipeline, CitationType } from "@/lib/verification";
+import { GoogleGenAI } from "@google/genai";
 
 type MessageMetadata = {
   model?: string;
@@ -180,7 +181,7 @@ export async function POST(
           role,
           content,
           conversationId: id,
-          metadata: mergedMetadata,
+          metadata: JSON.stringify(mergedMetadata),
         },
       });
 
@@ -205,7 +206,7 @@ export async function POST(
           role,
           content,
           conversationId: id,
-          metadata: metadata || {},
+          metadata: JSON.stringify({}),
         },
       });
       return NextResponse.json(message);
@@ -219,69 +220,10 @@ export async function POST(
 }
 
 /* ------------------------------------------------------------------
-   PATCH /api/conversations/[id]/messages/[mid] — Edit message
-   Updates content, marks isEdited=true, stores original in metadata
-   ------------------------------------------------------------------ */
-export async function PATCH(
-  req: Request,
-  { params }: { params: Promise<{ id: string; mid: string }> }
-) {
-  try {
-    const session = await getUserSession();
-    if (!session) {
-      return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
-    }
-
-    const { id, mid } = await params;
-    const body = (await req.json()) as EditMessageBody;
-
-    if (!body.content) {
-      return NextResponse.json(
-        { error: "Content is required" },
-        { status: 400 }
-      );
-    }
-
-    // Fetch existing message to get current metadata
-    const existingMessage = await prisma.chatMessage.findUnique({
-      where: { id: mid },
-    });
-
-    const mergedMetadata: Record<string, unknown> = {
-      ...(existingMessage?.metadata || {}),
-      originalContent: existingMessage?.content,
-    };
-
-    const message = await prisma.chatMessage.update({
-      where: { id: mid },
-      data: {
-        content: body.content,
-        isEdited: true,
-        editedAt: new Date(),
-        metadata: mergedMetadata,
-      },
-    });
-
-    await prisma.conversation.update({
-      where: { id },
-      data: { updatedAt: new Date() },
-    });
-
-    return NextResponse.json(message);
-  } catch (error) {
-    console.error("PATCH EDIT ERROR:", error);
-    return NextResponse.json(
-      { error: "Failed to edit message" },
-      { status: 500 }
-    );
-  }
-}
-
-/* ------------------------------------------------------------------
-   POST /api/conversations/[id]/messages/[mid]/regenerate — Regenerate
+   Regenerate message helper
    Creates a new branch from the message with fresh verification metadata
    ------------------------------------------------------------------ */
-export async function POST(
+async function regenerateMessage(
   req: Request,
   { params }: { params: Promise<{ id: string; mid: string }> }
 ) {
@@ -292,7 +234,12 @@ export async function POST(
     }
 
     const { id, mid } = await params;
-    const body = (await req.json()) as { regenerate?: boolean };
+    const body = (await req.json()) as {
+      regenerate?: boolean;
+      role?: string;
+      content?: string;
+      metadata?: Record<string, unknown>;
+    };
 
     if (body?.regenerate) {
       // Fetch the original message and its metadata
@@ -352,18 +299,18 @@ export async function POST(
           { articles: [], amendments: [], cases: [] }
         );
 
-        const verificationMetadata = buildVerificationMetadata(freshVerificationResults);
+        const verificationMetadata = { verification: freshVerificationResults };
 
         const newMessage = await prisma.chatMessage.create({
           data: {
             role: "assistant",
             content: (response as any).text || "",
             conversationId: id,
-            metadata: {
+            metadata: JSON.stringify({
               ...verificationMetadata,
               parentMessageId: mid,
               branchFrom: mid,
-            },
+            }),
           },
         });
 
@@ -445,7 +392,7 @@ export async function POST(
           role,
           content,
           conversationId: id,
-          metadata: mergedMetadata,
+          metadata: JSON.stringify(mergedMetadata),
         },
       });
 
@@ -463,14 +410,14 @@ export async function POST(
     // Even if verification fails, preserve the original message without verification metadata
     try {
       const { id, mid } = await params;
-      const body = (await req.json()) as { role?: string; content?: string };
+      const body = (await req.json()) as { role: string; content: string; metadata?: unknown };
       const { role, content } = body;
       const message = await prisma.chatMessage.create({
         data: {
           role,
           content,
           conversationId: id,
-          metadata: body.metadata || {},
+          metadata: JSON.stringify(body.metadata || {}),
         },
       });
       return NextResponse.json(message);

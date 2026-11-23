@@ -15,6 +15,7 @@ import {
 import { rateLimit } from "@/lib/rate-limit";
 import { verifyAccessToken } from "@/lib/auth";
 import { verifyCitationPipeline, CitationType } from "@/lib/verification";
+import { prisma } from "@/lib/prisma";
 
 const ai = new GoogleGenAI({
   apiKey: process.env.GEMINI_API_KEY!,
@@ -153,7 +154,7 @@ async function classifyUserQuery(
   query: string
 ): Promise<ClassificationOutput> {
   // Run the hybrid classification engine
-  const classification = finalDecisionEngine(query);
+  const classification = await finalDecisionEngine(query);
 
   return classification;
 }
@@ -192,7 +193,7 @@ async function generateWithGemini(
     };
   } catch (error) {
     const oError = error as { error: { code?: string }; message?: string };
-    const errorCode = oError.error?.code;
+    const errorCode = Number(oError.error?.code);
     const errorMessage = oError.message || "Unknown error";
 
     // Non-recoverable errors: don't fallback (auth, invalid request, forbidden)
@@ -230,7 +231,8 @@ async function generateWithGemini(
             contents: [
               {
                 role: "user",
-                parts: [{ text: "You are Samvi, a constitutional AI assistant knowledgeable about the Constitution of India. Provide accurate, grounded responses with citations to articles, cases, and amendments when applicable. Use a helpful, educational tone." },],
+                parts: [{ text: "You are Samvi, a constitutional AI assistant knowledgeable about the Constitution of India. Provide accurate, grounded responses with citations to articles, cases, and amendments when applicable. Use a helpful, educational tone." }],
+              },
             ],
           });
 
@@ -332,7 +334,7 @@ async function persistAssistantMessage(
           role: "assistant",
           content,
           conversationId,
-          metadata: verificationMetadata,
+          metadata: JSON.stringify(verificationMetadata),
         },
       });
 

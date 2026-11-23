@@ -111,7 +111,7 @@ async function fetchSecurityData() {
     prisma.pageView.count({
       where: {
         visitedAt: { gte: dayAgo },
-        userAgent: { contains: "bot", mode: "insensitive" },
+        userAgent: { contains: "bot" },
       },
     }),
     prisma.userQuizAttempt.findMany({

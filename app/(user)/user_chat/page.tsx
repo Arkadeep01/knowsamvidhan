@@ -25,6 +25,7 @@ import {
   Hash,
   AlignLeft,
   ArrowUpRight,
+  Edit,
 } from "lucide-react";
 import { motion } from "framer-motion";
 
@@ -35,6 +36,8 @@ interface Conversation {
   updatedAt: string;
   isGuest?: boolean;
   guestSessionId?: string;
+  isArchived?: boolean;
+  isPinned?: boolean;
   _count: { messages: number };
 }
 
@@ -43,7 +46,7 @@ interface StoredMessage {
   role: "user" | "assistant";
   content: string;
   createdAt: string;
-  _metadata?: Record<string, unknown>;
+  _metadata?: Record<string, any>;
   isEditing?: boolean;
   parentMessageId?: string;
   branchFrom?: string;
@@ -113,6 +116,10 @@ interface Message {
   role: Role;
   text: string;
   time: string;
+  _metadata?: Record<string, any>;
+  isEditing?: boolean;
+  parentMessageId?: string;
+  branchFrom?: string;
 }
 
 /* Suggested prompts */
@@ -189,7 +196,7 @@ function toUiMessages(storedMessages: StoredMessage[]): Message[] {
     return [welcomeMessage()];
   }
 
-  return storedMessages.map((msg) => ({
+  return storedMessages.map((msg, index) => ({
     id: msg.id || `${index}`,
     role: msg.role === "assistant" ? "ai" : "user",
     text: msg.content,
@@ -197,6 +204,7 @@ function toUiMessages(storedMessages: StoredMessage[]): Message[] {
       hour: "2-digit",
       minute: "2-digit",
     }),
+    _metadata: msg._metadata,
     isEditing: msg.isEditing || false,
     parentMessageId: msg.parentMessageId,
     branchFrom: msg.branchFrom,
@@ -221,7 +229,23 @@ function TypingDots() {
 
 /* Message bubble */
 
-function Bubble({ msg }: { msg: Message }) {
+function Bubble({
+  msg,
+  isEditing,
+  editText,
+  setEditText,
+  onStartEdit,
+  onCancelEdit,
+  onSaveEdit,
+}: {
+  msg: Message;
+  isEditing: boolean;
+  editText: string;
+  setEditText: (value: string) => void;
+  onStartEdit: () => void;
+  onCancelEdit: () => void;
+  onSaveEdit: () => void;
+}) {
   const isAI = msg.role === "ai";
   const metadata = msg._metadata || {};
   const verification = metadata.verification;
@@ -233,8 +257,7 @@ function Bubble({ msg }: { msg: Message }) {
   const explanation = verification?.explanation || "";
 
   // Edit/regenerate controls show for user's own messages (not the AI welcome message)
-  const canEdit = !isAI && msg.id !== "0" && !msg.isEditing;
-  const canRegenerate = isAI && msg._metadata?.verification;
+  const canEdit = !isAI && msg.id !== "0";
 
   return (
     <div
@@ -253,7 +276,7 @@ function Bubble({ msg }: { msg: Message }) {
         </div>
       )}
 
-      {msg.isEditing && !isAI ? (
+      {isEditing && !isAI ? (
         /* Edit form for user message */
         <div
           className={"flex max-w-[75%] sm:max-w-[68%] flex-col gap-1 " + (isAI ? "items-start" : "items-end")}
@@ -262,20 +285,21 @@ function Bubble({ msg }: { msg: Message }) {
             className={"relative rounded-2xl px-4 py-3 text-[13.5px] leading-[1.8] " + (isAI ? "rounded-bl-sm bg-white border-[1.5px] border-slate-200 text-slate-800 shadow-sm" : "rounded-br-sm bg-amber-900 text-amber-50 shadow-md")}
           >
             <textarea
-              defaultValue={msg.text}
+              value={editText}
+              onChange={(event) => setEditText(event.target.value)}
               className={"w-full rounded-blg bg-white border border-slate-300 py-2 px-3 text-[13.5px] leading-[1.8] focus:outline-none focus:border-amber-500"}
               rows={3}
               style={{ minHeight: 50 }}
             />
             <div className="flex gap-2 mt-2">
               <button
-                onClick={() => setMsgEditing(null)}
+                onClick={onCancelEdit}
                 className="flex-1 rounded bg-gray-200 px-3 py-1 text-sm text-slate-600 hover:bg-gray-300 cancel-edit"
               >
                 Cancel
               </button>
               <button
-                onClick={handleSaveEdit}
+                onClick={onSaveEdit}
                 className="rounded bg-amber-600 px-3 py-1 text-sm text-white hover:bg-amber-500 save-edit"
               >
                 Save
@@ -283,33 +307,20 @@ function Bubble({ msg }: { msg: Message }) {
             </div>
           </div>
         </div>
-      ) : canEdit && (
+      ) : canEdit ? (
         /* Edit button for user message */
         <div
           className="absolute top-2 right-2 flex items-center gap-2"
         >
           <button
-            onClick={() => setMsgEditing(msg.id)}
+            onClick={onStartEdit}
             className="rounded bg-amber-600 px-2 py-1 text-xs text-white hover:bg-amber-500 transition-colors"
             title="Edit message"
           >
             <Edit size={12} strokeWidth={1.5} className="text-amber-100" />
           </button>
         </div>
-      ) : canRegenerate && (
-        /* Regenerate button for AI message */
-        <div
-          className="absolute top-2 right-2 flex items-center gap-2"
-        >
-          <button
-            onClick={() => handleRegenerate(msg.id)}
-            className="rounded bg-amber-600 px-2 py-1 text-xs text-white hover:bg-amber-500 transition-colors"
-            title="Regenerate response"
-          >
-            <RefreshCw size={12} strokeWidth={1.5} className="text-amber-100" />
-          </button>
-        </div>
-      )}
+      ) : null}
 
       <div
         className={"flex max-w-[75%] sm:max-w-[68%] flex-col gap-1 " + (isAI ? "items-start" : "items-end")}
@@ -323,28 +334,6 @@ function Bubble({ msg }: { msg: Message }) {
       className={"absolute top-2 right-2 flex items-center gap-2 px-2 py-1 text-[9px] font-medium rounded border " + (citationStatus === "VERIFIED" ? "bg-green-100 text-green-800 border-green-300" : citationStatus === "PARTIALLY_SUPPORTED" ? "bg-amber-100 text-amber-800 border-amber-300" : citationStatus === "UNSUPPORTED" ? "bg-red-100 text-red-800 border-red-300" : "bg-gray-100 text-gray-800 border-gray-300")}
     >
       {citationStatus}
-    </div>
-  )}
-
-  {isAI && !msg.isEditing && (
-    <div
-      className="absolute top-2 right-2 flex items-center gap-2 px-2 py-1 text-[10px] text-slate-400"
-      style={{ zIndex: 10 }}
-    >
-      <button
-        onClick={() => setFeedbackState({ msgId: msg.id, rating: 5, comment: "" })}
-        className="rounded bg-green-100 px-2 py-1 text-green-800 hover:bg-green-200 transition-colors"
-        title="Thumbs up"
-      >
-        <RotateCw size={12} strokeWidth={1.5} className="text-green-600" />
-      </button>
-      <button
-        onClick={() => setFeedbackState({ msgId: msg.id, rating: 1, comment: "" })}
-        className="rounded bg-red-100 px-2 py-1 text-red-800 hover:bg-red-200 transition-colors"
-        title="Thumbs down"
-      >
-        <XMark size={12} strokeWidth={1.5} className="text-red-600" />
-      </button>
     </div>
   )}
 
@@ -412,15 +401,15 @@ function Bubble({ msg }: { msg: Message }) {
                   <span className="flex-1">
                     <strong>Partial support:</strong> {evidencePassages[0]}
                   </span>
-                )
-              : citationStatus === "UNSUPPORTED" ? (
+                </div>
+              ) : citationStatus === "UNSUPPORTED" ? (
                 <div className="flex items-start gap-2">
                   <X size={8} strokeWidth={1.5} className="text-rose-600 flex-shrink-0 mt-0.5" />
                   <span className="flex-1">
                     <strong>Not supported:</strong> {evidencePassages[0]}
                   </span>
-                )
-              : (
+                </div>
+              ) : (
                 <div className="flex items-start gap-2">
                   <Clock size={8} strokeWidth={1.5} className="text-slate-600 flex-shrink-0 mt-0.5" />
                   <span className="flex-1">
@@ -592,14 +581,36 @@ export default function ChatPage() {
   const [sidebarOpen, setSidebarOpen] = useState(false);
   const [conversations, setConversations] = useState<Conversation[]>([]);
   const [activeConversationId, setActiveConversationId] = useState<string | null>(null);
+  const [openMenuId, setOpenMenuId] = useState<string | null>(null);
+  const menuRef = useRef<HTMLDivElement>(null);
   const [user, setUser] = useState<{ id: string; name?: string; email: string } | null>(null);
   const [followUpSuggestions, setFollowUpSuggestions] = useState<Suggestion[]>([]);
   const [showAllSuggestions, setShowAllSuggestions] = useState(false);
-  const [feedbackState, setFeedbackState] = useState<{ msgId: string; rating: number; comment: string } | null>(null);
   const bottomRef = useRef<HTMLDivElement>(null);
   const inputRef = useRef<HTMLTextAreaElement>(null);
   const [editingMsgId, setMsgEditing] = useState<string | null>(null);
   const [editText, setEditText] = useState("");
+
+  const handleSaveEdit = async (messageId: string) => {
+    if (!activeConversationId || !editText.trim()) return;
+    try {
+      const response = await fetch(
+        `/api/conversations/${activeConversationId}/messages/${messageId}`,
+        {
+          method: "PATCH",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ content: editText.trim() }),
+        }
+      );
+      if (!response.ok) throw new Error("Could not save the edited message");
+      setMessages((current) => current.map((message) =>
+        message.id === messageId ? { ...message, text: editText.trim() } : message
+      ));
+      setMsgEditing(null);
+    } catch (error) {
+      console.error("EDIT MESSAGE ERROR:", error);
+    }
+  };
 
   useEffect(() => {
     const initializeAndLoad = async () => {
@@ -636,6 +647,30 @@ export default function ChatPage() {
       migrateGuestConversations();
     }
   }, [user]);
+
+  // Close archive action menu when clicking outside it
+  useEffect(() => {
+    const handleClickOutside = (e: MouseEvent) => {
+      if (openMenuId === null) return;
+      const target = e.target as Node;
+      if (menuRef.current && !menuRef.current.contains(target)) {
+        if (!(target as Element).closest("[data-archive-menu-trigger]")) {
+          setOpenMenuId(null);
+        }
+      }
+    };
+    document.addEventListener("mousedown", handleClickOutside);
+    return () => document.removeEventListener("mousedown", handleClickOutside);
+  }, [openMenuId]);
+
+  // Close archive action menu when pressing Escape
+  useEffect(() => {
+    const handleKeyDown = (e: KeyboardEvent) => {
+      if (e.key === "Escape") setOpenMenuId(null);
+    };
+    document.addEventListener("keydown", handleKeyDown);
+    return () => document.removeEventListener("keydown", handleKeyDown);
+  }, []);
 
   useEffect(() => {
     if (!activeConversationId) {
@@ -674,7 +709,7 @@ export default function ChatPage() {
           if (saved) {
             try {
               const parsed = JSON.parse(saved);
-              const converted: Message[] = parsed.map((msg: { role: string; content: string }, index: number) => ({
+              const converted: Message[] = parsed.map((msg: { role: string; content: string; parentMessageId?: string; branchFrom?: string }, index: number) => ({
                 id: `${index}`,
                 role: msg.role === "assistant" ? "ai" : "user",
                 text: msg.content,
@@ -711,7 +746,7 @@ export default function ChatPage() {
         if (saved) {
           try {
             const parsed = JSON.parse(saved);
-            const converted: Message[] = parsed.map((msg: { role: string; content: string }, index: number) => ({
+            const converted: Message[] = parsed.map((msg: { role: string; content: string; parentMessageId?: string; branchFrom?: string }, index: number) => ({
               id: `${index}`,
               role: msg.role === "assistant" ? "ai" : "user",
               text: msg.content,
@@ -974,6 +1009,21 @@ export default function ChatPage() {
     }
   }
 
+const handleNewConversation = () => {
+  // Close any open archive action menu
+  setOpenMenuId(null);
+  // Start a fresh, unsaved conversation; existing conversation stays intact.
+  // No confirmation dialog, no backend mutation, no deletion/archival.
+  setActiveConversationId(null);
+  setInput("");
+  setTyping(false);
+  setLoading(false);
+  setFollowUpSuggestions([]);
+  setShowAllSuggestions(false);
+  // The existing useEffect resets messages to the welcome state when
+  // activeConversationId becomes null.
+};
+
 const clearChat = async () => {
     // If there's an active conversation, show confirmation and archive/delete
     if (activeConversationId) {
@@ -1045,9 +1095,40 @@ setMessages([
   },
 ]);
 
-// Reset suggestions after chat clear
-setFollowUpSuggestions([]);
-setShowAllSuggestions(false);
+    // Reset suggestions after chat clear
+    setFollowUpSuggestions([]);
+    setShowAllSuggestions(false);
+  };
+
+  const handleRestoreConversation = async (id: string) => {
+    try {
+      const res = await fetch(`/api/conversations/${id}`, {
+        method: "POST",
+      });
+      if (!res.ok) throw new Error("Failed to restore conversation");
+      setConversations((prev) =>
+        prev.map((c) => (c.id === id ? { ...c, isArchived: false } : c))
+      );
+      setOpenMenuId(null);
+    } catch (error) {
+      console.error("RESTORE CONVERSATION ERROR:", error);
+    }
+  };
+
+  const handlePermanentDeleteConversation = async (id: string) => {
+    try {
+      const res = await fetch(`/api/conversations/${id}`, {
+        method: "PUT",
+      });
+      if (!res.ok) throw new Error("Failed to delete conversation");
+      setConversations((prev) => prev.filter((c) => c.id !== id));
+      setOpenMenuId(null);
+      if (activeConversationId === id) {
+        setActiveConversationId(null);
+      }
+    } catch (error) {
+      console.error("PERMANENT DELETE CONVERSATION ERROR:", error);
+    }
   };
 
   return (
@@ -1110,7 +1191,7 @@ setShowAllSuggestions(false);
         {/* New chat */}
         <div className="px-4 py-4">
           <button
-            onClick={clearChat}
+            onClick={handleNewConversation}
             className="
               group flex w-full items-center justify-center gap-2
               rounded-xl border-[1.5px] border-amber-800/35
@@ -1142,30 +1223,17 @@ setShowAllSuggestions(false);
                 ? "Yesterday"
                 : `${Math.floor((Date.now() - date.getTime()) / 86400000)} days ago`;
               const isArchived = conv.isArchived;
-
-              // Menu items for archived conversations
-              const archivedMenu = isArchived ? (
-                <div className="absolute right-0 w-48 mt-2 origin-top-left bg-white rounded-sm shadow-lg py-1 z-50 border border-slate-200">
-                  <div className="rounded-sm px-2 py-1 text-sm text-slate-500">
-                    <RefreshCw>
-                      size={10} strokeWidth={1.5} className="text-slate-400"
-                    /> Restored
-                  </div>
-                  <hr className="my-1 border-b border-slate-100" />
-                  <div className="rounded-sm px-2 py-1 text-sm text-slate-500">
-                    <Trash2>
-                      size={10} strokeWidth={1.5} className="text-red-500"
-                    /> Permanently delete
-                  </div>
-                </div>
-              ) : null;
+              const showArchiveMenu = isArchived && openMenuId === conv.id;
 
               return (
                 <button
                   key={conv.id}
-                  onClick={() => setActiveConversationId(conv.id)}
+                  onClick={() => {
+                    setOpenMenuId(null);
+                    setActiveConversationId(conv.id);
+                  }}
                   className={`
-                    group flex w-full items-center gap-2.5 rounded-xl px-3 py-2.5 text-left
+                    relative group flex w-full items-center gap-2.5 rounded-xl px-3 py-2.5 text-left
                     transition-all duration-150
                     {
                       isActive
@@ -1200,7 +1268,7 @@ setShowAllSuggestions(false);
                     )}
                     <span className="flex items-center gap-1 text-[10px] text-slate-400 mt-0.5">
                       <Clock size={9} strokeWidth={2} />
-                      {timeStr} · {conv._count.messages} messages
+                      {timeStr} · {conv._count.messages / 2} messages
                     </span>
                   </div>
                   <ChevronRight
@@ -1208,7 +1276,45 @@ setShowAllSuggestions(false);
                     strokeWidth={2}
                     className="text-slate-300 group-hover:text-slate-500 shrink-0 transition-colors"
                   />
-                  {archivedMenu}
+                  {isArchived && (
+                    <button
+                      data-archive-menu-trigger
+                      aria-label="Conversation actions"
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        setOpenMenuId(openMenuId === conv.id ? null : conv.id);
+                      }}
+                      className="flex h-7 w-7 items-center justify-center rounded-lg text-slate-400 hover:bg-slate-100 hover:text-slate-700 transition-colors shrink-0"
+                    >
+                      <Menu size={14} strokeWidth={1.5} />
+                    </button>
+                  )}
+                  {showArchiveMenu && (
+                    <div
+                      ref={menuRef}
+                      className="absolute left-full top-1/2 -translate-y-1/2 ml-1 w-48 origin-top-left bg-white rounded-sm shadow-lg py-1 z-50 border border-slate-200"
+                    >
+                      <div
+                        className="rounded-sm px-2 py-1 text-sm text-slate-500 hover:bg-slate-50 cursor-pointer"
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          handleRestoreConversation(conv.id);
+                        }}
+                      >
+                        <RefreshCw size={10} strokeWidth={1.5} className="text-slate-400" /> Restored
+                      </div>
+                      <hr className="my-1 border-b border-slate-100" />
+                      <div
+                        className="rounded-sm px-2 py-1 text-sm text-slate-500 hover:bg-slate-50 cursor-pointer"
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          handlePermanentDeleteConversation(conv.id);
+                        }}
+                      >
+                        <Trash2 size={10} strokeWidth={1.5} className="text-red-500" /> Permanently delete
+                      </div>
+                    </div>
+                  )}
                 </button>
               );
             })}
@@ -1385,7 +1491,18 @@ setShowAllSuggestions(false);
   <div className="flex flex-col gap-5">
     {messages.map((msg, idx) => (
       <Fragment key={msg.id}>
-        <Bubble msg={msg} />
+        <Bubble
+          msg={msg}
+          isEditing={editingMsgId === msg.id}
+          editText={editText}
+          setEditText={setEditText}
+          onStartEdit={() => {
+            setMsgEditing(msg.id);
+            setEditText(msg.text);
+          }}
+          onCancelEdit={() => setMsgEditing(null)}
+          onSaveEdit={() => void handleSaveEdit(msg.id)}
+        />
         {msg.role === "ai" && idx === messages.length - 1 && followUpSuggestions.length > 0 && (
           <div className="pl-12">
             <SuggestionChips
@@ -1404,7 +1521,6 @@ setShowAllSuggestions(false);
         )}
       </Fragment>
     ))}
-  }
 
   {/* Typing indicator */}
   {typing && (
@@ -1458,5 +1574,8 @@ setShowAllSuggestions(false);
             </div>
           </div>
         </div>
+      </div>
+      </div>
+    </div>
   );
 }

@@ -42,13 +42,13 @@ export async function POST(request: NextRequest) {
           entityLabel: attackType,
           ipAddress: clientIp,
           userAgent: clientUserAgent,
-          metadata: {
+          metadata: JSON.stringify({
             attackType,
             payload,
             endpoint: targetEndpoint,
             detectedAt: new Date().toISOString(),
             source: "security-track-api",
-          },
+          }),
         },
       }),
       prisma.rateLimitEvent.create({
@@ -88,11 +88,11 @@ export async function POST(request: NextRequest) {
           country: countryCode,
           endpoint: targetEndpoint,
           payloadHash: crypto.createHash("sha256").update(payload || "empty").digest("hex").substring(0, 16),
-          prediction: {
+          prediction: JSON.stringify({
             attackType,
             severity,
             blocked: true,
-          },
+          }),
           mitigated: true,
           createdAt: new Date(),
         },

@@ -84,7 +84,6 @@ interface DashboardData {
  * Get the current evaluation state by querying the database for the latest runs.
  */
 async function getEvaluationState(
-  prisma: typeof prisma,
   benchmarkCasesCount: number = GOLDEN_BENCHMARK_CASES.length
 ): Promise<EvaluationState> {
   // Get the latest benchmark evaluation run
@@ -100,6 +99,7 @@ async function getEvaluationState(
           evaluationError: true,
         },
       },
+    },
     });
 
   // Get the latest production monitoring data
@@ -133,11 +133,11 @@ async function getEvaluationState(
     benchmarkStatus = MetricStatus.MEASURED;
     lastMeasuredAt = latestBenchmarkRun.startedAt;
     lastRunId = latestBenchmarkRun.id;
-    citationAccuracy = latestBenchmarkRun.citationAccuracy;
-    groundingRate = latestBenchmarkRun.groundingRate;
-    unsupportedClaimRate = latestBenchmarkRun.unsupportedClaimRate;
-    unverifiableCitationRate = latestBenchmarkRun.unverifiableCitationRate;
-    citationVerificationCoverage = latestBenchmarkRun.citationVerificationCoverage;
+    citationAccuracy = Number(latestBenchmarkRun.citationAccuracy);
+    groundingRate = Number(latestBenchmarkRun.groundingRate);
+    unsupportedClaimRate = Number(latestBenchmarkRun.unsupportedClaimRate);
+    unverifiableCitationRate = Number(latestBenchmarkRun.unverifiableCitationRate);
+    citationVerificationCoverage = Number(latestBenchmarkRun.citationVerificationCoverage);
     modelId = latestBenchmarkRun.modelId;
     promptVersion = latestBenchmarkRun.promptVersion;
     totalCaseCount = latestBenchmarkRun.totalCases;
@@ -185,13 +185,13 @@ async function getEvaluationState(
     productionStatus = MetricStatus.MEASURED;
     lastSampledAt = latestBenchmarkRun.completedAt || latestBenchmarkRun.startedAt;
     // Production metrics are separate - placeholder values with clear labeling
-    citationAccuracyProd = latestBenchmarkRun.citationAccuracy;
-    groundingRateProd = latestBenchmarkRun.groundingRate;
+    citationAccuracyProd = Number(latestBenchmarkRun.citationAccuracy);
+    groundingRateProd = Number(latestBenchmarkRun.groundingRate);
     representativenessNote =
       "Production metrics are calculated from sampled real user conversations. " +
       "See sampling policy for coverage details.";
     samplingCoverage = latestBenchmarkRun.citationVerificationCoverage
-      ? latestBenchmarkRun.citationVerificationCoverage
+      ? Number(latestBenchmarkRun.citationVerificationCoverage)
       : null;
   } else {
     productionStatus = MetricStatus.PENDING;
@@ -202,10 +202,7 @@ async function getEvaluationState(
     benchmarkStatus === MetricStatus.MEASURED &&
     productionStatus === MetricStatus.MEASURED
       ? MetricStatus.MEASURED
-      : benchmarkStatus === MetricStatus.FAILED ||
-        productionStatus === MetricStatus.FAILED
-          ? MetricStatus.FAILED
-          : MetricStatus.STALE;
+      : MetricStatus.STALE;
 
   return {
     benchmark: {
@@ -217,7 +214,7 @@ async function getEvaluationState(
       unsupportedClaimRate,
       unverifiableCitationRate,
       citationVerificationCoverage,
-      benchmarkCoverage: benchmarkCoverage ?? undefined,
+      benchmarkCoverage,
       modelId,
       promptVersion,
       historicalTrend,
@@ -228,12 +225,12 @@ async function getEvaluationState(
     },
     production: {
       status: productionStatus,
-      lastMeasuredAt: lastMeasuredAt || undefined,
-      lastSampledAt: lastSampledAt ? new Date(lastSampledAt) : undefined,
-      citationAccuracy: citationAccuracyProd ?? undefined,
-      groundingRate: groundingRateProd ?? undefined,
+      lastMeasuredAt,
+      lastSampledAt,
+      citationAccuracy: citationAccuracyProd,
+      groundingRate: groundingRateProd,
       representativenessNote,
-      samplingCoverage: samplingCoverage ?? undefined,
+      samplingCoverage,
     },
     overall: overallStatus,
   };
@@ -288,10 +285,8 @@ function formatMetricState(
 /**
  * Generate dashboard data for the admin UI.
  */
-async function getDashboardData(
-  prisma: typeof prisma
-): Promise<DashboardData> {
-  const evaluationState = await getEvaluationState(prisma);
+async function getDashboardData(): Promise<DashboardData> {
+  const evaluationState = await getEvaluationState();
   const now = new Date();
 
   // Determine data freshness
@@ -308,9 +303,9 @@ async function getDashboardData(
     production: string;
     overall: string;
   } = {
-    benchmark: MetricStatus[evaluationState.benchmark.status],
-    production: MetricStatus[evaluationState.production.status],
-    overall: MetricStatus[evaluationState.overall],
+    benchmark: evaluationState.benchmark.status.toUpperCase(),
+    production: evaluationState.production.status.toUpperCase(),
+    overall: evaluationState.overall.toUpperCase(),
   };
 
   // Check if needs attention
@@ -332,11 +327,14 @@ async function getDashboardData(
   };
 }
 
+export type { EvaluationState, DashboardData };
+
 export {
-  EvaluationState,
-  DashboardData,
   formatMetricState,
   MetricStatus,
   getEvaluationState,
   getDashboardData,
 };
+import { prisma } from "./prisma";
+import { GOLDEN_BENCHMARK_CASES } from "./goldenBenchmark";
+

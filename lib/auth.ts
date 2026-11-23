@@ -223,6 +223,18 @@ export const getUserSession =
       return null;
     }
 
+    const activeSession = await prisma.session.findFirst({
+      where: {
+        id: payload.jti,
+        userId: user.id,
+        isActive: true,
+        expiresAt: { gt: new Date() },
+      },
+      select: { id: true },
+    });
+
+    if (!activeSession) return null;
+
     return {
       id: user.id,
       sub: payload.sub,
@@ -262,6 +274,18 @@ export const getAdminSession =
     ) {
       return null;
     }
+
+    const activeSession = await prisma.session.findFirst({
+      where: {
+        id: payload.jti,
+        userId: user.id,
+        isActive: true,
+        expiresAt: { gt: new Date() },
+      },
+      select: { id: true },
+    });
+
+    if (!activeSession) return null;
 
     return {
       id: user.id,

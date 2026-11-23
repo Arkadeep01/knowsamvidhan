@@ -156,6 +156,7 @@ export async function POST(req: Request) {
     const refreshToken = signRefreshToken(payload);
 
     const session = await createSession({
+      id: payload.jti,
       userId: user.id,
       userAgent: req.headers.get("user-agent") || "",
       ipAddress: ip,

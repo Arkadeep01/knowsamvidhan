@@ -1,10 +1,4 @@
-import {
-  GoogleGenAI,
-  Type,
-  EmbedContentRequest,
-  Content,
-  Part,
-} from "@google/genai";
+import { GoogleGenAI } from "@google/genai";
 import { prisma } from "./prisma";
 import { recordSecurityAudit } from "./security-engine";
 
@@ -104,7 +98,7 @@ function verifyConstitutionalArticle(
   const articleNumber = citation.extracted?.articleNumber;
   if (!articleNumber) {
     return {
-      claim,
+      claim: { text: claim, citations: [] },
       citation,
       status: VerificationStatus.UNVERIFIABLE,
       provenance: {
@@ -127,7 +121,7 @@ function verifyConstitutionalArticle(
     // Article number exists in citation but not in our database
     // Still not VERIFIED just because the number is referenced
     return {
-      claim,
+      claim: { text: claim, citations: [] },
       citation,
       status: VerificationStatus.UNSUPPORTED,
       provenance: {
@@ -173,11 +167,11 @@ function verifyConstitutionalArticle(
     explanation = `Article ${articleNumber} provides partial support for the claim. Only some aspects of the claim are reflected in the cited passage.`;
   } else {
     status = VerificationStatus.UNSUPPORTED;
-    explanation = `Article ${article_number} exists but does not support the generated claim. The cited passage is unrelated or insufficient.`;
+    explanation = `Article ${articleNumber} exists but does not support the generated claim. The cited passage is unrelated or insufficient.`;
   }
 
   return {
-    claim,
+    claim: { text: claim, citations: [] },
     citation,
     status,
     provenance: {
@@ -208,7 +202,7 @@ function verifyAmendment(
 
   if (!amendmentNumber) {
     return {
-      claim,
+      claim: { text: claim, citations: [] },
       citation,
       status: VerificationStatus.UNVERIFIABLE,
       provenance: {
@@ -229,7 +223,7 @@ function verifyAmendment(
 
   if (!matchingAmendment) {
     return {
-      claim,
+      claim: { text: claim, citations: [] },
       citation,
       status: VerificationStatus.UNSUPPORTED,
       provenance: {
@@ -283,7 +277,7 @@ function verifyAmendment(
     explanation = `Amendment ${amendmentNumber} supports the claim with matching constitutional text.`;
   } else if (bestSupport > 0 && bestSupport < 0.7) {
     status = VerificationStatus.PARTIALLY_SUPPORTED;
-    explanation = `Amendment ${amendment_number} provides partial support for the claim. Some aspects are reflected in the cited passage.`;
+    explanation = `Amendment ${amendmentNumber} provides partial support for the claim. Some aspects are reflected in the cited passage.`;
   } else if (isOutdated && bestSupport >= 0.7) {
     // Even with good support, if it's an outdated version, mark unsupported
     status = VerificationStatus.UNSUPPORTED;
@@ -294,7 +288,7 @@ function verifyAmendment(
   }
 
   return {
-    claim,
+    claim: { text: claim, citations: [] },
     citation,
     status,
     provenance: {
@@ -329,7 +323,7 @@ function verifyJudicialDecision(
 
   if (!caseName) {
     return {
-      claim,
+      claim: { text: claim, citations: [] },
       citation,
       status: VerificationStatus.UNVERIFIABLE,
       provenance: {
@@ -430,7 +424,7 @@ function verifyJudicialDecision(
   }
 
   return {
-    claim,
+    claim: { text: claim, citations: [] },
     citation,
     status,
     provenance: {
@@ -634,14 +628,14 @@ async function semanticVerification(
   let bestScore = 0;
   let worstScore = 1;
   let hasContradiction = false;
-  let supportingPassages: string[] = [];
+  const supportingPassages: string[] = [];
 
   // Embed the claim once
-  const claimEmbeddingResp = await AI.embedContent({
+  const claimEmbeddingResp = await AI.models.embedContent({
     model: "text-embedding-004",
-    content: claim,
+    contents: claim,
   });
-  const claimEmbedding = claimEmbeddingResp.embedding;
+  const claimEmbedding = claimEmbeddingResp.embeddings?.[0]?.values;
   if (!claimEmbedding || claimEmbedding.length === 0) {
     // Fall back to rule-based if embeddings fail
     return semanticVerificationFallback(claim, evidencePassages);
@@ -650,11 +644,11 @@ async function semanticVerification(
   for (const passage of evidencePassages) {
     if (!passage || passage.trim().length < 10) continue;
 
-    const passageEmbeddingResp = await AI.embedContent({
+    const passageEmbeddingResp = await AI.models.embedContent({
       model: "text-embedding-004",
-      content: passage,
+      contents: passage,
     });
-    const passageEmbedding = passageEmbeddingResp.embedding;
+    const passageEmbedding = passageEmbeddingResp.embeddings?.[0]?.values;
 
     if (!passageEmbedding || passageEmbedding.length === 0) continue;
 
@@ -762,7 +756,7 @@ function semanticVerificationFallback(
     if (score > bestScore) bestScore = score;
   }
 
-  let status: VerivationStatus;
+  let status: VerificationStatus;
   let supportLevel: "direct" | "partial" | "contradiction" | "absent";
   let explanation: string;
 
@@ -977,15 +971,3 @@ async function runSemanticVerification(
   };
 }
 
-/* ======================================================================
-   Export types for frontend and persistence
-   ====================================================================== */
-
-export type { 
-  VerificationStatus, 
-  CitationType, 
-  VerificationProvenance,
-  ExtractedClaim,
-  CitationInfo,
-  VerificationResult 
-};

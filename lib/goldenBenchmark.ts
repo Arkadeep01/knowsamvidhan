@@ -24,7 +24,7 @@
  * reported as UNVERIFIABLE, NOT used to drive metric calculations.
  */
 
-const GOLDEN_BENCHMARK_CASES = [
+export const GOLDEN_BENCHMARK_CASES = [
   // ============================================================
   // Category A: Exact Article Lookups (1-15 cases)
   // ============================================================
@@ -456,7 +456,7 @@ const GOLDEN_BENCHMARK_CASES = [
     expectedCitations: ["Schedule 5"],
     expectedVerificationStatus: "VERIFIED",
     category: "C",
-    tags: ["schedule-5",-tribal-areas"],
+    tags: ["schedule-5", "tribal-areas"],
     groundTruthMissing: false,
   },
   {

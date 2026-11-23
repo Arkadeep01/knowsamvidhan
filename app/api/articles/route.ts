@@ -40,14 +40,14 @@ export async function GET(req: NextRequest) {
 
   if (search) {
     where.OR = [
-      { articleNumber: { contains: search, mode: "insensitive" } },
-      { title:         { contains: search, mode: "insensitive" } },
-      { tags:          { contains: search, mode: "insensitive" } },
+      { articleNumber: { contains: search } },
+      { title:         { contains: search } },
+      { tags:          { contains: search } },
     ];
   }
 
   if (part && part !== "All") {
-    where.part = { partNumber: { equals: part, mode: "insensitive" } };
+    where.part = { partNumber: { equals: part } };
   }
 
   const articles = await prisma.article.findMany({

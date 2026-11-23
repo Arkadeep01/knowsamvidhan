@@ -15,7 +15,7 @@ export const requireUser = async (request?: NextRequest) => {
                      "unknown";
     const userAgent = request.headers.get("user-agent") || "unknown";
     
-    const tokenValidation = validateSessionToken(token, request);
+    const tokenValidation = validateSessionToken(token ?? null, request);
     if (!tokenValidation.valid) {
       await recordSecurityAudit({
         action: "SESSION_HIJACK_ATTEMPT",
@@ -67,7 +67,7 @@ export const requireAdminGuard = async (request?: NextRequest) => {
                      "unknown";
     const userAgent = request.headers.get("user-agent") || "unknown";
     
-    const tokenValidation = validateSessionToken(token, request);
+    const tokenValidation = validateSessionToken(token ?? null, request);
     if (!tokenValidation.valid) {
       await recordSecurityAudit({
         action: "SESSION_HIJACK_ATTEMPT",

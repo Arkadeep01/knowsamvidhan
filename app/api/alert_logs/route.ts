@@ -1,7 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { PrismaClient } from '@prisma/client';
-
-const prisma = new PrismaClient();
+import { prisma } from '@/lib/prisma';
 
 // ─── TYPES ────────────────────────────────────────────────────────────────────
 type Severity = 'CRITICAL' | 'HIGH' | 'MEDIUM' | 'LOW';
@@ -66,7 +64,7 @@ export async function GET(request: NextRequest) {
     const formattedAlerts: Alert[] = alerts.map(alert => ({
       id: alert.id,
       status: alert.status as AlertStatus,
-      severity: alert.severity,
+      severity: alert.severity as Severity,
       title: alert.title,
       description: alert.description,
       serviceName: alert.serviceName,

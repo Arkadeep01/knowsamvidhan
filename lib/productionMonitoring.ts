@@ -1,3 +1,6 @@
+import { prisma as defaultPrisma } from "./prisma";
+import { verifyCitationPipeline } from "./verification";
+
 /**
  * Production-Quality Monitoring and Privacy Safeguards
  * 
@@ -80,9 +83,9 @@ const SAMPLING_POLICY = {
  * or treating user data as benchmark ground truth.
  */
 class ProductionMonitor {
-  private prisma: typeof prisma;
+  private prisma: typeof defaultPrisma;
 
-  constructor(prismaInstance: typeof prisma) {
+  constructor(prismaInstance: typeof defaultPrisma) {
     this.prisma = prismaInstance;
   }
 
@@ -92,7 +95,7 @@ class ProductionMonitor {
    * @param conversation The conversation to extract claims from
    * @returns Array of extracted claims with minimal retained text
    */
-  async extractClaimsForMonitoring(
+  extractClaimsForMonitoring(
     conversation: {
       id: string;
       messages: { role: string; content: string }[];
@@ -140,6 +143,7 @@ class ProductionMonitor {
       // Create a sample with minimal retained text
       const sample: ProductionMonitoringSample = {
         id: `prod_mon_${Date.now()}_${Math.random().toString(36).substring(2, 9)}`,
+        runId: `prod_run_${Date.now()}`,
         conversationId: conversation.id,
         query: message.content.substring(0, 200), // Limited length for privacy
         claim,
@@ -170,6 +174,8 @@ class ProductionMonitor {
       [], // No retrieved evidence - will be handled by the pipeline
       {
         articles: sample.citations?.map((c) => ({ articleNumber: c })) || [],
+        amendments: [],
+        cases: [],
       }
     );
 
@@ -294,5 +300,6 @@ class ProductionMonitor {
   }
 }
 
-export { ProductionMonitor, SAMPLING_POLICY, ProductionMonitoringSample, ProductionMonitoringMetrics };
+export { ProductionMonitor, SAMPLING_POLICY };
 export type { ProductionMonitoringSample, ProductionMonitoringMetrics };
+

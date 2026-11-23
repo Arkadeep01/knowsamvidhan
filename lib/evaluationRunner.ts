@@ -9,9 +9,9 @@
  */
 
 import { GoogleGenAI } from "@google/genai";
-import { prisma } from "./lib/prisma";
-import { verifyCitationPipeline } from "./lib/verification";
-import { GOLDEN_BENCHMARK_CASES } from "./lib/goldenBenchmark";
+import { prisma } from "./prisma";
+import { verifyCitationPipeline } from "./verification";
+import { GOLDEN_BENCHMARK_CASES } from "./goldenBenchmark";
 
 const PRIMARY_MODEL = "gemini-3.5-flash-lite";
 const BACKUP_MODEL = "gemini-3.5-flash";
@@ -101,7 +101,7 @@ async function evaluateSingleCase(
 
   try {
     // Step 1: Execute retrieval for the query
-    retrievalStart = Date.now();
+    const retrievalStart = Date.now();
     
     // Use the hybrid retrieval pipeline to find relevant evidence
     // This is a simplified version - in production this would use the full hybrid retrieval
@@ -116,7 +116,7 @@ async function evaluateSingleCase(
     };
 
     // Step 2: Generate answer using the Gemini model
-    generationStart = Date.now();
+    const generationStart = Date.now();
     
     const systemPrompt =
       "You are Samvi, a constitutional AI assistant knowledgeable about the Constitution of India. Provide accurate, grounded responses with citations to articles, cases, and amendments when applicable. Use a helpful, educational tone.";
@@ -161,7 +161,11 @@ async function evaluateSingleCase(
     const verificationResult = await verifyCitationPipeline(
       generatedText,
       [], // retrievedEvidence - we'll use the retrieved articles
-      { articles: relevantArticles.map((a) => ({ articleNumber: a }) }) }
+      {
+        articles: relevantArticles.map((a) => ({ articleNumber: a })),
+        amendments: [],
+        cases: [],
+      }
     );
 
     // The pipeline returns results for each citation found in the text
@@ -269,7 +273,7 @@ async function retrieveRelevantEvidence(query: string): Promise<string[]> {
 
 // Extract citation references from text (Article XX, XXth Amendment, Case Name patterns)
 function extractCitationsFromText(text: string): { value: string; type: string; extracted?: any }[] {
-  const citations: typeof extractCitationsFromText.type[] = [];
+  const citations: ReturnType<typeof extractCitationsFromText> = [];
   const lower = text.toLowerCase();
   
   // Pattern: "Article XX" or "Article XX(1)" or "Article XX, clause YY"
@@ -379,7 +383,7 @@ export async function runBenchmarkEvaluation(
     
     // Track metrics
     const latency = caseResult.generationDetails?.latencyMs || 
-                    caseResult.retrievalDetails?.latencyMs || 0;
+                    caseResult.retrievalDetails?.retrievalLatencyMs || 0;
     totalLatencyMs += latency;
     
     if (caseResult.skippedReason === "groundTruthMissing") {
@@ -404,7 +408,7 @@ export async function runBenchmarkEvaluation(
     retrievalSuccessCount++;
     generationSuccessCount++;
     evaluatedCount++;
-    totalLatencyMs += (caseResult.generationDetails?.latencyMs || 0) + (caseResult.retrievalDetails?.latencyMs || 0);
+    totalLatencyMs += (caseResult.generationDetails?.latencyMs || 0) + (caseResult.retrievalDetails?.retrievalLatencyMs || 0);
     
     switch (caseResult.verificationStatus) {
       case "VERIFIED":
@@ -502,13 +506,13 @@ export async function runBenchmarkEvaluation(
             benchmarkCaseId: c.benchmarkCaseId,
             query: c.query,
             generatedAnswer: c.generatedAnswer,
-            citations: c.citations,
+            citations: JSON.stringify(c.citations),
             verificationStatus: c.verificationStatus,
-            verificationDetails: c.verificationDetails,
+            verificationDetails: c.verificationDetails == null ? null : JSON.stringify(c.verificationDetails),
             retrievalStatus: c.retrievalStatus,
-            retrievalDetails: c.retrievalDetails,
+            retrievalDetails: c.retrievalDetails == null ? null : JSON.stringify(c.retrievalDetails),
             generationStatus: c.generationStatus,
-            generationDetails: c.generationDetails,
+            generationDetails: c.generationDetails == null ? null : JSON.stringify(c.generationDetails),
             evaluationError: c.evaluationError,
             skippedReason: c.skippedReason,
           })),
@@ -533,7 +537,7 @@ export async function runBenchmarkEvaluation(
 }
 
 // Export the benchmark cases and runner for use
-export { GOLDEN_BENCHMARK_CASES, evaluateSingleCase, runBenchmarkEvaluation };
+export { GOLDEN_BENCHMARK_CASES, evaluateSingleCase };
 
 console.log("Evaluation runner loaded successfully");
 console.log(`Benchmark contains ${GOLDEN_BENCHMARK_CASES.length} cases covering categories A-Y`);

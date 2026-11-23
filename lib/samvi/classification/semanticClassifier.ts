@@ -96,7 +96,7 @@ exclusively analyze: {truncated}
     let parsed: any;
     try {
       // Extract JSON from the response (model may add surrounding text)
-      const jsonMatch = textResponse.match(/```json\s*(\{.*\})\s*```/s);
+      const jsonMatch = textResponse.match(/```json\s*([\s\S]*?)\s*```/);
       if (jsonMatch) {
         parsed = JSON.parse(jsonMatch[1]);
       } else {
@@ -269,7 +269,7 @@ export async function semanticClassifyQuery(
       // Other bypass attempts - classify as unrelated
       intent = "BLOCK";
       category = "UNRELATED";
-      reasonCodes = [...reasonCodes, ...bypass.techniques.map((t) => `SEMANTIC_${t.toUpperCase()}`)];
+      reasonCodes = [...reasonCodes, "KEYWORD_BASED_BYPASS_ATTEMPT"];
       explanation = `${explanation || ''} Semantic bypass attempt detected.`.trim();
     }
   }
@@ -280,7 +280,7 @@ export async function semanticClassifyQuery(
     // If policy engine already resolved, respect its decision
     if (policyMatch.matched && policyMatch.reasonCode) {
       // Map policy reason codes to classifier categories
-      const policyReasonToCategory: Record<ReasonCode, ClassificationCategory> = {
+      const policyReasonToCategory: Partial<Record<ReasonCode, ClassificationCategory>> = {
         "PROMPT_INJECTION_DETECTED": "OUT_OF_SCOPE",
         "COMPLETELY_UNRELATED": "UNRELATED",
         "MIXED_RELEVANT_AND_UNRELATED": "MIXED_TOPIC",

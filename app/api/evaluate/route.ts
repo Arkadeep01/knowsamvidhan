@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 
 import { runBenchmarkEvaluation, GOLDEN_BENCHMARK_CASES } from "@/lib/evaluationRunner";
+import { prisma } from "@/lib/prisma";
 
 const MAX_CONCURRENT_RUNS = 1;
 const EVALUATION_TIMEOUT_MS = 600000; // 10 minutes
@@ -50,7 +51,7 @@ export async function POST(req: NextRequest) {
         promptVersion || "v1"
       );
 
-      const timeoutPromise = new Promise((_, reject) => {
+      const timeoutPromise = new Promise<never>((_, reject) => {
         setTimeout(() => {
           reject(new Error("Evaluation timed out after 10 minutes"));
         }, EVALUATION_TIMEOUT_MS);

@@ -12,7 +12,6 @@ export async function GET(
       where: {
         number: {
           equals: slug,
-          mode: "insensitive",
         },
       },
     });

@@ -1,0 +1,2 @@
+Set-Location "D:\knowsamvidhan"
+Start-Process "node" -ArgumentList "\"D:\knowsamvidhan\node_modules\.bin\next\dev.ps1\" --port 3000" -Wait -RedirectStandardOutput "NDEV_OUT.txt" -RedirectStandardError "NDEV_ERR.txt"

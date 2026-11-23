@@ -8,6 +8,14 @@ const RESEND_TEST_RECIPIENT_ERROR =
   "You can only send testing emails to your own email address";
 
 export async function sendEmail({ to, subject, html }: SendEmailInput) {
+  if (
+    process.env.NODE_ENV !== "production" &&
+    to.trim().toLowerCase().endsWith("@example.invalid")
+  ) {
+    console.info(`Email skipped for reserved test domain: ${subject}`);
+    return;
+  }
+
   const apiKey = process.env.RESEND_API_KEY;
   const from = process.env.EMAIL_FROM ?? "KnowSamvidhan <onboarding@resend.dev>";
 

@@ -11,9 +11,9 @@
  * - Accidental execution on every user request
  */
 
-import { prisma } from "./lib/prisma";
-import { GOLDEN_BENCHMARK_CASES } from "./lib/goldenBenchmark";
-import { runBenchmarkEvaluation } from "./lib/evaluationRunner";
+import { prisma } from "./prisma";
+import { GOLDEN_BENCHMARK_CASES } from "./goldenBenchmark";
+import { runBenchmarkEvaluation } from "./evaluationRunner";
 
 // Configuration for scheduling
 const SCHEDULER_CONFIG = {
@@ -45,8 +45,13 @@ const SCHEDULER_CONFIG = {
 // State tracking for scheduler
 const schedulerState = {
   isRunning: false,
-  lastRunId: null,
-  lastSuccessMetrics: null,
+  lastRunId: null as string | null,
+  lastSuccessMetrics: null as {
+    citationAccuracy: number;
+    groundingRate: number;
+    runId: string;
+    completedAt: Date | null;
+  } | null,
   runCount: 0,
   consecutiveFailures: 0,
 };

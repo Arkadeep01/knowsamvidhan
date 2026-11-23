@@ -163,7 +163,7 @@ export async function PATCH(
       { status: 500 }
     );
   }
-)
+}
 
 /* ------------------------------------------------------------------
    PIN/UNPIN conversation
@@ -204,7 +204,7 @@ export async function POST_pin(
       { status: 500 }
     );
   }
-)
+}
 
 /* ------------------------------------------------------------------
    EXPORT conversation (Markdown/JSON preserving metadata)
@@ -257,7 +257,6 @@ export async function GET_export(
         if (key === "messages") return value;
         return value;
       },
-      null,
       2
     );
 

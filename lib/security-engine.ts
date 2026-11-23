@@ -107,9 +107,9 @@ export async function calculateAdaptiveRisk(input: {
           createdAt: { gte: fifteenMinutesAgo },
           scope: "SECURITY",
           OR: [
-            { action: { contains: "fail", mode: "insensitive" } },
-            { action: { contains: "blocked", mode: "insensitive" } },
-            { description: { contains: input.ipAddress, mode: "insensitive" } },
+            { action: { contains: "fail" } },
+            { action: { contains: "blocked" } },
+            { description: { contains: input.ipAddress } },
           ],
         },
       }),
@@ -280,7 +280,7 @@ export async function recordSecurityAudit(input: {
       entityLabel: input.entityLabel,
       ipAddress: input.ipAddress,
       userAgent: input.userAgent,
-      metadata: input.metadata,
+      metadata: input.metadata == null ? null : JSON.stringify(input.metadata),
     },
   });
 }

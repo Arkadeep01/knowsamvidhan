@@ -20,7 +20,7 @@ export async function GET(
   const articleNumber = slugToArticleNumber(slug);
 
   const article = await prisma.article.findFirst({
-    where: { articleNumber: { equals: articleNumber, mode: "insensitive" } },
+    where: { articleNumber: { equals: articleNumber } },
     include: {
       part: true,
       clauses: { orderBy: { clauseNumber: "asc" } },

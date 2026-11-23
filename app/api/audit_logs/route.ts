@@ -1,6 +1,7 @@
 import { NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
-import { AuditScope, AuditSeverity } from "@prisma/client";
+type AuditScope = "IAM" | "SECURITY" | "DATABASE" | "CONTENT" | "SETTINGS" | "SYSTEM";
+type AuditSeverity = "INFO" | "LOW" | "MEDIUM" | "HIGH" | "CRITICAL";
 
 // ───────────────── TYPES ─────────────────
 
@@ -86,7 +87,6 @@ export async function GET() {
 
           action: {
             contains: "role",
-            mode: "insensitive",
           },
         },
       }),
@@ -139,9 +139,9 @@ export async function GET() {
           log.entityLabel ||
           "Unknown entity",
 
-        scope: log.scope,
+        scope: log.scope as AuditScope,
 
-        severity: log.severity,
+        severity: log.severity as AuditSeverity,
       })
     );
 
