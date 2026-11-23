@@ -1,51 +1,88 @@
 import { NextResponse } from "next/server";
-import { getUserSession } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
+import { getUserSession } from "@/lib/auth";
 
-export async function POST(req: Request) {
-  const session = getUserSession(req);
+export async function POST(
+  req: Request
+) {
+  try {
+    const session = await getUserSession();
+    const body = await req.json();
+    const { conversationId, rating, category, comment } = body;
 
-  if (!session) {
+    // Validate required fields
+    if (rating === undefined || rating === null) {
+      return NextResponse.json(
+        { error: "Rating is required" },
+        { status: 400 }
+      );
+    }
+
+    if (category === undefined || category === null) {
+      return NextResponse.json(
+        { error: "Category is required" },
+        { status: 400 }
+      );
+    }
+
+    // Rating must be 1-5
+    if (rating < 1 || rating > 5) {
+      return NextResponse.json(
+        { error: "Rating must be between 1 and 5" },
+        { status: 400 }
+      );
+    }
+
+    // Category must be a valid option
+    const validCategories = ["general", "quality", "correctness", "helpfulness", "privacy"];
+    if (!validCategories.includes(category)) {
+      return NextResponse.json(
+        { error: "Invalid category" },
+        { status: 400 }
+      );
+    }
+
+    // Determine userId - authenticated user or guest
+    let userId: string | null = null;
+    if (session) {
+      userId = session.id;
+    } else {
+      // For guest conversations, we store feedback without userId
+      // and rely on conversationId + guestSessionId tracking
+      const guestConv = await prisma.conversation.findFirst({
+        where: { id: conversationId, isGuest: true },
+        select: { guestSessionId: true },
+      });
+      // We'll store null userId for guest feedback; frontend tracks guest session
+      userId = null;
+    }
+
+    // Create feedback entry
+    const feedback = await prisma.feedback.create({
+      data: {
+        userId,
+        rating,
+        category,
+        comment: comment || null,
+        conversationId,
+      },
+    });
+
+    // Check if this is negative feedback that should be flagged for admin review
+    if (rating <= 2) {
+      // Flag for admin review by setting showOnSite to true or creating an alert
+      await prisma.feedback.update({
+        where: { id: feedback.id },
+        data: { showOnSite: true },
+      });
+    }
+
+    return NextResponse.json(feedback);
+  } catch (error) {
+    console.error("FEEDBACK ERROR:", error);
     return NextResponse.json(
-      { error: "User must login first" },
-      { status: 401 }
+      { error: "Failed to submit feedback" },
+      { status: 500 }
     );
   }
-
-  const user = await prisma.user.findUnique({
-    where: { id: session.id },
-    select: { id: true, status: true, isDeleted: true },
-  });
-
-  if (!user || user.isDeleted || user.status !== "ACTIVE") {
-    return NextResponse.json(
-      { error: "User must login first" },
-      { status: 401 }
-    );
-  }
-
-  const body = (await req.json()) as {
-    rating?: unknown;
-    name?: unknown;
-    comment?: unknown;
-  };
-
-  const rating = Number(body.rating);
-
-  if (!Number.isInteger(rating) || rating < 1 || rating > 5) {
-    return NextResponse.json(
-      { error: "Select a rating between 1 and 5" },
-      { status: 400 }
-    );
-  }
-
-  const name = typeof body.name === "string" ? body.name.trim() : "";
-  const comment = typeof body.comment === "string" ? body.comment.trim() : "";
-
-  await prisma.$executeRaw`
-    INSERT INTO "Feedback" ("id", "userId", "rating", "name", "comment")
-    VALUES (${crypto.randomUUID()}, ${user.id}, ${rating}, ${name || null}, ${comment || null})
-  `;
-
-  return NextResponse.json({ message: "Feedback saved" });
 }

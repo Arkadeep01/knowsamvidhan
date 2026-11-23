@@ -1,3 +1,4 @@
+import crypto from "crypto";
 import jwt, { type SignOptions, type JwtPayload } from "jsonwebtoken";
 import { cookies } from "next/headers";
 import { prisma } from "@/lib/prisma";
@@ -7,8 +8,11 @@ export type SessionRole = "USER" | "ADMIN";
 
 export type SessionPayload = {
   id: string;
+  sub: string;
   email: string;
   role: SessionRole;
+  jti: string;
+  device_id?: string;
 };
 
 const ACCESS_TOKEN_EXPIRES = "15m";
@@ -71,8 +75,12 @@ const validatePayload = (
   ) {
     return {
       id: decoded.id,
+      sub: typeof decoded.sub === "string" ? decoded.sub : decoded.id,
       email: decoded.email,
       role: decoded.role,
+      jti: typeof decoded.jti === "string" ? decoded.jti : "legacy-token",
+      device_id:
+        typeof decoded.device_id === "string" ? decoded.device_id : undefined,
     };
   }
 
@@ -215,10 +223,25 @@ export const getUserSession =
       return null;
     }
 
+    const activeSession = await prisma.session.findFirst({
+      where: {
+        id: payload.jti,
+        userId: user.id,
+        isActive: true,
+        expiresAt: { gt: new Date() },
+      },
+      select: { id: true },
+    });
+
+    if (!activeSession) return null;
+
     return {
       id: user.id,
+      sub: payload.sub,
       email: user.email,
       role: user.role as SessionRole,
+      jti: payload.jti,
+      device_id: payload.device_id,
     };
   };
 
@@ -252,10 +275,25 @@ export const getAdminSession =
       return null;
     }
 
+    const activeSession = await prisma.session.findFirst({
+      where: {
+        id: payload.jti,
+        userId: user.id,
+        isActive: true,
+        expiresAt: { gt: new Date() },
+      },
+      select: { id: true },
+    });
+
+    if (!activeSession) return null;
+
     return {
       id: user.id,
+      sub: payload.sub,
       email: user.email,
       role: "ADMIN",
+      jti: payload.jti,
+      device_id: payload.device_id,
     };
   };
 
@@ -264,9 +302,7 @@ export const getAdminSession =
 // ─────────────────────────────────────────────
 
 export const ACCESS_TOKEN_MAX_AGE = 60 * 15;
-
-export const REFRESH_TOKEN_MAX_AGE =
-  60 * 60 * 24 * 7;
+export const REFRESH_TOKEN_MAX_AGE = 60 * 60 * 24 * 7;
 
 // ─────────────────────────────────────────────
 // AUTH UTILITIES
@@ -276,14 +312,21 @@ export const buildSessionPayload = ({
   id,
   email,
   role,
+  deviceId,
+  jti,
 }: {
   id: string;
   email: string;
   role: SessionRole;
+  deviceId?: string;
+  jti?: string;
 }): SessionPayload => {
   return {
     id,
+    sub: id,
     email,
     role,
+    jti: jti || crypto.randomUUID(),
+    device_id: deviceId,
   };
 };

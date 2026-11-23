@@ -14,11 +14,13 @@ export const generateSessionToken = () => {
 // ─────────────────────────────────────────────
 
 export const createSession = async ({
+  id,
   userId,
   userAgent,
   ipAddress,
   expiresAt,
 }: {
+  id?: string;
   userId: string;
   userAgent?: string;
   ipAddress?: string;
@@ -26,6 +28,7 @@ export const createSession = async ({
 }) => {
   return prisma.session.create({
     data: {
+      ...(id ? { id } : {}),
       userId,
       userAgent,
       ipAddress,

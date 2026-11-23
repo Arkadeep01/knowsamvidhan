@@ -247,7 +247,7 @@ async function getAdminFeatures(): Promise<AdminProfileFeatures> {
       id: u.id,
       name: u.name?.trim() || "Unnamed user",
       email: u.email,
-      role: u.role,
+      role: u.role === "ADMIN" ? "ADMIN" : "USER",
       joined: formatDate(u.createdAt),
     })),
   };
@@ -436,7 +436,7 @@ export async function getProfileDashboard(
       id: user.id,
       name: user.name?.trim() || user.email.split("@")[0],
       email: user.email,
-      role: user.role,
+      role: user.role === "ADMIN" ? "ADMIN" : "USER",
       avatar: user.avatar ?? null,
       status: user.status,
       memberSince: formatYear(joinedDate),

@@ -180,10 +180,11 @@ export default function Navbar() {
                   <Image
                     src="/image/logo.png"
                     alt="KnowSamvidhan Logo"
-                    width={40}
-                    height={40}
+                    width={36}
+                    height={36}
                     priority
-                    className="h-full w-full object-cover"
+                    className="object-cover"
+                    style={{ width: 'auto', height: 'auto' }}
                   />
                 </div>
               </div>
@@ -472,7 +473,8 @@ export default function Navbar() {
                   alt="Logo"
                   width={36}
                   height={36}
-                  className="h-full w-full object-cover"
+                  className="object-cover"
+                  style={{ width: 'auto', height: 'auto' }}
                 />
               </div>
             </div>

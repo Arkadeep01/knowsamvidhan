@@ -1,20 +1,23 @@
 generator client {
   provider = "prisma-client-js"
+  previewFeatures = ["driverAdapters"]
 }
 
 datasource db {
-  provider = "postgresql"
-  url      = env("DATABASE_URL")
+  provider = "sqlite"
+  // Prisma's schema URL is only used for generation and SQLite migrations.
+  // Production connections are supplied by the libSQL driver adapter in lib/prisma.ts.
+  url      = "file:./dev.db"
 }
 
 model Post {
   id        String   @id @default(uuid())
   title     String
-  content   String
+  content   String?
   category  String
   createdAt DateTime @default(now())
   authorId  String
-  author    User     @relation(fields: [authorId], references: [id])
+author  User     @relation(fields: [authorId], references: [id], name: "author")
 }
 
 model PasswordResetToken {
@@ -43,8 +46,8 @@ model RegistrationOTP {
   createdAt    DateTime @default(now())
   updatedAt    DateTime @updatedAt
 
-  @@index([email])
-  @@index([expiresAt])
+  
+  
 }
 
 model Part {
@@ -70,7 +73,7 @@ model Article {
   featured          Boolean  @default(false)
   partId            String
   createdAt         DateTime @default(now())
-  part              Part     @relation(fields: [partId], references: [id])
+  part              Part     @relation(fields: [partId], references: [id], onDelete: Cascade)
   clauses           Clause[]
 }
 
@@ -161,58 +164,42 @@ model UserQuizAttempt {
   user        User     @relation(fields: [userId], references: [id], onDelete: Cascade)
 
   @@unique([userId, quizId])
-  @@index([userId])
-  @@index([quizId])
+  
+  
 }
 
 model Feedback {
-  id        String   @id @default(uuid())
-  userId    String
-  rating    Int
-  name      String?
-  comment   String?
-  createdAt DateTime @default(now())
-  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  id         String   @id @default(uuid())
+  userId     String?
+  rating     Int
+  name       String?
+  comment    String?
+  category   String?
+  conversationId String?
+  topic      String?
+  createdAt  DateTime @default(now())
+  showOnSite Boolean  @default(false)
+  user       User?    @relation(fields: [userId], references: [id], onDelete: Cascade)
 
-  @@index([userId])
-  @@index([createdAt])
-}
-
-model User {
-  id                  String               @id @default(uuid())
-  name                String?
-  email               String               @unique
-  password            String
-  role                Role                 @default(USER)
-  status              Status               @default(ACTIVE)
-  createdAt           DateTime             @default(now())
-  updatedAt           DateTime             @updatedAt
-  avatar              String?
-  lastLogin           DateTime?
-  isDeleted           Boolean              @default(false)
-  feedbacks           Feedback[]
-  passwordResetTokens PasswordResetToken[]
-  posts               Post[]
-  refreshTokens       RefreshToken[]
-  sessions            Session[]
-  quizAttempts        UserQuizAttempt[]
-
-  @@index([email])
-  @@index([role])
-  @@index([status])
+  
+  
 }
 
 model RefreshToken {
   id        String   @id @default(cuid())
   token     String   @unique
   userId    String
-  sessionId String                        
   expiresAt DateTime
   revoked   Boolean  @default(false)
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
+  sessionId String
+  session   Session  @relation(fields: [sessionId], references: [id], onDelete: Cascade)
   user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
-  session   Session  @relation(fields: [sessionId], references: [id], onDelete: Cascade)  
+
+  
+  
+  
 }
 
 model Session {
@@ -220,23 +207,361 @@ model Session {
   userId        String
   ipAddress     String?
   userAgent     String?
-  refreshTokens RefreshToken[]
-  isActive      Boolean        @default(true)   
+  isActive      Boolean        @default(true)
   createdAt     DateTime       @default(now())
   expiresAt     DateTime
+  refreshTokens RefreshToken[]
   user          User           @relation(fields: [userId], references: [id], onDelete: Cascade)
 
-  @@index([userId])       
-  @@index([expiresAt])     
+  
+  
+  
 }
 
-enum Role {
-  USER
-  ADMIN
+model PageView {
+  id        String   @id @default(uuid())
+  path      String
+  visitorId String?
+  ipAddress String?
+  userAgent String?
+  source    String?
+  visitedAt DateTime @default(now())
+
+  
+  
 }
 
-enum Status {
-  ACTIVE
-  BLOCKED
-  SUSPENDED
+model TrafficSource {
+  id        String   @id @default(uuid())
+  name      String
+  value     Int
+  createdAt DateTime @default(now())
+}
+
+model DailyAnalytics {
+  id        String   @id @default(uuid())
+  date      DateTime @unique
+  dau       Int
+  mau       Int
+  createdAt DateTime @default(now())
+
+  
+}
+
+model Conversation {
+  id String @id @default(uuid())
+  title String?
+  userId String?
+  isGuest Boolean @default(false)
+  guestSessionId String?
+  isArchived Boolean @default(false)
+  archivedAt DateTime?
+  deletedAt DateTime?
+  isPinned Boolean @default(false)
+  topic String?
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  messages ChatMessage[]
+  user User? @relation(fields: [userId], references: [id])
+}
+
+model ChatMessage {
+  id String @id @default(uuid())
+  role String
+  content String
+  createdAt DateTime @default(now())
+  conversationId String
+conversation Conversation @relation(fields: [conversationId], references: [id], onDelete: Cascade)
+  metadata String?
+  editedAt DateTime?
+  isEdited Boolean @default(false)
+  parentMessageId String?
+}
+
+model EvaluationRun {
+  id String @id @default(uuid())
+  benchmarkVersion String
+  modelId String
+  promptVersion String
+  retrievalK Int
+  totalCases Int
+  passedCases Int
+  failedCases Int
+  skippedCases Int
+  citationAccuracy Decimal
+  groundingRate Decimal
+  unsupportedClaimRate Decimal
+  unverifiableCitationRate Decimal
+  citationVerificationCoverage Decimal
+  retrievalRelevance Decimal
+  evidenceSufficiency Decimal
+  evaluationFailureRate Decimal
+  averageLatencyMs Int
+  status String
+  startedAt DateTime
+  completedAt DateTime?
+  cases EvaluationCaseResult[]
+
+  
+  
+  
+}
+
+model EvaluationCaseResult {
+  id String @id @default(uuid())
+  evaluationRunId String
+  benchmarkCaseId String
+  query String
+  generatedAnswer String?
+  citations String
+  verificationStatus String
+  verificationDetails String?
+  retrievalStatus String
+  retrievalDetails String?
+  generationStatus String
+  generationDetails String?
+  evaluationError String?
+  skippedReason String @default("")
+  startedAt DateTime @default(now())
+  completedAt DateTime?
+  run EvaluationRun @relation(fields: [evaluationRunId], references: [id], onDelete: Cascade)
+
+  
+  
+  
+}
+
+model ChatbotQuery {
+  id        String   @id @default(uuid())
+  category  String
+  resolved  Boolean  @default(false)
+  question  String?
+  createdAt DateTime @default(now())
+
+  
+  
+}
+
+model RateLimitEvent {
+  id          String   @id @default(uuid())
+  key         String
+  ipAddress   String?
+  userId      String?
+  endpoint    String?
+  attempts    Int
+  delayMs     Int      @default(0)
+  blockedUntil DateTime?
+  fingerprint String?
+  createdAt   DateTime @default(now())
+
+  @@index([key])
+  @@index([ipAddress])
+  @@index([blockedUntil])
+  @@index([createdAt])
+}
+
+model ThreatIntelligenceEvent {
+  id         String   @id @default(uuid())
+  type       String
+  severity   String
+  confidence Int
+  ipAddress  String?
+  country    String?
+  endpoint   String?
+  payloadHash String?
+  prediction String?
+  mitigated  Boolean  @default(false)
+  createdAt  DateTime @default(now())
+
+  @@index([type])
+  @@index([severity])
+  @@index([ipAddress])
+  @@index([createdAt])
+}
+
+model DeviceTrust {
+  id            String   @id @default(uuid())
+  userId        String
+  deviceId      String
+  trustScore    Int      @default(50)
+  userAgentHash String?
+  ipPrefix      String?
+  country       String?
+  lastSeenAt    DateTime @default(now())
+  trustedUntil  DateTime?
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
+
+  @@unique([userId, deviceId])
+  @@index([trustScore])
+  @@index([lastSeenAt])
+}
+
+model SecurityIncident {
+  id              String   @id @default(uuid())
+  incidentNumber  String   @unique
+  title           String
+  severity        String
+  status          String   @default("Investigating")
+  rootCause       String?
+  timeline        String   @default("[]")
+  recoveryPercent Int      @default(0)
+  openedAt        DateTime @default(now())
+  resolvedAt      DateTime?
+  createdAt       DateTime @default(now())
+  updatedAt       DateTime @updatedAt
+
+  @@index([severity])
+  @@index([status])
+  @@index([openedAt])
+}
+
+model SecurityRiskAssessment {
+  id           String   @id @default(uuid())
+  userId       String?
+  emailHash    String?
+  ipAddress    String?
+  country      String?
+  deviceId     String?
+  userAgent    String?
+  riskScore    Int
+  trustScore   Int
+  decision     String
+  signals      String
+  behaviorScore Int     @default(0)
+  modelVersion String   @default("cyberguard-v4.2")
+  createdAt    DateTime @default(now())
+
+  @@index([userId])
+  @@index([ipAddress])
+  @@index([decision])
+  @@index([createdAt])
+}
+
+model AuditLog {
+  id          String        @id @default(uuid())
+  actorId     String?
+  actorEmail  String?
+  actorName   String?
+  actorRole   String?
+  action      String
+  description String?
+  scope       String
+  severity    String        @default("INFO")
+  entityType  String
+  entityId    String?
+  entityLabel String?
+  ipAddress   String?
+  userAgent   String?
+  metadata String?
+  createdAt   DateTime      @default(now())
+  actor       User? @relation(fields: [actorId], references: [id])
+
+  
+  
+  
+  
+  
+}
+
+model Alert {
+  id             String                @id @default(uuid())
+  status         String           @default("OPEN")
+severity       String          @default("MEDIUM")
+  title          String
+  description    String
+  serviceName    String
+  serviceIcon    String?
+  createdAt      DateTime              @default(now())
+  updatedAt      DateTime              @updatedAt
+  acknowledgedAt DateTime?
+  dismissedAt    DateTime?
+  metrics        AlertCategoryMetric[]
+  categories     AlertCategory[]       @relation("AlertToAlertCategory")
+
+  @@index([status])
+  @@index([severity])
+}
+
+model AlertCategory {
+  id          String                @id @default(uuid())
+  name        String                @unique
+  description String?
+  color       String
+  metrics     AlertCategoryMetric[]
+  alerts      Alert[]               @relation("AlertToAlertCategory")
+
+  @@index([name])
+  @@index([color])
+}
+
+model AlertCategoryMetric {
+  id         String        @id @default(uuid())
+  alertId    String
+  categoryId String
+  count      Int
+  total      Int
+  date       DateTime      @default(now())
+  alert      Alert         @relation(fields: [alertId], references: [id], onDelete: Cascade)
+  category   AlertCategory @relation(fields: [categoryId], references: [id], onDelete: Cascade)
+
+  @@unique([alertId, categoryId, date])
+  
+  
+}
+
+model AlertFrequencyMetric {
+  id             String   @id @default(uuid())
+  hour           Int
+  date           DateTime
+  totalAlerts    Int
+  criticalAlerts Int
+  createdAt      DateTime @default(now())
+
+  @@unique([hour, date])
+  
+}
+
+model AlertHistoricalMetric {
+  id            String   @id @default(uuid())
+  date          DateTime @unique
+  openedCount   Int
+  resolvedCount Int
+  createdAt     DateTime @default(now())
+}
+
+model AlertHeatmapMetric {
+  id         String   @id @default(uuid())
+  dayOfWeek  Int
+  hour       Int
+  alertCount Int
+  date       DateTime @default(now())
+
+  @@unique([dayOfWeek, hour, date])
+  
+}
+
+model User {
+  id                  String               @id @default(uuid())
+  name                String?
+  email               String               @unique
+  password            String
+role                String            @default("USER")
+status              String            @default("ACTIVE")
+  createdAt           DateTime             @default(now())
+  updatedAt           DateTime             @updatedAt
+  avatar              String?
+  lastLogin           DateTime?
+  isDeleted           Boolean              @default(false)
+  auditLogs           AuditLog[]
+  feedbacks           Feedback[]
+  passwordResetTokens PasswordResetToken[]
+  refreshTokens       RefreshToken[]
+  sessions            Session[]
+  quizAttempts        UserQuizAttempt[]
+  conversations       Conversation[]
+  posts               Post[] @relation("author")
+
+  
+  
 }
