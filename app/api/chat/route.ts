@@ -4,7 +4,7 @@
 
 import { NextRequest, NextResponse } from "next/server";
 
-import { GoogleGenAI } from "@google/genai";
+import { generateWithSamvi } from "@/lib/samvi/generation";
 
 import {
   finalDecisionEngine,
@@ -16,16 +16,6 @@ import { rateLimit } from "@/lib/rate-limit";
 import { verifyAccessToken } from "@/lib/auth";
 import { verifyCitationPipeline, CitationType } from "@/lib/verification";
 import { prisma } from "@/lib/prisma";
-
-const ai = new GoogleGenAI({
-  apiKey: process.env.GEMINI_API_KEY!,
-});
-
-const PRIMARY_MODEL = "gemini-3.5-flash-lite";
-const FALLBACK_MODEL = "gemini-3.5-flash";
-
-const MAX_ATTEMPTS = 2;
-const BACKOFF_MS = 800;
 
 interface ApiMessage {
   role: "user" | "assistant";
@@ -169,104 +159,18 @@ async function generateWithGemini(
   isFallbackUsed: boolean;
   error?: string;
 }> {
-  try {
-    const lastUserMessage =
-      messages[messages.length - 1]?.content ?? "";
+  const lastUserMessage = messages[messages.length - 1]?.content ?? "";
+  const result = await generateWithSamvi(lastUserMessage, {
+    model,
+    attempt,
+  });
 
-    const systemInstruction =
-      "You are Samvi, a constitutional AI assistant knowledgeable about the Constitution of India. Provide accurate, grounded responses with citations to articles, cases, and amendments when applicable. Use a helpful, educational tone.";
-
-    const response = await ai.models.generateContent({
-      model,
-      contents: [
-        {
-          role: "user",
-          parts: [{ text: systemInstruction }, { text: lastUserMessage }],
-        },
-      ],
-    });
-
-    return {
-      success: true,
-      response,
-      isFallbackUsed: false,
-    };
-  } catch (error) {
-    const oError = error as { error: { code?: string }; message?: string };
-    const errorCode = Number(oError.error?.code);
-    const errorMessage = oError.message || "Unknown error";
-
-    // Non-recoverable errors: don't fallback (auth, invalid request, forbidden)
-    if (
-      errorCode === 400 ||
-      errorCode === 401 ||
-      errorCode === 403 ||
-      errorCode === 422 ||
-      errorCode === 404
-    ) {
-      return {
-        success: false,
-        response: null,
-        isFallbackUsed: false,
-        error: `Non-recoverable error (attempt ${attempt}): ${errorCode || 'unknown'}`,
-      };
-    }
-
-    // Transient errors (503, 429, overloaded): attempt fallback on first attempt only
-    if (attempt < MAX_ATTEMPTS) {
-      const isTransient =
-        errorCode === 503 ||
-        errorCode === 429 ||
-        errorMessage.includes("high demand") ||
-        errorMessage.includes("overloaded");
-
-      if (isTransient) {
-        // Brief backoff before fallback attempt
-        await new Promise((r) => setTimeout(r, BACKOFF_MS));
-
-        // Try fallback model
-        try {
-          const fallbackResponse = await ai.models.generateContent({
-            model: FALLBACK_MODEL,
-            contents: [
-              {
-                role: "user",
-                parts: [{ text: "You are Samvi, a constitutional AI assistant knowledgeable about the Constitution of India. Provide accurate, grounded responses with citations to articles, cases, and amendments when applicable. Use a helpful, educational tone." }],
-              },
-            ],
-          });
-
-          return {
-            success: true,
-            response: fallbackResponse,
-            isFallbackUsed: true,
-          };
-        } catch (fallbackError) {
-          const oFallbackError = fallbackError as { message?: string };
-          return {
-            success: false,
-            response: null,
-            isFallbackUsed: false,
-            error: `Fallback model also failed: ${oFallbackError.message || 'unknown'}`,
-          };
-        }
-      }
-
-      return {
-        success: false,
-        response: null,
-        isFallbackUsed: false,
-        error: `Transient error (attempt ${attempt}): ${errorCode || 'unknown'}`,
-      };
-    }
-
-    return {
-      success: false,
-      response: null,
-      isFallbackUsed: false,
-      error: `Max attempts reached: ${errorCode || 'unknown'}`,
-    };
-  }
+  return {
+    success: result.success,
+    response: result.text,
+    isFallbackUsed: result.isFallbackUsed,
+    ...(result.error ? { error: result.error } : {}),
+  };
 }
 
 /* ======================================================================

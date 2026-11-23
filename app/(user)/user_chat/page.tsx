@@ -1,7 +1,7 @@
 "use client";
 
 import Script from "next/script";
-import { useState, useRef, useEffect, Fragment } from "react";
+import { useState, useRef, useEffect, useMemo, useCallback, memo, Fragment } from "react";
 import Image from "next/image";
 import Link from "next/link";
 import {
@@ -26,9 +26,9 @@ import {
   AlignLeft,
   ArrowUpRight,
   Edit,
+  Clipboard,
+  Check,
 } from "lucide-react";
-import { motion } from "framer-motion";
-
 interface Conversation {
   id: string;
   title?: string;
@@ -116,6 +116,8 @@ interface Message {
   role: Role;
   text: string;
   time: string;
+  suggestions?: Suggestion[];
+  isStreaming?: boolean;
   _metadata?: Record<string, any>;
   isEditing?: boolean;
   parentMessageId?: string;
@@ -210,6 +212,539 @@ function toUiMessages(storedMessages: StoredMessage[]): Message[] {
     branchFrom: msg.branchFrom,
   }));
 }
+
+/* ---- Conservative Markdown structure detection ---------------------------------
+   Structures are only produced when the Markdown explicitly declares them:
+   - a valid two-column Markdown table            -> comparison card
+   - consecutive ordered-list items               -> numbered process cards
+   - ATX headings                                 -> section blocks
+   - consecutive bullet items                      -> bullet list
+   - blockquotes                                   -> highlighted callout
+   Anything incomplete (e.g. an unclosed/short table row) or unrecognised is
+   rendered as ordinary Markdown text. No titles, categories or conclusions are
+   invented: every label shown comes from the message's own Markdown.
+--------------------------------------------------------------------------------- */
+
+type MdBlock =
+  | { kind: "heading"; level: number; text: string }
+  | { kind: "paragraph"; lines: string[] }
+  | { kind: "comparison"; left: string; right: string; rows: [string, string][] }
+  | { kind: "process"; items: { n: string; text: string }[] }
+  | { kind: "bullets"; items: string[] }
+  | { kind: "callout"; lines: string[] };
+
+function splitCells(line: string): string[] | null {
+  const t = line.trim();
+  if (!t.startsWith("|") || !t.endsWith("|")) return null;
+  return t.slice(1, -1).split("|").map((cell) => cell.trim());
+}
+
+function isTableDelimiter(line: string): boolean {
+  const cells = splitCells(line);
+  if (!cells || cells.length !== 2) return false;
+  return cells.every((cell) => /^:?-{3,}:?$/.test(cell));
+}
+
+function parseMarkdownBlocks(text: string): MdBlock[] {
+  const lines = text.replace(/\r\n?/g, "\n").split("\n");
+  const blocks: MdBlock[] = [];
+  let paragraph: string[] = [];
+
+  const flushParagraph = () => {
+    if (paragraph.length > 0) {
+      blocks.push({ kind: "paragraph", lines: paragraph });
+      paragraph = [];
+    }
+  };
+
+  let i = 0;
+  while (i < lines.length) {
+    const raw = lines[i];
+    const line = raw.trim();
+
+    if (line === "") {
+      flushParagraph();
+      i++;
+      continue;
+    }
+
+    // Two-column comparison table. A header row, a delimiter row and at least
+    // one fully-formed body row are all required; otherwise fall back to text.
+    if (line.startsWith("|") && i + 1 < lines.length && isTableDelimiter(lines[i + 1])) {
+      const header = splitCells(line);
+      if (header && header.length === 2) {
+        let j = i + 2;
+        const rows: [string, string][] = [];
+        let complete = true;
+        while (j < lines.length && lines[j].trim().startsWith("|")) {
+          const cells = splitCells(lines[j]);
+          if (!cells || cells.length !== 2) {
+            complete = false;
+            break;
+          }
+          rows.push([cells[0], cells[1]]);
+          j++;
+        }
+        if (complete && rows.length > 0) {
+          flushParagraph();
+          blocks.push({ kind: "comparison", left: header[0], right: header[1], rows });
+          i = j;
+          continue;
+        }
+        // Incomplete/partial table: emit the raw lines as plain Markdown.
+        for (let k = i; k < j; k++) paragraph.push(lines[k]);
+        i = j;
+        continue;
+      }
+    }
+
+    // ATX heading -> section title (text taken verbatim from the message).
+    const heading = line.match(/^(#{1,6})\s+(.+?)\s*#*\s*$/);
+    if (heading) {
+      flushParagraph();
+      blocks.push({ kind: "heading", level: heading[1].length, text: heading[2].trim() });
+      i++;
+      continue;
+    }
+
+    // Ordered list -> numbered process cards (original numbers preserved).
+    if (/^\d+\.\s+/.test(line)) {
+      const items: { n: string; text: string }[] = [];
+      let j = i;
+      while (j < lines.length) {
+        const match = lines[j].trim().match(/^(\d+)\.\s+(.+)$/);
+        if (!match) break;
+        items.push({ n: match[1], text: match[2] });
+        j++;
+      }
+      if (items.length > 0) {
+        flushParagraph();
+        blocks.push({ kind: "process", items });
+        i = j;
+        continue;
+      }
+    }
+
+    // Unordered list.
+    if (/^[-*+]\s+/.test(line)) {
+      const items: string[] = [];
+      let j = i;
+      while (j < lines.length) {
+        const match = lines[j].trim().match(/^[-*+]\s+(.+)$/);
+        if (!match) break;
+        items.push(match[1]);
+        j++;
+      }
+      flushParagraph();
+      blocks.push({ kind: "bullets", items });
+      i = j;
+      continue;
+    }
+
+    // Blockquote -> highlighted takeaway/callout.
+    if (/^>/.test(line)) {
+      const quote: string[] = [];
+      let j = i;
+      while (j < lines.length && /^>/.test(lines[j].trim())) {
+        quote.push(lines[j].trim().replace(/^>\s?/, ""));
+        j++;
+      }
+      flushParagraph();
+      blocks.push({ kind: "callout", lines: quote });
+      i = j;
+      continue;
+    }
+
+    paragraph.push(raw);
+    i++;
+  }
+
+  flushParagraph();
+  return blocks;
+}
+
+/* ---- Inline Markdown rendering ------------------------------------------------ */
+
+type InlineContext = {
+  isAI: boolean;
+  citationStatus?: string;
+  provenance: Record<string, any>;
+};
+
+const INLINE_PATTERN = /(\*\*[^*]+\*\*|\*[^*]+\*|_[^_]+_|`[^`]+`|\[[^\]]+\]\([^)]+\))/g;
+const CITATION_PATTERN = /Article|article|Amendment|amendment|v\.|vs|Judgment|judgment/;
+
+function isSafeHref(raw: string): boolean {
+  return /^(https?:|mailto:)/i.test(raw.trim());
+}
+
+function renderCitationSegment(text: string, ctx: InlineContext, key: string): React.ReactNode {
+  if (
+    ctx.citationStatus &&
+    CITATION_PATTERN.test(text) &&
+    !text.startsWith("<") &&
+    !text.startsWith(">")
+  ) {
+    return (
+      <span key={key} className="relative inline-block pr-2">
+        {text}
+        {ctx.provenance?.sourceType && (
+          <span className="text-[xxs] opacity-40">{ctx.provenance.sourceType}</span>
+        )}
+      </span>
+    );
+  }
+  return <Fragment key={key}>{text}</Fragment>;
+}
+
+function renderInline(text: string, ctx: InlineContext): React.ReactNode[] {
+  const nodes: React.ReactNode[] = [];
+  const regex = new RegExp(INLINE_PATTERN.source, "g");
+  let last = 0;
+  let key = 0;
+  let match: RegExpExecArray | null;
+
+  while ((match = regex.exec(text)) !== null) {
+    if (match.index > last) {
+      nodes.push(renderCitationSegment(text.slice(last, match.index), ctx, `t${key++}`));
+    }
+    const token = match[0];
+    if (token.startsWith("**") && token.endsWith("**")) {
+      nodes.push(
+        <strong key={key++} className={ctx.isAI ? "font-semibold text-slate-900" : "font-semibold"}>
+          {token.slice(2, -2)}
+        </strong>
+      );
+    } else if (token.startsWith("`") && token.endsWith("`")) {
+      nodes.push(
+        <code
+          key={key++}
+          className="rounded border border-slate-200 bg-slate-100 px-1 py-0.5 text-[12px] text-amber-800"
+        >
+          {token.slice(1, -1)}
+        </code>
+      );
+    } else if (token.startsWith("[")) {
+      const link = token.match(/^\[([^\]]+)\]\(([^)]+)\)$/);
+      if (link && isSafeHref(link[2])) {
+        nodes.push(
+          <a
+            key={key++}
+            href={link[2]}
+            target="_blank"
+            rel="noopener noreferrer"
+            className="text-amber-800 underline underline-offset-2 hover:text-amber-900"
+          >
+            {link[1]}
+          </a>
+        );
+      } else {
+        nodes.push(renderCitationSegment(token, ctx, `t${key++}`));
+      }
+    } else {
+      nodes.push(
+        <em key={key++} className="italic opacity-80">
+          {token.slice(1, -1)}
+        </em>
+      );
+    }
+    last = match.index + token.length;
+  }
+  if (last < text.length) {
+    nodes.push(renderCitationSegment(text.slice(last), ctx, `t${key++}`));
+  }
+  return nodes;
+}
+
+/* ---- Structured content renderer (all AI responses go through this) ------------ */
+
+function BlockView({ block, ctx }: { block: MdBlock; ctx: InlineContext }) {
+  switch (block.kind) {
+    case "heading": {
+      const major = block.level <= 2;
+      return (
+        <div className={major ? "mt-1 border-b border-slate-200/80 pb-1.5" : "mt-0.5"}>
+          <h3
+            className={
+              major
+                ? "text-[15px] font-bold tracking-tight text-slate-900"
+                : "text-[13.5px] font-semibold text-slate-900"
+            }
+          >
+            {renderInline(block.text, ctx)}
+          </h3>
+        </div>
+      );
+    }
+    case "paragraph":
+      return (
+        <div className="space-y-1.5">
+          {block.lines.map((line, i) => (
+            <p key={i} className={line.trim() === "" ? "h-2" : ""}>
+              {line.trim() === "" ? null : renderInline(line, ctx)}
+            </p>
+          ))}
+        </div>
+      );
+    case "comparison":
+      return (
+        <div className="overflow-hidden rounded-xl border border-slate-200 bg-white">
+          <div className="grid grid-cols-2 bg-slate-50/80">
+            <div className="border-r border-slate-200 px-3 py-2 text-[12px] font-semibold text-amber-900">
+              {renderInline(block.left, ctx)}
+            </div>
+            <div className="px-3 py-2 text-[12px] font-semibold text-amber-900">
+              {renderInline(block.right, ctx)}
+            </div>
+          </div>
+          {block.rows.map((row, i) => (
+            <div key={i} className="grid grid-cols-2 divide-x divide-slate-200 border-t border-slate-200/80">
+              <div className="px-3 py-2 text-[12.5px] leading-[1.7] text-slate-700">
+                {renderInline(row[0], ctx)}
+              </div>
+              <div className="px-3 py-2 text-[12.5px] leading-[1.7] text-slate-700">
+                {renderInline(row[1], ctx)}
+              </div>
+            </div>
+          ))}
+        </div>
+      );
+    case "process":
+      return (
+        <div className="flex flex-col gap-2">
+          {block.items.map((item, i) => (
+            <div key={i} className="flex items-start gap-2.5">
+              <span className="mt-0.5 flex h-6 w-6 shrink-0 items-center justify-center rounded-full border border-amber-200 bg-amber-50 text-[11px] font-bold text-amber-800">
+                {item.n}
+              </span>
+              <p className="pt-0.5 text-[12.5px] leading-[1.7] text-slate-700">
+                {renderInline(item.text, ctx)}
+              </p>
+            </div>
+          ))}
+        </div>
+      );
+    case "bullets":
+      return (
+        <ul className="list-disc space-y-1 pl-5 text-[12.5px] leading-[1.7] text-slate-700">
+          {block.items.map((item, i) => (
+            <li key={i}>{renderInline(item, ctx)}</li>
+          ))}
+        </ul>
+      );
+    case "callout":
+      return (
+        <div className="flex gap-2.5 rounded-xl border border-amber-200 bg-amber-50/70 p-3">
+          <BookOpen size={14} strokeWidth={1.8} className="mt-0.5 shrink-0 text-amber-700" />
+          <div className="space-y-1.5">
+            {block.lines.map((line, i) => (
+              <p key={i} className={line.trim() === "" ? "h-1.5" : "text-[12.5px] leading-[1.7] text-amber-900"}>
+                {line.trim() === "" ? null : renderInline(line, ctx)}
+              </p>
+            ))}
+          </div>
+        </div>
+      );
+    default:
+      return null;
+  }
+}
+
+const StructuredContentRenderer = memo(function StructuredContentRenderer({
+  text,
+  isAI,
+  citationStatus,
+  provenance,
+  streaming,
+}: {
+  text: string;
+  isAI: boolean;
+  citationStatus?: string;
+  provenance: Record<string, any>;
+  streaming?: boolean;
+}) {
+  const blocks = useMemo<MdBlock[]>(() => {
+    // During streaming, skip structural parsing entirely and fall back safely
+    // to ordinary Markdown so partial tokens/rows never flicker into cards.
+    if (streaming) {
+      return [{ kind: "paragraph", lines: text.replace(/\r\n?/g, "\n").split("\n") }];
+    }
+    return parseMarkdownBlocks(text);
+  }, [text, streaming]);
+
+  const ctx = useMemo<InlineContext>(
+    () => ({ isAI, citationStatus, provenance }),
+    [isAI, citationStatus, provenance]
+  );
+
+  return (
+    <div className="flex flex-col gap-3">
+      {blocks.map((block, i) => (
+        <BlockView key={i} block={block} ctx={ctx} />
+      ))}
+    </div>
+  );
+});
+
+/* ---- Response card: wraps every AI answer ------------------------------------- */
+
+const ResponseCard = memo(function ResponseCard({
+  msg,
+  onSelectSuggestion,
+}: {
+  msg: Message;
+  onSelectSuggestion: (suggestion: Suggestion) => void;
+}) {
+  const [copied, setCopied] = useState(false);
+  const [showAllSuggestions, setShowAllSuggestions] = useState(false);
+
+  const metadata = msg._metadata || {};
+  const verification = metadata.verification;
+  const citationStatus = verification?.status;
+  const provenance = verification?.provenance || {};
+  const evidencePassages = verification?.evidencePassages || [];
+  const explanation = verification?.explanation || "";
+  const suggestions = msg.suggestions || [];
+
+  const handleCopy = async () => {
+    try {
+      await navigator.clipboard.writeText(msg.text);
+      setCopied(true);
+      window.setTimeout(() => setCopied(false), 1600);
+    } catch {
+      /* clipboard unavailable */
+    }
+  };
+
+  const badgeClass =
+    citationStatus === "VERIFIED"
+      ? "bg-green-100 text-green-800 border-green-300"
+      : citationStatus === "PARTIALLY_SUPPORTED"
+        ? "bg-amber-100 text-amber-800 border-amber-300"
+        : citationStatus === "UNSUPPORTED"
+          ? "bg-red-100 text-red-800 border-red-300"
+          : "bg-gray-100 text-gray-800 border-gray-300";
+
+  const evidenceClass =
+    citationStatus === "VERIFIED" || citationStatus === "PARTIALLY_SUPPORTED"
+      ? "bg-amber-50 border-amber-200"
+      : citationStatus === "UNSUPPORTED"
+        ? "bg-red-50 border-red-200"
+        : "bg-gray-50 border-gray-200";
+
+  return (
+    <div className="flex items-end gap-3 flex-row">
+      {/* AI avatar */}
+      <div className="relative flex h-8 w-8 shrink-0 items-center justify-center overflow-hidden rounded-full border-[1.5px] border-amber-800/50 bg-amber-950/8 shadow-sm">
+        <Zap size={14} strokeWidth={2} className="text-amber-800" />
+      </div>
+
+      <div className="flex max-w-[75%] sm:max-w-[68%] flex-col gap-1 items-start">
+        <div className="relative w-full overflow-hidden rounded-2xl rounded-bl-sm border-[1.5px] border-slate-200 bg-white text-slate-800 shadow-sm">
+          <div className="absolute top-0 left-0 right-0 h-0.5 bg-amber-800" />
+
+          {citationStatus && (
+            <div className="flex justify-end px-4 pt-3">
+              <span className={`inline-flex items-center gap-1.5 rounded border px-2 py-1 text-[9px] font-medium ${badgeClass}`}>
+                <Landmark size={9} strokeWidth={1.8} />
+                {citationStatus}
+              </span>
+            </div>
+          )}
+
+          <div className={`p-4 ${citationStatus ? "pt-3" : "pt-4"}`}>
+            <StructuredContentRenderer
+              text={msg.text}
+              isAI
+              citationStatus={citationStatus}
+              provenance={provenance}
+              streaming={msg.isStreaming}
+            />
+
+            {/* Evidence passages (preserved) */}
+            {evidencePassages.length > 0 && (
+              <div className={`mt-3 rounded-sm border-t-2 p-3 text-[10px] text-slate-500 ${evidenceClass}`}>
+                {citationStatus === "VERIFIED" ? (
+                  <div className="flex items-start gap-2">
+                    <Landmark size={8} strokeWidth={1.5} className="mt-0.5 flex-shrink-0 text-amber-600" />
+                    <span className="flex-1"><strong>Supported by constitutional text:</strong> {evidencePassages[0]}</span>
+                  </div>
+                ) : citationStatus === "PARTIALLY_SUPPORTED" ? (
+                  <div className="flex items-start gap-2">
+                    <Layers size={8} strokeWidth={1.5} className="mt-0.5 flex-shrink-0 text-amber-600" />
+                    <span className="flex-1"><strong>Partial support:</strong> {evidencePassages[0]}</span>
+                  </div>
+                ) : citationStatus === "UNSUPPORTED" ? (
+                  <div className="flex items-start gap-2">
+                    <X size={8} strokeWidth={1.5} className="mt-0.5 flex-shrink-0 text-rose-600" />
+                    <span className="flex-1"><strong>Not supported:</strong> {evidencePassages[0]}</span>
+                  </div>
+                ) : (
+                  <div className="flex items-start gap-2">
+                    <Clock size={8} strokeWidth={1.5} className="mt-0.5 flex-shrink-0 text-slate-600" />
+                    <span className="flex-1"><strong>Unverified:</strong> {evidencePassages[0]}</span>
+                  </div>
+                )}
+              </div>
+            )}
+
+            {/* Citations reference line (preserved) */}
+            {citationStatus && provenance.articleClauseRef && (
+              <div className="mt-2 flex flex-col gap-1 border-t border-slate-200/30 pt-2 text-[10px] text-slate-400">
+                <span>
+                  {provenance.sourceTitle || "Citation"}
+                  {provenance.articleClauseRef ? " · " + provenance.articleClauseRef : ""}
+                  {provenance.court ? " (" + provenance.court + ")" : ""}
+                  {provenance.judgmentYear ? " (" + provenance.judgmentYear + ")" : ""}
+                </span>
+                {explanation && <div className="mt-1 text-[xxs] opacity-70">{explanation}</div>}
+              </div>
+            )}
+          </div>
+
+          {/* Integrated footer: copy + per-message follow-up suggestions */}
+          <div className="flex flex-wrap items-center justify-between gap-2 border-t border-slate-100 bg-slate-50/60 px-4 py-2.5">
+            <button
+              type="button"
+              onClick={() => void handleCopy()}
+              className="inline-flex items-center gap-1.5 rounded-md px-2 py-1 text-[11px] font-medium text-slate-500 transition-colors hover:bg-white hover:text-amber-800"
+              title="Copy answer"
+            >
+              {copied ? <Check size={12} strokeWidth={2} className="text-emerald-600" /> : <Clipboard size={12} strokeWidth={1.8} />}
+              {copied ? "Copied" : "Copy"}
+            </button>
+
+            {suggestions.length > 0 && (
+              <div className="flex flex-wrap items-center justify-end gap-1.5">
+                {(showAllSuggestions ? suggestions : suggestions.slice(0, 4)).map((suggestion) => (
+                  <button
+                    key={suggestion}
+                    type="button"
+                    onClick={() => onSelectSuggestion(suggestion)}
+                    className="rounded-full border border-amber-800/30 bg-amber-100 px-3 py-1 text-[11px] text-amber-900 transition-colors hover:border-amber-800/60 hover:bg-amber-200/70"
+                  >
+                    {suggestion}
+                  </button>
+                ))}
+                {!showAllSuggestions && suggestions.length > 4 && (
+                  <button
+                    type="button"
+                    onClick={() => setShowAllSuggestions(true)}
+                    className="rounded-full px-2 py-1 text-[11px] font-medium text-amber-800 underline underline-offset-2"
+                  >
+                    More
+                  </button>
+                )}
+              </div>
+            )}
+          </div>
+        </div>
+
+        <span className="px-1 text-[10px] text-slate-400">{msg.time}</span>
+      </div>
+    </div>
+  );
+});
 
 /* Typing indicator */
 
@@ -444,44 +979,6 @@ function Bubble({
   );
 }
 
-/* Suggestion chips component */
-
-type SuggestionChipsProps = {
-  suggestions: Suggestion[];
-  onSelect: (suggestion: Suggestion) => void;
-};
-
-const chipVariants = {
-  hidden: { opacity: 0, y: 10 },
-  visible: (i: number) => ({
-    opacity: 1,
-    y: 0,
-    transition: { delay: i * 0.1, duration: 0.3 },
-  }),
-};
-
-function SuggestionChips({ suggestions, onSelect }: SuggestionChipsProps) {
-  return (
-    <div className="flex flex-wrap gap-2 mt-2">
-      {suggestions.map((s, i) => (
-        <motion.button
-          key={s}
-          custom={i}
-          variants={chipVariants}
-          initial="hidden"
-          animate="visible"
-          whileHover={{ scale: 1.05 }}
-          whileTap={{ scale: 0.95 }}
-          className="rounded-full border border-amber-800/30 bg-amber-100 px-3 py-1 text-sm text-amber-900"
-          onClick={() => onSelect(s)}
-        >
-          {s}
-        </motion.button>
-      ))}
-    </div>
-  );
-}
-
 type ChatMessage = {
   role: "system" | "user" | "assistant";
   content: string;
@@ -584,8 +1081,6 @@ export default function ChatPage() {
   const [openMenuId, setOpenMenuId] = useState<string | null>(null);
   const menuRef = useRef<HTMLDivElement>(null);
   const [user, setUser] = useState<{ id: string; name?: string; email: string } | null>(null);
-  const [followUpSuggestions, setFollowUpSuggestions] = useState<Suggestion[]>([]);
-  const [showAllSuggestions, setShowAllSuggestions] = useState(false);
   const bottomRef = useRef<HTMLDivElement>(null);
   const inputRef = useRef<HTMLTextAreaElement>(null);
   const [editingMsgId, setMsgEditing] = useState<string | null>(null);
@@ -709,7 +1204,7 @@ export default function ChatPage() {
           if (saved) {
             try {
               const parsed = JSON.parse(saved);
-              const converted: Message[] = parsed.map((msg: { role: string; content: string; parentMessageId?: string; branchFrom?: string }, index: number) => ({
+              const converted: Message[] = parsed.map((msg: { role: string; content: string; parentMessageId?: string; branchFrom?: string; suggestions?: string[] }, index: number) => ({
                 id: `${index}`,
                 role: msg.role === "assistant" ? "ai" : "user",
                 text: msg.content,
@@ -717,6 +1212,7 @@ export default function ChatPage() {
                 isEditing: false,
                 parentMessageId: msg.parentMessageId,
                 branchFrom: msg.branchFrom,
+                suggestions: msg.suggestions || [],
                 _metadata: {}, // no metadata in old localStorage format
               }));
               setMessages(converted);
@@ -746,7 +1242,7 @@ export default function ChatPage() {
         if (saved) {
           try {
             const parsed = JSON.parse(saved);
-            const converted: Message[] = parsed.map((msg: { role: string; content: string; parentMessageId?: string; branchFrom?: string }, index: number) => ({
+            const converted: Message[] = parsed.map((msg: { role: string; content: string; parentMessageId?: string; branchFrom?: string; suggestions?: string[] }, index: number) => ({
               id: `${index}`,
               role: msg.role === "assistant" ? "ai" : "user",
               text: msg.content,
@@ -754,6 +1250,7 @@ export default function ChatPage() {
               isEditing: false,
               parentMessageId: msg.parentMessageId,
               branchFrom: msg.branchFrom,
+              suggestions: msg.suggestions || [],
               _metadata: {}, // no metadata in old localStorage format
             }));
             setMessages(converted);
@@ -789,6 +1286,7 @@ export default function ChatPage() {
         isEditing: msg.isEditing || false,
         parentMessageId: msg.parentMessageId,
         branchFrom: msg.branchFrom,
+        suggestions: msg.suggestions || [],
         _metadata: msg._metadata || {},
       }));
       localStorage.setItem(`samvi-chat-${activeConversationId}`, JSON.stringify(storageMessages));
@@ -822,12 +1320,8 @@ export default function ChatPage() {
   //   );
   // };
 
-  const send = async (text: string) => {
+  const send = useCallback(async (text: string) => {
     if (!text.trim() || loading) return;
-
-    // Reset previous follow-up suggestions for a new turn
-    setFollowUpSuggestions([]);
-    setShowAllSuggestions(false);
 
     const userMsg: Message = {
       id: Date.now().toString(),
@@ -887,12 +1381,15 @@ export default function ChatPage() {
 
       setMessages((prev) => [...prev, aiMsg]);
 
-      // Generate follow-up suggestions based on the latest exchange
+      // Generate follow-up suggestions and store them on this AI message so
+      // the chips render in this message's ResponseCard footer only.
       try {
-        console.log("AI response:", aiText);
-        const suggestions = await generateSuggestions(text.trim(), aiText);
-        console.log("Suggestions response:", suggestions);
-        setFollowUpSuggestions(suggestions);
+        const followUps = await generateSuggestions(text.trim(), aiText);
+        if (followUps.length > 0) {
+          setMessages((prev) => prev.map((message) =>
+            message.id === aiMsg.id ? { ...message, suggestions: followUps } : message
+          ));
+        }
       } catch (sErr) {
         console.error("Failed to generate suggestions:", sErr);
       }
@@ -957,7 +1454,7 @@ export default function ChatPage() {
       setTyping(false);
       setLoading(false);
     }
-  };
+  }, [loading, messages, user, activeConversationId]);
 
   const handleKey = (e: React.KeyboardEvent<HTMLTextAreaElement>) => {
     if (e.key === "Enter" && !e.shiftKey) {
@@ -1018,8 +1515,6 @@ const handleNewConversation = () => {
   setInput("");
   setTyping(false);
   setLoading(false);
-  setFollowUpSuggestions([]);
-  setShowAllSuggestions(false);
   // The existing useEffect resets messages to the welcome state when
   // activeConversationId becomes null.
 };
@@ -1095,9 +1590,6 @@ setMessages([
   },
 ]);
 
-    // Reset suggestions after chat clear
-    setFollowUpSuggestions([]);
-    setShowAllSuggestions(false);
   };
 
   const handleRestoreConversation = async (id: string) => {
@@ -1489,9 +1981,12 @@ setMessages([
 
   {/* Messages */}
   <div className="flex flex-col gap-5">
-    {messages.map((msg, idx) => (
-      <Fragment key={msg.id}>
+    {messages.map((msg) =>
+      msg.role === "ai" ? (
+        <ResponseCard key={msg.id} msg={msg} onSelectSuggestion={send} />
+      ) : (
         <Bubble
+          key={msg.id}
           msg={msg}
           isEditing={editingMsgId === msg.id}
           editText={editText}
@@ -1503,24 +1998,8 @@ setMessages([
           onCancelEdit={() => setMsgEditing(null)}
           onSaveEdit={() => void handleSaveEdit(msg.id)}
         />
-        {msg.role === "ai" && idx === messages.length - 1 && followUpSuggestions.length > 0 && (
-          <div className="pl-12">
-            <SuggestionChips
-              suggestions={showAllSuggestions ? followUpSuggestions : followUpSuggestions.slice(0, 4)}
-              onSelect={send}
-            />
-            {!showAllSuggestions && followUpSuggestions.length > 4 && (
-              <button
-                onClick={() => setShowAllSuggestions(true)}
-                className="mt-1 text-sm text-amber-800 underline"
-              >
-                Show More
-              </button>
-            )}
-          </div>
-        )}
-      </Fragment>
-    ))}
+      )
+    )}
 
   {/* Typing indicator */}
   {typing && (

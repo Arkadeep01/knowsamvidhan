@@ -1,8 +1,15 @@
 import { GoogleGenAI } from "@google/genai";
 
-export const ai = new GoogleGenAI({
-  apiKey: process.env.GEMINI_API_KEY!,
-});
+let aiClient: GoogleGenAI | null = null;
+
+function getAi(): GoogleGenAI {
+  if (!aiClient) {
+    aiClient = new GoogleGenAI({
+      apiKey: process.env.GEMINI_API_KEY!,
+    });
+  }
+  return aiClient;
+}
 
 export const GEMINI_MODELS = [
   "gemini-2.5-flash-preview-tts",
@@ -124,7 +131,7 @@ export async function generateGeminiSpeech(
   model: string
 ) {
   const response =
-    await ai.models.generateContent({
+    await getAi().models.generateContent({
       model,
 
       contents: [
