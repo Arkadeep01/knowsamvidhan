@@ -24,11 +24,13 @@ import {
 interface SpeakButtonProps {
   text: string;
   voiceName?: string;
+  audioSrc?: string;
 }
 
 export function SpeakButton({
   text,
   voiceName = "Algenib",
+  audioSrc,
 }: SpeakButtonProps) {
   const {
     isSpeaking: globalSpeaking,
@@ -97,6 +99,30 @@ export function SpeakButton({
         return;
       }
 
+      // Pre-generated audio for fixed content (e.g. the Preamble) plays
+      // immediately, with no server round-trip or audio generation wait.
+      if (audioSrc) {
+        const audio = new Audio(audioSrc);
+
+        audioRef.current = audio;
+
+        audio.onended = () => {
+          stopAudio();
+        };
+
+        audio.onerror = () => {
+          stopAudio();
+        };
+
+        setSpeaking(true);
+
+        setGlobalSpeaking(true);
+
+        await audio.play();
+
+        return;
+      }
+
       setLoading(true);
 
       /*
@@ -105,22 +131,39 @@ export function SpeakButton({
        --------------------------------
       */
 
-      const response = await fetch(
-        "/api/tts",
-        {
-          method: "POST",
+      const controller =
+        new AbortController();
 
-          headers: {
-            "Content-Type":
-              "application/json",
-          },
-
-          body: JSON.stringify({
-            text,
-            voiceName,
-          }),
-        }
+      const timeoutId = window.setTimeout(
+        () => controller.abort(),
+        8000
       );
+
+      let response: Response;
+
+      try {
+        response = await fetch(
+          "/api/tts",
+          {
+            method: "POST",
+
+            headers: {
+              "Content-Type":
+                "application/json",
+            },
+
+            signal:
+              controller.signal,
+
+            body: JSON.stringify({
+              text,
+              voiceName,
+            }),
+          }
+        );
+      } finally {
+        window.clearTimeout(timeoutId);
+      }
 
       /*
        --------------------------------
