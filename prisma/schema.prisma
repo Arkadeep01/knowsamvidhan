@@ -86,19 +86,6 @@ model Clause {
   article      Article  @relation(fields: [articleId], references: [id], onDelete: Cascade)
 }
 
-model Preamble {
-  id                String   @id @default("singleton")
-  officialText      String
-  simpleExplanation String
-  whyItMatters      String
-  keywords          String   @default("[]")
-  timeline          String   @default("[]")
-  quickFacts        String   @default("[]")
-  updatedAt         DateTime @updatedAt
-  landmarkCases     String   @default("[]")
-  notes             String   @default("[]")
-}
-
 model Schedule {
   id          String   @id @default(uuid())
   shortId     String

@@ -3,7 +3,7 @@
 import React, { useState } from 'react';
 import Link from 'next/link';
 import { 
-  LayoutDashboard, List, FileText, AlignLeft, Book, 
+  LayoutDashboard, List, FileText, AlignLeft,
   CalendarDays, History, GraduationCap, Users, BarChart3, 
   Settings, ShieldAlert, BookOpen, Search, Bell,
   ShieldCheck, CheckCircle2, AlertTriangle, XCircle
@@ -18,7 +18,6 @@ export default function ActivityLogsPage() {
     { name: 'Parts', icon: List, active: false, href: '/parts' },
     { name: 'Articles', icon: FileText, active: false, href: '/articles' },
     { name: 'Clauses', icon: AlignLeft, active: false, href: '/clauses' },
-    { name: 'Preamble', icon: Book, active: false, href: '/preamble' },
     { name: 'Schedules', icon: CalendarDays, active: false, href: '/schedules' },
     { name: 'Amendments', icon: History, active: false, href: '/amendments' },
     { name: 'Quizzes', icon: GraduationCap, active: false, href: '/quizzes' },

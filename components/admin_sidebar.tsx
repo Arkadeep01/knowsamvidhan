@@ -9,7 +9,6 @@ import {
   AlignLeft,
   BarChart3,
   Bell,
-  BookOpen,
   Bug,
   CalendarDays,
   ChevronDown,
@@ -63,12 +62,6 @@ const sidebarItems: SidebarItem[] = [
         title: "Parts",
         href: "/parts",
         icon: ScrollText,
-      },
-
-      {
-        title: "Preamble",
-        href: "/preamble",
-        icon: BookOpen,
       },
 
       {

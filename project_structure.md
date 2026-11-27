@@ -92,8 +92,6 @@ knowsamvidhan/
 │   │   │   └── ⚛️ page.tsx
 │   │   ├── 📂 parts/
 │   │   │   └── ⚛️ page.tsx
-│   │   ├── 📂 preamble/
-│   │   │   └── ⚛️ page.tsx
 │   │   ├── 📂 quizzes/
 │   │   │   └── ⚛️ page.tsx
 │   │   ├── 📂 schedules/
@@ -159,8 +157,6 @@ knowsamvidhan/
 │   │   │   ├── 📂 parts/
 │   │   │   │   ├── 📂 [id]/
 │   │   │   │   │   └── 🔷 route.ts
-│   │   │   │   └── 🔷 route.ts
-│   │   │   ├── 📂 preamble/
 │   │   │   │   └── 🔷 route.ts
 │   │   │   ├── 📂 quizzes/
 │   │   │   │   ├── 📂 [id]/
