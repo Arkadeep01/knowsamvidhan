@@ -1,6 +1,7 @@
 "use client";
 
 import { useState, useEffect } from "react";
+import type { CSSProperties } from "react";
 import { useRouter } from "next/navigation";
 import TestimonialsSection from "./TestimonialsSection";
 
@@ -164,6 +165,15 @@ const partStyles: Record<string, { color: string; bg: string; border: string; ic
 };
 
 const fallbackStyle = { color: "#78716c", bg: "#f5f5f4", border: "#d6d3d1", icon: "scroll" };
+
+const articleCardPalette = [
+  { color: "#7c3aed", text: "#4c1d95", bg: "#f5f3ff", border: "#ddd6fe", shadow: "rgba(124,58,237,0.18)" },
+  { color: "#0891b2", text: "#155e75", bg: "#ecfeff", border: "#a5f3fc", shadow: "rgba(8,145,178,0.18)" },
+  { color: "#059669", text: "#065f46", bg: "#ecfdf5", border: "#a7f3d0", shadow: "rgba(5,150,105,0.18)" },
+  { color: "#f97316", text: "#9a3412", bg: "#fff7ed", border: "#fed7aa", shadow: "rgba(249,115,22,0.20)" },
+  { color: "#e11d48", text: "#9f1239", bg: "#fff1f2", border: "#fecdd3", shadow: "rgba(225,29,72,0.18)" },
+  { color: "#b45309", text: "#92400e", bg: "#fffbeb", border: "#fde68a", shadow: "rgba(180,83,9,0.18)" },
+];
 
 const amendmentPalette = [
   { color: "#16a34a", bg: "#f0fdf4", border: "#bbf7d0" },
@@ -378,7 +388,7 @@ export default function Hero() {
 
         /* Article cards */
         .article-card { transition: all 0.22s cubic-bezier(.4,0,.2,1); cursor:pointer; position:relative; overflow:hidden; }
-        .article-card:hover { transform: translateY(-4px); box-shadow: 0 16px 44px rgba(0,0,0,0.10); }
+        .article-card:hover { transform: translateY(-4px); box-shadow: 0 16px 44px var(--card-shadow, rgba(0,0,0,0.10)); border-color: var(--card-accent, #c48232) !important; }
         .article-card:hover .article-arrow { transform: translateX(4px); opacity:1; }
         .article-arrow { transition: transform 0.2s ease, opacity 0.2s ease; opacity:0.4; }
 
@@ -742,24 +752,25 @@ export default function Hero() {
                 No featured articles yet. Mark some as featured from the admin panel.
               </p>
             )
-            : featuredArticles.map((a, idx) => {
-                const partStyle = a.part?.partNumber
-                  ? (partStyles[a.part.partNumber] ?? amendmentPalette[idx % amendmentPalette.length])
-                  : amendmentPalette[idx % amendmentPalette.length];
-                const color  = (partStyle as any).color;
-                const bg     = (partStyle as any).bg;
-                const border = (partStyle as any).border;
+            : featuredArticles
+                .slice()
+                .sort((a, b) => a.articleNumber.localeCompare(b.articleNumber))
+                .map((a, idx) => {
+                const theme  = articleCardPalette[idx % articleCardPalette.length];
+                const color  = theme.color;
+                const bg     = theme.bg;
+                const border = theme.border;
                 const slug   = articleNumberToSlug(a.articleNumber);
 
                 return (
                   <div
                     key={a.id}
                     className="article-card"
-                    style={{ borderRadius: 16, padding: "24px 28px", background: bg, border: `1px solid ${border}` }}
+                    style={{ borderRadius: 16, padding: "24px 28px", background: bg, border: `1px solid ${border}`, "--card-accent": color, "--card-shadow": theme.shadow } as CSSProperties}
                     onClick={() => router.push(`/user_articles/${slug}`)}
                   >
                     <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: 20 }}>
-                      <span style={{ fontSize: 10, fontWeight: 700, letterSpacing: "0.12em", fontFamily: "'DM Sans', sans-serif", padding: "6px 12px", borderRadius: 999, background: "rgba(255,255,255,0.7)", color, border: `1px solid ${border}` }}>
+                      <span style={{ fontSize: 10, fontWeight: 700, letterSpacing: "0.12em", fontFamily: "'DM Sans', sans-serif", padding: "6px 12px", borderRadius: 999, background: bg, color, border: `1px solid ${border}` }}>
                         {a.part?.title ?? "Constitution"}
                       </span>
                       <span style={{ fontSize: "1.875rem", fontWeight: 900, lineHeight: 1, fontFamily: "'Georgia', serif", color, opacity: 0.15 }}>
@@ -769,7 +780,7 @@ export default function Hero() {
                     <div style={{ marginBottom: 4 }}>
                       <span style={{ fontSize: "0.75rem", fontWeight: 700, fontFamily: "'DM Sans', sans-serif", letterSpacing: "0.08em", color }}>{a.articleNumber}</span>
                     </div>
-                    <h3 style={{ fontSize: "clamp(16px,2vw,20px)", fontWeight: 700, color: "#1c1917", marginBottom: 12, lineHeight: 1.25, fontFamily: "'Georgia', serif" }}>{a.title}</h3>
+                    <h3 style={{ fontSize: "clamp(16px,2vw,20px)", fontWeight: 700, color: theme.text, marginBottom: 12, lineHeight: 1.25, fontFamily: "'Georgia', serif" }}>{a.title}</h3>
                     <p style={{ fontSize: "0.875rem", color: "#57534e", lineHeight: 1.6, marginBottom: 24, fontFamily: "'DM Sans', sans-serif", display: "-webkit-box", WebkitLineClamp: 3, WebkitBoxOrient: "vertical", overflow: "hidden" }}>
                       {a.shortSummary ?? a.simpleExplanation ?? ""}
                     </p>
