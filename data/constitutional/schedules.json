@@ -1,0 +1,251 @@
+[
+  {
+    "shortId": "I",
+    "schedule": "First Schedule",
+    "slug": "first-schedule",
+    "title": "The States and the Union territories",
+    "description": "The States and the Union territories",
+    "topics": [
+      "The States",
+      "The Union territories"
+    ],
+    "tagDetails": [
+      {
+        "tag": "The States",
+        "detail": "The States"
+      },
+      {
+        "tag": "The Union territories",
+        "detail": "The Union territories"
+      }
+    ],
+    "sourceUrl": "https://www.legislative.gov.in/static/uploads/2025/07/95ef471035ee0b5e4e5b1cac3d3584c1.pdf"
+  },
+  {
+    "shortId": "II",
+    "schedule": "Second Schedule",
+    "slug": "second-schedule",
+    "title": "Provisions as to the President and the Governors of States",
+    "description": "Provisions as to the President and the Governors of States",
+    "topics": [
+      "Part A — Provisions as to the President and the Governors of States",
+      "Part C — Provisions as to the Speaker and the Deputy Speaker of the House of the People and the Chairman and the Deputy Chairman of the Council of States",
+      "Part D — Provisions as to the Judges of the Supreme Court and of the High Courts",
+      "Part E — Provisions as to the Comptroller and Auditor-General of India"
+    ],
+    "tagDetails": [
+      {
+        "tag": "Part A",
+        "detail": "Provisions as to the President and the Governors of States"
+      },
+      {
+        "tag": "Part C",
+        "detail": "Provisions as to the Speaker and the Deputy Speaker of the House of the People and the Chairman and the Deputy Chairman of the Council of States"
+      },
+      {
+        "tag": "Part D",
+        "detail": "Provisions as to the Judges of the Supreme Court and of the High Courts"
+      },
+      {
+        "tag": "Part E",
+        "detail": "Provisions as to the Comptroller and Auditor-General of India"
+      }
+    ],
+    "sourceUrl": "https://www.legislative.gov.in/static/uploads/2025/07/95ef471035ee0b5e4e5b1cac3d3584c1.pdf"
+  },
+  {
+    "shortId": "III",
+    "schedule": "Third Schedule",
+    "slug": "third-schedule",
+    "title": "Forms of Oaths or Affirmations",
+    "description": "Forms of Oaths or Affirmations",
+    "topics": [
+      "Forms of Oaths or Affirmations"
+    ],
+    "tagDetails": [
+      {
+        "tag": "Forms of Oaths or Affirmations",
+        "detail": "Forms of Oaths or Affirmations"
+      }
+    ],
+    "sourceUrl": "https://www.legislative.gov.in/static/uploads/2025/07/95ef471035ee0b5e4e5b1cac3d3584c1.pdf"
+  },
+  {
+    "shortId": "IV",
+    "schedule": "Fourth Schedule",
+    "slug": "fourth-schedule",
+    "title": "Allocation of seats in the Council of States",
+    "description": "Allocation of seats in the Council of States",
+    "topics": [
+      "Allocation of seats in the Council of States"
+    ],
+    "tagDetails": [
+      {
+        "tag": "Allocation of seats in the Council of States",
+        "detail": "Allocation of seats in the Council of States"
+      }
+    ],
+    "sourceUrl": "https://www.legislative.gov.in/static/uploads/2025/07/95ef471035ee0b5e4e5b1cac3d3584c1.pdf"
+  },
+  {
+    "shortId": "V",
+    "schedule": "Fifth Schedule",
+    "slug": "fifth-schedule",
+    "title": "Provisions as to the Administration and Control of Scheduled Areas and Scheduled Tribes",
+    "description": "Provisions as to the Administration and Control of Scheduled Areas and Scheduled Tribes",
+    "topics": [
+      "Part A — General",
+      "Part B — Administration and Control of Scheduled Areas and Scheduled Tribes",
+      "Part C — Scheduled Areas",
+      "Part D — Amendment of the Schedule"
+    ],
+    "tagDetails": [
+      {
+        "tag": "Part A",
+        "detail": "General"
+      },
+      {
+        "tag": "Part B",
+        "detail": "Administration and Control of Scheduled Areas and Scheduled Tribes"
+      },
+      {
+        "tag": "Part C",
+        "detail": "Scheduled Areas"
+      },
+      {
+        "tag": "Part D",
+        "detail": "Amendment of the Schedule"
+      }
+    ],
+    "sourceUrl": "https://www.legislative.gov.in/static/uploads/2025/07/95ef471035ee0b5e4e5b1cac3d3584c1.pdf"
+  },
+  {
+    "shortId": "VI",
+    "schedule": "Sixth Schedule",
+    "slug": "sixth-schedule",
+    "title": "Provisions as to the Administration of Tribal Areas in the States of Assam, Meghalaya, Tripura and Mizoram",
+    "description": "Provisions as to the Administration of Tribal Areas in the States of Assam, Meghalaya, Tripura and Mizoram",
+    "topics": [
+      "Provisions as to the Administration of Tribal Areas in the States of Assam, Meghalaya, Tripura and Mizoram"
+    ],
+    "tagDetails": [
+      {
+        "tag": "Provisions as to the Administration of Tribal Areas in the States of Assam, Meghalaya, Tripura and Mizoram",
+        "detail": "Provisions as to the Administration of Tribal Areas in the States of Assam, Meghalaya, Tripura and Mizoram"
+      }
+    ],
+    "sourceUrl": "https://www.legislative.gov.in/static/uploads/2025/07/95ef471035ee0b5e4e5b1cac3d3584c1.pdf"
+  },
+  {
+    "shortId": "VII",
+    "schedule": "Seventh Schedule",
+    "slug": "seventh-schedule",
+    "title": "Union List, State List and Concurrent List",
+    "description": "Union List, State List and Concurrent List",
+    "topics": [
+      "List I — Union List",
+      "List II — State List",
+      "List III — Concurrent List"
+    ],
+    "tagDetails": [
+      {
+        "tag": "List I",
+        "detail": "Union List"
+      },
+      {
+        "tag": "List II",
+        "detail": "State List"
+      },
+      {
+        "tag": "List III",
+        "detail": "Concurrent List"
+      }
+    ],
+    "sourceUrl": "https://www.legislative.gov.in/static/uploads/2025/07/95ef471035ee0b5e4e5b1cac3d3584c1.pdf"
+  },
+  {
+    "shortId": "VIII",
+    "schedule": "Eighth Schedule",
+    "slug": "eighth-schedule",
+    "title": "Languages",
+    "description": "Languages",
+    "topics": [
+      "Languages"
+    ],
+    "tagDetails": [
+      {
+        "tag": "Languages",
+        "detail": "Languages"
+      }
+    ],
+    "sourceUrl": "https://www.legislative.gov.in/static/uploads/2025/07/95ef471035ee0b5e4e5b1cac3d3584c1.pdf"
+  },
+  {
+    "shortId": "IX",
+    "schedule": "Ninth Schedule",
+    "slug": "ninth-schedule",
+    "title": "Validation of certain Acts and Regulations (Article 31B)",
+    "description": "Validation of certain Acts and Regulations (Article 31B)",
+    "topics": [
+      "Validation of certain Acts and Regulations"
+    ],
+    "tagDetails": [
+      {
+        "tag": "Validation of certain Acts and Regulations",
+        "detail": "Validation of certain Acts and Regulations"
+      }
+    ],
+    "sourceUrl": "https://www.legislative.gov.in/static/uploads/2025/07/95ef471035ee0b5e4e5b1cac3d3584c1.pdf"
+  },
+  {
+    "shortId": "X",
+    "schedule": "Tenth Schedule",
+    "slug": "tenth-schedule",
+    "title": "Provisions as to disqualification on ground of defection",
+    "description": "Provisions as to disqualification on ground of defection",
+    "topics": [
+      "Provisions as to disqualification on ground of defection"
+    ],
+    "tagDetails": [
+      {
+        "tag": "Provisions as to disqualification on ground of defection",
+        "detail": "Provisions as to disqualification on ground of defection"
+      }
+    ],
+    "sourceUrl": "https://www.legislative.gov.in/static/uploads/2025/07/95ef471035ee0b5e4e5b1cac3d3584c1.pdf"
+  },
+  {
+    "shortId": "XI",
+    "schedule": "Eleventh Schedule",
+    "slug": "eleventh-schedule",
+    "title": "Powers, authority and responsibilities of Panchayats",
+    "description": "Powers, authority and responsibilities of Panchayats",
+    "topics": [
+      "Powers, authority and responsibilities of Panchayats"
+    ],
+    "tagDetails": [
+      {
+        "tag": "Powers, authority and responsibilities of Panchayats",
+        "detail": "Powers, authority and responsibilities of Panchayats"
+      }
+    ],
+    "sourceUrl": "https://www.legislative.gov.in/static/uploads/2025/07/95ef471035ee0b5e4e5b1cac3d3584c1.pdf"
+  },
+  {
+    "shortId": "XII",
+    "schedule": "Twelfth Schedule",
+    "slug": "twelfth-schedule",
+    "title": "Powers, authority and responsibilities of Municipalities, etc. (Article 243W)",
+    "description": "Powers, authority and responsibilities of Municipalities, etc. (Article 243W)",
+    "topics": [
+      "Powers, authority and responsibilities of Municipalities, etc."
+    ],
+    "tagDetails": [
+      {
+        "tag": "Powers, authority and responsibilities of Municipalities, etc.",
+        "detail": "Powers, authority and responsibilities of Municipalities, etc."
+      }
+    ],
+    "sourceUrl": "https://www.legislative.gov.in/static/uploads/2025/07/95ef471035ee0b5e4e5b1cac3d3584c1.pdf"
+  }
+]

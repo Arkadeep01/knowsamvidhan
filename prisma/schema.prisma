@@ -52,7 +52,7 @@ model RegistrationOTP {
 
 model Part {
   id           String    @id @default(uuid())
-  partNumber   String
+  partNumber   String   @unique
   title        String
   range        String
   articles     Int
@@ -63,7 +63,7 @@ model Part {
 
 model Article {
   id                String   @id @default(uuid())
-  articleNumber     String
+  articleNumber     String   @unique
   title             String
   shortSummary      String?
   officialText      String?
@@ -84,6 +84,8 @@ model Clause {
   createdAt    DateTime @default(now())
   articleId    String
   article      Article  @relation(fields: [articleId], references: [id], onDelete: Cascade)
+
+  @@unique([articleId, clauseNumber])
 }
 
 model Schedule {
