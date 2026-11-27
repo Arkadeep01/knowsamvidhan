@@ -2,6 +2,7 @@
 
 import { NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
+import { validateAmendmentInput } from "@/lib/amendments/validation.mjs";
 
 // ✅ GET all amendments
 export async function GET() {
@@ -14,18 +15,30 @@ export async function GET() {
 
 // ✅ POST create amendment
 export async function POST(req: Request) {
-  const body = await req.json();
+  try {
+    const body = await req.json();
+    const result = validateAmendmentInput(body);
+    if (!result.ok || !result.value) {
+      return NextResponse.json({ error: result.errors.join("; ") }, { status: 400 });
+    }
 
-  const created = await prisma.amendment.create({
-    data: {
-      number:          body.number,
-      year:            body.year,
-      title:           body.title,
-      summary:         body.summary,
-      whyItMatters:    body.whyItMatters    ?? "",
-      relatedArticles: body.relatedArticles ?? "",
-    },
-  });
+    const created = await prisma.amendment.create({
+      data: {
+        number:          result.value.number,
+        year:            result.value.year,
+        title:           result.value.title,
+        summary:         result.value.summary,
+        whyItMatters:    result.value.whyItMatters,
+        relatedArticles: result.value.relatedArticles,
+      },
+    });
 
-  return NextResponse.json({ amendment: created }, { status: 201 });
+    return NextResponse.json({ amendment: created }, { status: 201 });
+  } catch (error) {
+    if (error && typeof error === "object" && "code" in error && error.code === "P2002") {
+      return NextResponse.json({ error: "Amendment number already exists" }, { status: 409 });
+    }
+    console.error("POST /api/admin/amendments error:", error);
+    return NextResponse.json({ error: "Failed to create amendment" }, { status: 500 });
+  }
 }

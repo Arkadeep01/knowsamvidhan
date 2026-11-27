@@ -1,0 +1,646 @@
+{
+  "appliedAt": "2026-11-27T08:29:17.933Z",
+  "records": 106,
+  "inserted": 106,
+  "updated": 0,
+  "unchanged": 0,
+  "note": "Provenance manifest is data/amendments/verified-amendments.json relatedArticles left empty because Article records are absent.",
+  "results": [
+    {
+      "id": "f1ed6920-c503-4681-8e34-83e02de1d5b0",
+      "number": "1st",
+      "sourceUrl": "https://www.legislative.gov.in/static/uploads/2025/07/f3789482ad0dfee795e54fb88c0401e6.pdf",
+      "sourceNotes": "Legislative Department PDF; SOR dated 10 May 1951, Act dated 18 June 1951."
+    },
+    {
+      "id": "8f1a1af0-ba91-4628-af29-8034c7437273",
+      "number": "2nd",
+      "sourceUrl": "https://www.legislative.gov.in/static/uploads/2025/07/38ef0247f825a631d62ae585a9bf529c.pdf",
+      "sourceNotes": "Legislative Department PDF; SOR dated 19 May 1952; Act dated 1 May 1953 while title says 1952."
+    },
+    {
+      "id": "0823d078-692a-46eb-a87d-e9445289e626",
+      "number": "3rd",
+      "sourceUrl": "https://www.legislative.gov.in/static/uploads/2025/07/d4b13be535b5e11a6784f227c57cf084.pdf",
+      "sourceNotes": "Legislative Department PDF; embedded SOR is mistakenly that of the Second Amendment Bill, 1952; summary taken from section 2; Act dated 22 February 1955."
+    },
+    {
+      "id": "dcbbd711-d918-434d-9e99-252ee5ef6cac",
+      "number": "4th",
+      "sourceUrl": "https://www.legislative.gov.in/static/uploads/2025/07/68badaa2da25d641c51992f854344773.pdf",
+      "sourceNotes": "Legislative Department PDF; SOR names Fourth Amendment Bill 1954 but says enacted as Act 1954; Act title reads 1955."
+    },
+    {
+      "id": "6562cfcc-b7ed-46e3-86ca-4e773854c901",
+      "number": "5th",
+      "sourceUrl": "https://www.legislative.gov.in/static/uploads/2025/07/b465c9d672c55778e7701f795e2ce1fb.pdf",
+      "sourceNotes": "Legislative Department one-page PDF; no SOR, summary from section 2; Act dated 24 December 1955."
+    },
+    {
+      "id": "dcd292df-8343-4559-beb6-280d93a792e0",
+      "number": "6th",
+      "sourceUrl": "https://www.legislative.gov.in/static/uploads/2025/07/1a2c5f93dab41d00838c0cabe4ec6306.pdf",
+      "sourceNotes": "Legislative Department PDF; no SOR, summary from Act sections; Act dated 11 September 1956."
+    },
+    {
+      "id": "44b1b106-d770-4908-8b25-d3661d23f35e",
+      "number": "7th",
+      "sourceUrl": "https://www.legislative.gov.in/static/uploads/2025/07/7f6bac8249d681944c3218b11ef4d62a.pdf",
+      "sourceNotes": "Legislative Department PDF; SOR heading mislabels the Bill but names the Seventh Amendment Act, 1956; Act dated 19 October 1956."
+    },
+    {
+      "id": "698a3708-0327-468d-8315-ce26fdc025e6",
+      "number": "8th",
+      "sourceUrl": "https://www.legislative.gov.in/static/uploads/2025/07/0cf16c3f1479074a87011e066396733e.pdf",
+      "sourceNotes": "Legislative Department PDF; embedded SOR is an erroneous copy of the Fourth Amendment SOR; summary from the operative section; Act dated 5 January 1960."
+    },
+    {
+      "id": "3591ccd7-c35f-445d-9cb4-9febe1d22886",
+      "number": "9th",
+      "sourceUrl": "https://www.legislative.gov.in/static/uploads/2025/07/5aed44b7bcf65d872dfa970df29a9648.pdf",
+      "sourceNotes": "Legislative Department PDF; SOR dated 12 December 1960; Act dated 28 December 1960."
+    },
+    {
+      "id": "c2bc3f78-5125-44ec-b780-5fa2383e91a1",
+      "number": "10th",
+      "sourceUrl": "https://www.legislative.gov.in/static/uploads/2025/07/9e2f8aa7cad5798c56d811820d905067.pdf",
+      "sourceNotes": "Legislative Department PDF; PDF also carries a misfiled Sixth Amendment SOR; summary uses the Tenth Amendment SOR; Act dated 16 August 1961."
+    },
+    {
+      "id": "c213439b-7b54-45a0-8027-ace41908cbad",
+      "number": "11th",
+      "sourceUrl": "https://www.legislative.gov.in/static/uploads/2025/07/2afd30b40699bdea0da82ff187745382.pdf",
+      "sourceNotes": "Legislative Department PDF; SOR dated 24 November 1961; Act dated 19 December 1961."
+    },
+    {
+      "id": "b6863104-e220-4dc3-b797-34f5e56c3d21",
+      "number": "12th",
+      "sourceUrl": "https://www.legislative.gov.in/static/uploads/2025/07/90f537a2f96e5304e088b723b665d426.pdf",
+      "sourceNotes": "Legislative Department PDF; SOR dated 25 August 1962; Act dated 27 March 1962."
+    },
+    {
+      "id": "b78e616c-37a0-4618-b941-e4d25ac4c55b",
+      "number": "13th",
+      "sourceUrl": "https://www.legislative.gov.in/static/uploads/2025/07/47137a87ca0016acc39e9eb9fe883fad.pdf",
+      "sourceNotes": "Legislative Department PDF; SOR dated 25 August 1962; Act dated 28 December 1962."
+    },
+    {
+      "id": "c761935b-311a-4fc1-968f-4cb2414879aa",
+      "number": "14th",
+      "sourceUrl": "https://www.legislative.gov.in/static/uploads/2025/07/8280fa9ccf56f067efd5cc9491297db8.pdf",
+      "sourceNotes": "Legislative Department PDF; SOR dated 25 August 1962; Act dated 28 December 1962."
+    },
+    {
+      "id": "3049eb31-89d7-4466-995d-6a41663cf6eb",
+      "number": "15th",
+      "sourceUrl": "https://www.legislative.gov.in/static/uploads/2025/07/e783be6f8c7c01084bd341be7389878b.pdf",
+      "sourceNotes": "Gazette of India Extraordinary PDF on legislative.gov.in; no SOR, summary from Act sections; assent 5 October 1963; OCR text garbled."
+    },
+    {
+      "id": "05fb0c2c-ee2d-4de3-abfc-9de2ac08a02e",
+      "number": "16th",
+      "sourceUrl": "https://www.legislative.gov.in/static/uploads/2025/07/44c47a4fe2b7c4b4e9afb4509aeba383.pdf",
+      "sourceNotes": "Legislative Department PDF; SOR dated 18 January 1963; Act dated 5 October 1963."
+    },
+    {
+      "id": "8617732a-8236-402c-bcc8-7043ab3a5e85",
+      "number": "17th",
+      "sourceUrl": "https://www.legislative.gov.in/static/uploads/2025/07/070cb7a0edb92c2d1fc0ca634ef60361.pdf",
+      "sourceNotes": "Legislative Department PDF; SOR heading mislabels the Bill; Act dated 20 June 1964."
+    },
+    {
+      "id": "fba87f52-549d-4858-aa4d-2c704d0dd01d",
+      "number": "18th",
+      "sourceUrl": "https://www.legislative.gov.in/static/uploads/2025/07/75c9ecd6164365d5816e0de381d33194.pdf",
+      "sourceNotes": "Legislative Department PDF; SOR heading mislabels the Bill; Act dated 27 August 1966."
+    },
+    {
+      "id": "a66f2a75-2b76-4f2b-b363-b5f0aef617bc",
+      "number": "19th",
+      "sourceUrl": "https://www.legislative.gov.in/static/uploads/2025/07/f6bc00d0cf640e651897539f1538caec.pdf",
+      "sourceNotes": "Legislative Department PDF; SOR heading mislabels the Bill; Act dated 11 December 1966."
+    },
+    {
+      "id": "0fb42ef6-19dc-4d41-937d-5697ff0c5b71",
+      "number": "20th",
+      "sourceUrl": "https://www.legislative.gov.in/static/uploads/2025/07/f81e5911e7c0855ebbc17420de69acc5.pdf",
+      "sourceNotes": "Legislative Department PDF; SOR heading mislabels the Bill; Act dated 22 December 1966."
+    },
+    {
+      "id": "b5cf9ee2-7c9d-4433-a4b9-814469c2146f",
+      "number": "21st",
+      "sourceUrl": "https://www.legislative.gov.in/static/uploads/2025/07/33c21c8515cca2f3b602ff3a765ea035.pdf",
+      "sourceNotes": "Legislative Department PDF; SOR heading mislabels the Bill; Act dated 10 April 1967."
+    },
+    {
+      "id": "0bccb32e-9b02-4b26-90e8-716cfc013927",
+      "number": "22nd",
+      "sourceUrl": "https://www.legislative.gov.in/static/uploads/2025/07/5d6c7ed399a157defd3b146994808380.pdf",
+      "sourceNotes": "Legislative Department PDF; SOR dated 12 November 1968; Act dated 25 September 1969."
+    },
+    {
+      "id": "5bece89a-5f7e-4100-b47a-7fa964c2d500",
+      "number": "23rd",
+      "sourceUrl": "https://www.legislative.gov.in/static/uploads/2025/07/6421aae09fc09b38fdb9c3bd9a47921c.pdf",
+      "sourceNotes": "Legislative Department PDF; Act title gives 1969 but date line reads 23 January 1970; SOR dated 11 August 1969."
+    },
+    {
+      "id": "d0a4108a-3742-46c2-9485-6dcb80d59a90",
+      "number": "24th",
+      "sourceUrl": "https://www.legislative.gov.in/static/uploads/2025/07/2a321e3e1deabf4a8e1b878b640414d7.pdf",
+      "sourceNotes": "Legislative Department PDF; SOR dated 22 July 1971; Act dated 5 November 1971."
+    },
+    {
+      "id": "a58a2d80-eaf2-4db9-8763-708ac5d3bb1c",
+      "number": "25th",
+      "sourceUrl": "https://www.legislative.gov.in/static/uploads/2025/07/a9a6ff5abe015dc06b265ecc9485f7a7.pdf",
+      "sourceNotes": "Legislative Department PDF; Act title gives 1971 but date line reads 20 April 1972; SOR dated 22 July 1971."
+    },
+    {
+      "id": "9883a974-d565-4ec8-811d-e1e28de1cbad",
+      "number": "26th",
+      "sourceUrl": "https://www.legislative.gov.in/static/uploads/2025/07/c61e222417607ab6e944b07f79b55d1b.pdf",
+      "sourceNotes": "Gazette of India Extraordinary PDF on legislative.gov.in; no SOR, summary from Act sections; OCR masthead has a 1975 typo but Act text gives 1971."
+    },
+    {
+      "id": "8874c607-293e-41cb-96d3-6271a8fc3a44",
+      "number": "27th",
+      "sourceUrl": "https://www.legislative.gov.in/static/uploads/2025/07/5eecdd73586cdaabe3ffc54ed2ab10f8.pdf",
+      "sourceNotes": "Legislative Department PDF; SOR dated 12 December 1971; Act dated 30 December 1971."
+    },
+    {
+      "id": "91d3ff96-e4cd-4420-be8a-b90a632ad39f",
+      "number": "28th",
+      "sourceUrl": "https://www.legislative.gov.in/static/uploads/2025/07/1143f441527d1adf5744e7e0ccf35a47.pdf",
+      "sourceNotes": "Official PDF text from search index; SOR appended to Constitution (Thirty-first Amendment) Bill, 1972."
+    },
+    {
+      "id": "a0c299a4-4dcd-462b-b871-a5b31479fb1d",
+      "number": "29th",
+      "sourceUrl": "https://www.legislative.gov.in/static/uploads/2025/07/32c2b9a302c83703871e081351af5f49.pdf",
+      "sourceNotes": "Official PDF fetched via proxy; SOR appended to Constitution (Thirty-second Amendment) Bill, 1972."
+    },
+    {
+      "id": "3b4c26f5-13ea-4976-8b78-0dd2a82470fc",
+      "number": "30th",
+      "sourceUrl": "https://www.legislative.gov.in/static/uploads/2025/07/d6970667d71b0cdaad2ad22b9d44d39c.pdf",
+      "sourceNotes": "Official PDF text from search index; registry published year 22 February 1973 differs from Act title year 1972."
+    },
+    {
+      "id": "e3e01a7b-a9bb-4fc7-9afd-2bda62118474",
+      "number": "31st",
+      "sourceUrl": "https://www.legislative.gov.in/static/uploads/2025/07/03eeedc70a4dad36292b05d64bc8ddd4.pdf",
+      "sourceNotes": "Official PDF text from search index; SOR appended to Constitution (Thirty-first Amendment) Bill, 1973."
+    },
+    {
+      "id": "4dc8f585-8709-4db2-8738-a4d7415cb352",
+      "number": "32nd",
+      "sourceUrl": "https://www.legislative.gov.in/static/uploads/2025/07/86861e79e41f499cf994f1f13da1df46.pdf",
+      "sourceNotes": "Official PDF text from search index; registry published year 3 May 1974 differs from Act title year 1973; SOR appended to Thirty-third Amendment Bill, 1973."
+    },
+    {
+      "id": "3833d1b1-52c8-4da0-811f-6108292bc755",
+      "number": "33rd",
+      "sourceUrl": "https://www.legislative.gov.in/static/uploads/2025/07/3562bb99bdcf20112f8341cc8562d308.pdf",
+      "sourceNotes": "Official PDF text from search index; SOR appended to Constitution (Thirty-fifth Amendment) Bill, 1974."
+    },
+    {
+      "id": "52dfdcdb-8cd0-48f4-8c91-2a59d645c971",
+      "number": "34th",
+      "sourceUrl": "https://www.legislative.gov.in/static/uploads/2025/07/edc7f592dbf84a7300fc91819278c8af.pdf",
+      "sourceNotes": "Official PDF text from search index; SOR Bill number matches the Act."
+    },
+    {
+      "id": "2cfe844b-b8ab-4bbd-b711-001dce325e54",
+      "number": "35th",
+      "sourceUrl": "https://www.legislative.gov.in/static/uploads/2025/07/c7c27cef78844056fc4033c78c1131ea.pdf",
+      "sourceNotes": "Official PDF text from search index; registry published year 22 February 1975 differs from Act title year 1974; SOR appended to Thirty-sixth Amendment Bill, 1974."
+    },
+    {
+      "id": "7bed8f51-5439-4266-8f92-d03937678b65",
+      "number": "36th",
+      "sourceUrl": "https://www.legislative.gov.in/static/uploads/2025/07/2a875dab390ddae1419f7f050ccd6ed0.pdf",
+      "sourceNotes": "Official PDF fetched via proxy; SOR appended to Thirty-eighth Amendment Bill, 1975."
+    },
+    {
+      "id": "17d4ecc6-cbe6-4038-8150-0abb76c2699a",
+      "number": "37th",
+      "sourceUrl": "https://www.legislative.gov.in/static/uploads/2025/07/e758d6fb56d08150e4359287a75266c1.pdf",
+      "sourceNotes": "Official PDF fetched via proxy; SOR Bill number matches the Act."
+    },
+    {
+      "id": "77a7e234-dd22-4f79-ae1c-8b61c1e0a9de",
+      "number": "38th",
+      "sourceUrl": "https://www.legislative.gov.in/static/uploads/2025/07/bca8d0b507a4ddeadc5f7152f6c91193.pdf",
+      "sourceNotes": "Official PDF text from search index; SOR appended to Constitution (Thirty-ninth Amendment) Bill, 1975."
+    },
+    {
+      "id": "134637ee-52df-4d5e-a1b9-1a8dbc4833af",
+      "number": "39th",
+      "sourceUrl": "https://www.legislative.gov.in/static/uploads/2025/07/023c05a84523bce30bca92bd293625c5.pdf",
+      "sourceNotes": "Official PDF text from search index; SOR appended to Constitution (Fortieth Amendment) Bill, 1975."
+    },
+    {
+      "id": "96605bb9-96b1-40b9-bdac-2e035b5ec5a7",
+      "number": "40th",
+      "sourceUrl": "https://www.legislative.gov.in/static/uploads/2025/07/33631a9257ad901c974cb48e870372e1.pdf",
+      "sourceNotes": "Official PDF fetched via proxy; SOR appended to Constitution (Forty-second Amendment) Bill, 1976."
+    },
+    {
+      "id": "1bddefbc-d10c-472f-8dbe-d5a897fddafd",
+      "number": "41st",
+      "sourceUrl": "https://www.legislative.gov.in/static/uploads/2025/07/c6953501ff9bdbbffcd0fe0a6cc0cb8e.pdf",
+      "sourceNotes": "Official PDF text from search index; SOR appended to Constitution (Forty-third Amendment) Bill, 1976."
+    },
+    {
+      "id": "7a809fcf-6ce3-47fe-938a-4cb205402752",
+      "number": "42nd",
+      "sourceUrl": "https://www.legislative.gov.in/static/uploads/2025/07/9f820a53b6e6840a459bde27eb5d24e5.pdf",
+      "sourceNotes": "Official PDF text from search index; SOR appended to Constitution (Forty-fourth Amendment) Bill, 1976 (Bill No. 91 of 1976); registry records split commencement across three dates."
+    },
+    {
+      "id": "d94b8ea7-dbcd-4004-b6f9-1801c588150a",
+      "number": "43rd",
+      "sourceUrl": "https://www.legislative.gov.in/static/uploads/2025/07/92ab0775a464da9f13fa816c402823f8.pdf",
+      "sourceNotes": "Official PDF fetched via proxy; SOR appended to Constitution (Forty-fourth Amendment) Bill, 1977."
+    },
+    {
+      "id": "8d9ded6f-2cc9-4816-aa3c-d31038ee28ea",
+      "number": "44th",
+      "sourceUrl": "https://www.legislative.gov.in/static/uploads/2025/07/376b37bf0ae18f1d9276ce226d0e67a1.pdf",
+      "sourceNotes": "Official PDF fetched via proxy; SOR appended to Constitution (Forty-fifth Amendment) Bill, 1978; registry published year differs from Act title year; split commencement."
+    },
+    {
+      "id": "9ca46ad3-57d1-408a-adb8-16f89c0aa948",
+      "number": "45th",
+      "sourceUrl": "https://www.legislative.gov.in/static/uploads/2025/07/62194c761da541335c5e1d8b4da03aab.pdf",
+      "sourceNotes": "Official PDF text from search index; SOR appended to Constitution (Forty-fifth Amendment) Bill, 1980; Act deemed in force from 25 January 1980."
+    },
+    {
+      "id": "b7f9c1ef-15af-4109-9fa7-4011d37d6dea",
+      "number": "46th",
+      "sourceUrl": "https://www.legislative.gov.in/static/uploads/2025/07/45675709264e657076d95506afb1da2a.pdf",
+      "sourceNotes": "Official PDF fetched via proxy; SOR names Forty-sixth Amendment Bill, 1981 while Act title year is 1982; registry date is a re-upload."
+    },
+    {
+      "id": "500e168d-c82e-4f7c-9e9a-a4af18974d49",
+      "number": "47th",
+      "sourceUrl": "https://www.legislative.gov.in/static/uploads/2025/07/b13ee4d9fe904587911afadf86379838.pdf",
+      "sourceNotes": "Official PDF text from search index; SOR appended to Constitution (Forty-eighth Amendment) Bill, 1983."
+    },
+    {
+      "id": "b9fd3f9c-bacb-49ce-a37c-806b52d25ce1",
+      "number": "48th",
+      "sourceUrl": "https://www.legislative.gov.in/static/uploads/2025/07/1b65d89d6107c526d5dc2102f3dcf479.pdf",
+      "sourceNotes": "Official PDF text from search index; SOR appended to Constitution (Fiftieth Amendment) Bill, 1984."
+    },
+    {
+      "id": "16ae68c4-2de2-49b5-a24a-4aa00cd952ec",
+      "number": "49th",
+      "sourceUrl": "https://www.legislative.gov.in/static/uploads/2025/07/63e45ad1fb67b3ca83fd83935e5d39b3.pdf",
+      "sourceNotes": "Official PDF text from search index; SOR appended to Constitution (Fifty-first Amendment) Bill, 1984."
+    },
+    {
+      "id": "9168bcc3-04fa-45bf-a4ee-707ccd39ba7d",
+      "number": "50th",
+      "sourceUrl": "https://www.legislative.gov.in/static/uploads/2025/07/92a0a27dfea67d7e6117a833aeff0da9.pdf",
+      "sourceNotes": "Official PDF fetched via proxy; SOR appended to Constitution (Fifty-second Amendment) Bill, 1984."
+    },
+    {
+      "id": "9fcfc53d-134c-4d3d-9009-886c64ff0070",
+      "number": "51st",
+      "sourceUrl": "https://www.legislative.gov.in/static/uploads/2025/07/a0285cd36e42bf42aceb90f882f486ec.pdf",
+      "sourceNotes": "Official PDF fetched via proxy; SOR appended to Constitution (Fifty-third Amendment) Bill, 1984."
+    },
+    {
+      "id": "5b420da7-0565-4ab5-a3bd-b9fa67a5a80e",
+      "number": "52nd",
+      "sourceUrl": "https://www.legislative.gov.in/static/uploads/2025/07/2d3bb2cbee87a8e7ede010fe0ca27655.pdf",
+      "sourceNotes": "Official PDF text from search index; SOR appended to Constitution (Fifty-second Amendment) Bill, 1985."
+    },
+    {
+      "id": "555ba99e-1bd7-4125-801d-61cc41488c57",
+      "number": "53rd",
+      "sourceUrl": "https://www.legislative.gov.in/static/uploads/2025/07/f1b620ba6a4d19f4fc9b83bb1d892160.pdf",
+      "sourceNotes": "Official PDF text from search index; SOR appended to Constitution (Fifty-third Amendment) Bill, 1986."
+    },
+    {
+      "id": "8cd9ad65-af45-4de6-a3a5-4e8ce3a7af41",
+      "number": "54th",
+      "sourceUrl": "https://www.legislative.gov.in/static/uploads/2025/07/10490cf8cc0117c5dfab227ad228f6fc.pdf",
+      "sourceNotes": "Official Legislative Department PDF text from search index; assent 14 March 1987."
+    },
+    {
+      "id": "f63f002b-f79d-46e6-b885-7ff6ba245bfc",
+      "number": "55th",
+      "sourceUrl": "https://www.legislative.gov.in/static/uploads/2025/07/de89f6e3d1d78cd9ce5fc456597278f2.pdf",
+      "sourceNotes": "Official Legislative Department PDF text from search index; SOR dated 1 December 1986."
+    },
+    {
+      "id": "51f079f0-211e-4c62-9d91-de9d52395923",
+      "number": "56th",
+      "sourceUrl": "https://www.legislative.gov.in/static/uploads/2025/07/04e04860c93f704a1f6a80b1a3f245c3.pdf",
+      "sourceNotes": "Official Legislative Department PDF text from search index; assent and commencement 23 May 1987."
+    },
+    {
+      "id": "4dd2604a-f7ff-4a56-b7d0-58a333880cd7",
+      "number": "57th",
+      "sourceUrl": "https://www.legislative.gov.in/static/uploads/2025/07/3b8f890171e2000fd23d21d261d5d0a3.pdf",
+      "sourceNotes": "Official Legislative Department PDF text from search index; assent 15 September 1987."
+    },
+    {
+      "id": "36e376cc-74b4-447a-a67b-5d686f57c2a1",
+      "number": "58th",
+      "sourceUrl": "https://www.legislative.gov.in/static/uploads/2025/07/12a318771c5670cf827c0a68ebf4c731.pdf",
+      "sourceNotes": "Official Legislative Department PDF text from search index; assent 9 December 1987."
+    },
+    {
+      "id": "8ff446e9-2f43-43f4-9202-3dd6e832986e",
+      "number": "59th",
+      "sourceUrl": "https://www.legislative.gov.in/static/uploads/2025/07/3756888f4fb9ffa8e456c1a94e3eaf2f.pdf",
+      "sourceNotes": "Official Legislative Department PDF text from search index; assent 30 March 1988."
+    },
+    {
+      "id": "70ad962d-a01e-4501-9f1f-14b073f6c202",
+      "number": "60th",
+      "sourceUrl": "https://www.legislative.gov.in/static/uploads/2025/07/1f71451452256d6fa3063c5678d7f8a9.pdf",
+      "sourceNotes": "Official Legislative Department PDF text from search index; assent 20 December 1988."
+    },
+    {
+      "id": "7121f947-105c-4dba-8fee-e71bfd440dd8",
+      "number": "61st",
+      "sourceUrl": "https://www.legislative.gov.in/static/uploads/2025/07/8446eabf82b28598535e8c5f1ef65508.pdf",
+      "sourceNotes": "Official Legislative Department PDF text from search index; assent 28 March 1989."
+    },
+    {
+      "id": "4e257b4d-bc45-4151-91e0-ccf06246d1a7",
+      "number": "62nd",
+      "sourceUrl": "https://www.legislative.gov.in/static/uploads/2025/07/ba766f1db4f622e4241ebcd8124838dc.pdf",
+      "sourceNotes": "Official Legislative Department PDF text from search index; assent 25 January 1990."
+    },
+    {
+      "id": "95dc9ecb-4e88-4918-b581-e32fdfaffcca",
+      "number": "63rd",
+      "sourceUrl": "https://www.legislative.gov.in/static/uploads/2025/07/b5ab483885454d08a510dbb34b72c3f5.pdf",
+      "sourceNotes": "Official Legislative Department PDF fetched in full; printed title says 1989 but appended SOR says enacted as Act of 1990; assent 6 January 1990."
+    },
+    {
+      "id": "ea7f4b98-84b3-4012-b3fd-09ca6991a506",
+      "number": "64th",
+      "sourceUrl": "https://www.legislative.gov.in/static/uploads/2025/07/a82862d726c4ce4102d23cc814693051.pdf",
+      "sourceNotes": "Official Legislative Department PDF text from search index; assent 16 April 1990."
+    },
+    {
+      "id": "30b77861-7b00-4384-a8a2-cf1cfc076533",
+      "number": "65th",
+      "sourceUrl": "https://www.legislative.gov.in/static/uploads/2025/07/17b7a09c7b1fbb07df2a26209e631d7b.pdf",
+      "sourceNotes": "Official Legislative Department PDF fetched in full; assent 7 June 1990."
+    },
+    {
+      "id": "eeeefde8-275b-431b-946f-e71f59e8caa1",
+      "number": "66th",
+      "sourceUrl": "https://www.legislative.gov.in/static/uploads/2025/07/ea709c4d92276c96a05a4a72b4f032c9.pdf",
+      "sourceNotes": "Official eGazette PDF fetched in full; no SOR, summary from section 2; OCR garbles short title; assent 7 June 1990."
+    },
+    {
+      "id": "5150a443-3342-4d98-9fcb-79eff6d50ff7",
+      "number": "67th",
+      "sourceUrl": "https://www.legislative.gov.in/static/uploads/2025/07/3d081c80a5358ff987eb6dbd74c32f69.pdf",
+      "sourceNotes": "Official Legislative Department PDF text from search index; assent 4 October 1990."
+    },
+    {
+      "id": "2bcff3bc-b218-4e91-b89f-e5623c0ca821",
+      "number": "68th",
+      "sourceUrl": "https://www.legislative.gov.in/static/uploads/2025/07/d27d3702f6ba11b069b74f3d42c8bf4e.pdf",
+      "sourceNotes": "Official Legislative Department PDF text from search index; assent 12 March 1991."
+    },
+    {
+      "id": "f7b384fa-0cdc-4a12-9448-a6e0af3c4c29",
+      "number": "69th",
+      "sourceUrl": "https://www.legislative.gov.in/static/uploads/2025/07/cb901ee7998206ee9f74849dff237ade.pdf",
+      "sourceNotes": "Official eGazette PDF fetched in full; no SOR, summary from Act sections; OCR heavily garbled; assent 21 December 1991."
+    },
+    {
+      "id": "bdc3ad1f-b104-4c28-817e-264a1c918960",
+      "number": "70th",
+      "sourceUrl": "https://www.legislative.gov.in/static/uploads/2025/07/6bdc9fcb7696dd93c5d1c71c41e1b969.pdf",
+      "sourceNotes": "Official Legislative Department PDF text from search index; registry notes section 3 in force from 21 December 1991 and section 2 yet to be notified."
+    },
+    {
+      "id": "30d6b042-1c0c-4037-8a7f-aaf99d78dbdc",
+      "number": "71st",
+      "sourceUrl": "https://www.legislative.gov.in/static/uploads/2025/07/87042b42e6fd5757797be6d2250a7e32.pdf",
+      "sourceNotes": "Official Legislative Department PDF text from search index; assent 31 August 1992; SOR refers to the Seventy-eighth Amendment Bill, 1992."
+    },
+    {
+      "id": "7efda5dc-9527-4906-ac7f-33a7768282a5",
+      "number": "72nd",
+      "sourceUrl": "https://www.legislative.gov.in/static/uploads/2025/07/5767a4c1cfd857e2b9521046e3681b6d.pdf",
+      "sourceNotes": "Official eGazette PDF fetched in full; no SOR, summary from section 2; assent 4 December 1992."
+    },
+    {
+      "id": "7de55805-8188-4155-98b8-8c9a71a97a17",
+      "number": "73rd",
+      "sourceUrl": "https://www.legislative.gov.in/static/uploads/2025/07/d6e04624ef8b6b869af003909507cfe6.pdf",
+      "sourceNotes": "Official Legislative Department PDF text from search index; assent 20 April 1993; SOR refers to the Seventy-second Amendment Bill, 1991."
+    },
+    {
+      "id": "36fc0421-3002-47bf-8766-4d69cf2a6ddf",
+      "number": "74th",
+      "sourceUrl": "https://www.legislative.gov.in/static/uploads/2025/07/8e3828fa91baa94f3aaa74cdc4152cf2.pdf",
+      "sourceNotes": "Official Legislative Department PDF fetched in full; SOR and Act sections; assent 20 April 1993; SOR refers to the Seventy-third Amendment Bill, 1991."
+    },
+    {
+      "id": "d141faf2-d1ca-4a9f-9b40-dba4b89ee186",
+      "number": "75th",
+      "sourceUrl": "https://www.legislative.gov.in/static/uploads/2025/07/fda338a4ec06555ee424f9ea10759d0d.pdf",
+      "sourceNotes": "Official eGazette PDF fetched in full; no SOR, summary from section 2; assent 5 February 1994."
+    },
+    {
+      "id": "43e2dbad-4d02-41cf-aefa-7cda674854a2",
+      "number": "76th",
+      "sourceUrl": "https://www.legislative.gov.in/static/uploads/2025/07/f3b4ae82cc697454c66a98b610225f34.pdf",
+      "sourceNotes": "Official Legislative Department PDF text from search index; assent 31 August 1994; SOR refers to the Eighty-fifth Amendment Bill, 1994."
+    },
+    {
+      "id": "ba9e0196-c52b-4af6-9fb8-6cd4249b4c14",
+      "number": "77th",
+      "sourceUrl": "https://www.legislative.gov.in/static/uploads/2025/07/a6d304fce13d42d83222daab59e01415.pdf",
+      "sourceNotes": "Official Legislative Department PDF text from search index; assent 17 June 1995; SOR refers to the Eighty-sixth Amendment Bill, 1995."
+    },
+    {
+      "id": "d17019bf-f48e-4050-9d72-350325f4b907",
+      "number": "78th",
+      "sourceUrl": "https://www.legislative.gov.in/static/uploads/2025/07/545b0ff2c61d1a6972905f0b50188a95.pdf",
+      "sourceNotes": "Official Legislative Department PDF fetched in full; SOR and section 2; assent 30 August 1995; SOR refers to the Eighty-first Amendment Bill, 1994."
+    },
+    {
+      "id": "e65a0817-b845-4de6-ada0-10c24da5e2d6",
+      "number": "79th",
+      "sourceUrl": "https://www.legislative.gov.in/static/uploads/2025/07/f44bc2266c00bac19672e503dcf056a2.pdf",
+      "sourceNotes": "Official eGazette PDF fetched in full; no SOR, summary from Act sections; printed title year 1999, assent and Gazette date 2000."
+    },
+    {
+      "id": "5cb04787-2f33-4e7f-af69-98ac7114d8a1",
+      "number": "80th",
+      "sourceUrl": "https://www.legislative.gov.in/static/uploads/2025/07/e87cb6624f9c380b43c396c1979342cf.pdf",
+      "sourceNotes": "Official Legislative Department PDF fetched in full; heading says 1999 while short title and registry say 2000; assent 9 June 2000."
+    },
+    {
+      "id": "5f55b5ef-1e03-4d89-9215-85413a0705af",
+      "number": "81st",
+      "sourceUrl": "https://www.legislative.gov.in/static/uploads/2025/07/cfb3fbce2387ec465a8e6529647512ad.pdf",
+      "sourceNotes": "Legislative Department PDF fetched in full; SOR refers to the Constitution (Ninetieth Amendment) Bill, 2000."
+    },
+    {
+      "id": "2398a571-864a-4211-b6ad-3af8f9d9edf0",
+      "number": "82nd",
+      "sourceUrl": "https://www.legislative.gov.in/static/uploads/2025/07/163d821e39b1891f0321d008fea81e50.pdf",
+      "sourceNotes": "Legislative Department PDF fetched in full; PDF prints assent date with a typo; SOR appended to Eighty Eighth Amendment Bill 1999."
+    },
+    {
+      "id": "5c6a8656-734d-4cb7-8ede-6d40093a2805",
+      "number": "83rd",
+      "sourceUrl": "https://www.legislative.gov.in/static/uploads/2025/07/de0ef6f8f469f9a4b7d5421de25dfc2b.pdf",
+      "sourceNotes": "Legislative Department PDF fetched in full; SOR appended to the Constitution (Eighty Sixth Amendment) Bill 1999."
+    },
+    {
+      "id": "2c4e39ad-c3c4-48f2-8b9a-799f812ac882",
+      "number": "84th",
+      "sourceUrl": "https://www.legislative.gov.in/static/uploads/2025/07/879abe65ba0eac1dbfffa83ba5cd0438.pdf",
+      "sourceNotes": "Legislative Department PDF fetched in full; SOR heading says Ninty First Amendment Bill, 2000."
+    },
+    {
+      "id": "c0ed7130-004d-448c-8e74-69072c56dfc0",
+      "number": "85th",
+      "sourceUrl": "https://www.legislative.gov.in/static/uploads/2025/07/0306241a215c6aafe8bee67f6a9fe894.pdf",
+      "sourceNotes": "Legislative Department PDF fetched in full; title year 2001, Act date 4 January 2002, deemed effective from 17 June 1995."
+    },
+    {
+      "id": "d8530dc2-dcae-4f95-bfc6-ab047d287cf3",
+      "number": "86th",
+      "sourceUrl": "https://www.legislative.gov.in/static/uploads/2025/07/16970eb1a68d4fe46ac40acd783a6c34.pdf",
+      "sourceNotes": "Legislative Department PDF fetched in full; SOR refers to the Eighty-third Amendment Bill, 1997 and Ninety-third Amendment Bill, 2001."
+    },
+    {
+      "id": "e3881ea1-f898-4ea8-a1b8-67d4b3ef8f8d",
+      "number": "87th",
+      "sourceUrl": "https://www.legislative.gov.in/static/uploads/2025/07/ba763f8738d9c5a13e212e9ea4cc6aaa.pdf",
+      "sourceNotes": "Legislative Department PDF fetched in full; PDF also carries an unrelated corrigendum."
+    },
+    {
+      "id": "c305390a-6720-43ed-b598-586c569ba220",
+      "number": "88th",
+      "sourceUrl": "https://www.legislative.gov.in/static/uploads/2025/07/1488ce649fee8ec56a270137b2cb2e55.pdf",
+      "sourceNotes": "Legislative Department PDF fetched in full; title year 2003, assent/commencement date printed 15 January 2004."
+    },
+    {
+      "id": "eb70468f-93cd-47b2-9c28-570e55f033c8",
+      "number": "89th",
+      "sourceUrl": "https://www.legislative.gov.in/static/uploads/2025/07/0c2366570aee86b57258a378ddf6dbc1.pdf",
+      "sourceNotes": "Legislative Department PDF fetched in full; SOR's member counts differ from enacted section 3 text."
+    },
+    {
+      "id": "3e4e1b3c-dc9a-4d86-a247-c675c748033a",
+      "number": "90th",
+      "sourceUrl": "https://www.legislative.gov.in/static/uploads/2025/07/4af6a31f7c56bdd0b93dbaaae0362190.pdf",
+      "sourceNotes": "Legislative Department PDF fetched in full; assent 28 September 2003; SOR dated 7 May 2003."
+    },
+    {
+      "id": "216b8803-f3c6-42a3-b590-480afdb65447",
+      "number": "91st",
+      "sourceUrl": "https://www.legislative.gov.in/static/uploads/2025/07/1bc0ff014a6cd9946d181eb268f1259b.pdf",
+      "sourceNotes": "Gazette PDF fetched in full; title year 2003, assent 1 January 2004."
+    },
+    {
+      "id": "06640372-df99-473b-a77e-e49e9dfa290a",
+      "number": "92nd",
+      "sourceUrl": "https://www.legislative.gov.in/static/uploads/2025/07/2e3c0925d75850f85cafbf34aa72eb31.pdf",
+      "sourceNotes": "Gazette PDF fetched in full; title year 2003, assent 7 January 2004; no constitutional article named."
+    },
+    {
+      "id": "e9bfd6ec-767a-4511-8a21-c860cf87bc4c",
+      "number": "93rd",
+      "sourceUrl": "https://www.legislative.gov.in/static/uploads/2025/07/aa777da5ac292230760bcc5778f5e0cc.pdf",
+      "sourceNotes": "Gazette PDF fetched in full; title year 2005, assent 20 January 2006; article 15(5) was later struck down by the Supreme Court, but the PDF text is as enacted."
+    },
+    {
+      "id": "f20a7789-3e79-4de4-981e-9e8a20d96cc6",
+      "number": "94th",
+      "sourceUrl": "https://cdnbbsr.s3waas.gov.in/s380537a945c7aaa788ccfcdf1b99b5d8f/uploads/2023/03/2023030212.pdf",
+      "sourceNotes": "Official Gazette PDF located via search index; extraction empty; full text corroborated by Legislative Department SOR PDF."
+    },
+    {
+      "id": "ca975533-a010-4b9d-b505-e582987c3103",
+      "number": "95th",
+      "sourceUrl": "https://cdnbbsr.s3waas.gov.in/s380537a945c7aaa788ccfcdf1b99b5d8f/uploads/2023/03/2023030236.pdf",
+      "sourceNotes": "Official Gazette PDF fetched in full; printed heading lacks a space before 2009."
+    },
+    {
+      "id": "41ceb398-244d-453a-9911-9a2ed05f6743",
+      "number": "96th",
+      "sourceUrl": "https://cdnbbsr.s3waas.gov.in/s380537a945c7aaa788ccfcdf1b99b5d8f/uploads/2023/03/2023030222.pdf",
+      "sourceNotes": "Official Gazette PDF located via search index; extraction empty; full text corroborated by other official Gazette PDFs."
+    },
+    {
+      "id": "841fd1a2-56ff-4b79-9cd2-a9adbc8571e0",
+      "number": "97th",
+      "sourceUrl": "https://www.legislative.gov.in/static/uploads/2025/07/4499315a6ffd7121c68adacbf1ad8dc9.pdf",
+      "sourceNotes": "Legislative Department PDF located via search index; title year 2011, assent 12 January 2012."
+    },
+    {
+      "id": "eee43e04-4f35-403d-b9df-836717ab6c76",
+      "number": "98th",
+      "sourceUrl": "https://www.legislative.gov.in/static/uploads/2025/07/543af8337b820982df352f2ecacfbb23.pdf",
+      "sourceNotes": "Legislative Department PDF located via search index only; extraction empty; assent 1 January 2013; OCR prints 371-1 for 371-I."
+    },
+    {
+      "id": "d16c4139-ebb9-4e0b-a1ed-1b4a7134e7fd",
+      "number": "99th",
+      "sourceUrl": "https://www.legislative.gov.in/static/uploads/2025/07/09c2097e2e34183043e9e3f6afc3753d.pdf",
+      "sourceNotes": "Legislative Department PDF located via search index; official Legislative Department Constitution PDF records that these NJAC provisions were struck down by the Supreme Court on 16 October 2015."
+    },
+    {
+      "id": "30552457-5d83-4543-9b29-24066460a46c",
+      "number": "100th",
+      "sourceUrl": "https://www.legislative.gov.in/static/uploads/2025/07/3b5b640b91d58f470aff54278d6d969b.pdf",
+      "sourceNotes": "Legislative Department PDF fetched in full; no constitutional article number is named."
+    },
+    {
+      "id": "12a9ecc4-0a33-4777-aef5-a6e8f30a0f14",
+      "number": "101st",
+      "sourceUrl": "https://www.legislative.gov.in/static/uploads/2025/07/a4250c5ad613af2f4f9347ef45add1db.pdf",
+      "sourceNotes": "Legislative Department PDF located via search index; manuscript notes partial commencement notifications dated 29 August, 12 September and 16 September 2016."
+    },
+    {
+      "id": "4eee6704-60e0-4895-984f-f7bdf3253470",
+      "number": "102nd",
+      "sourceUrl": "https://www.legislative.gov.in/static/uploads/2025/07/8c366f8ebe268d1bee2992bfb4ae9db1.pdf",
+      "sourceNotes": "Legislative Department PDF located via search index; full Gazette text fetched from National Commission for Backward Classes official PDF."
+    },
+    {
+      "id": "25d8fd25-34e4-4894-b3a0-4dad16b74662",
+      "number": "103rd",
+      "sourceUrl": "https://www.legislative.gov.in/static/uploads/2025/07/1e84d2ca7394641dfb2653b0a5ef0e86.pdf",
+      "sourceNotes": "Gazette PDF located via search index; manuscript note records notification S.O. 292(E), dated 14 January 2019."
+    },
+    {
+      "id": "164cc596-3294-45f6-86ac-97eb75cbc1de",
+      "number": "104th",
+      "sourceUrl": "https://www.legislative.gov.in/static/uploads/2025/07/e8e83c0faf01f4dc4fdad9ef4d37f556.pdf",
+      "sourceNotes": "Gazette PDF fetched in full; title year 2019 but assent 21 January 2020 and commencement 25 January 2020."
+    },
+    {
+      "id": "14737ae6-eb11-41a7-a9b2-68c67d3b6c50",
+      "number": "105th",
+      "sourceUrl": "https://www.legislative.gov.in/static/uploads/2025/07/f98100221cb33fa76e84162532b48d56.pdf",
+      "sourceNotes": "Gazette PDF located via search index; assent printed as 18 August 2021, commencement left to notification."
+    },
+    {
+      "id": "c97a9398-2a7c-4e6b-b337-15f493178ec3",
+      "number": "106th",
+      "sourceUrl": "https://www.legislative.gov.in/static/uploads/2025/08/415c4ac11019eeed37d4e87e4e8a6831.pdf",
+      "sourceNotes": "Gazette PDF fetched in full; assent 28 September 2023; commencement verified by S.O. 1922(E), 16 April 2026, at https://egazette.gov.in/WriteReadData/2026/271834.pdf."
+    }
+  ]
+}

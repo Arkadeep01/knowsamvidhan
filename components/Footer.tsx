@@ -142,6 +142,16 @@ export default function FooterSection() {
   const [authChecked, setAuthChecked] = useState(false);
   const [feedbackNotice, setFeedbackNotice] = useState("");
   const [submitting, setSubmitting] = useState(false);
+  const [amendmentCount, setAmendmentCount] = useState<number | null>(null);
+
+  useEffect(() => {
+    fetch("/api/amendments")
+      .then((response) => (response.ok ? response.json() : []))
+      .then((data: unknown) => {
+        if (Array.isArray(data)) setAmendmentCount(data.length);
+      })
+      .catch(() => setAmendmentCount(null));
+  }, []);
 
   useEffect(() => {
     const controller = new AbortController();
@@ -242,7 +252,9 @@ export default function FooterSection() {
               }`}
             >
               <div className="bg-linear-to-br from-orange-500 to-amber-400 bg-clip-text text-[18px] xs:text-[20px] sm:text-[22px] font-black leading-none text-transparent font-['Playfair_Display',serif]">
-                {s.value}
+                {s.label === "Amendments" && amendmentCount !== null
+                  ? `${amendmentCount}+`
+                  : s.value}
               </div>
               <div className="mt-1 text-[9px] sm:text-[10px] uppercase tracking-[1px] text-gray-500">{s.label}</div>
             </div>

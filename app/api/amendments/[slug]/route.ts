@@ -1,5 +1,6 @@
 import { NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
+import { normalizeNumber } from "@/lib/amendments/validation.mjs";
 
 export async function GET(
   _req: Request,
@@ -7,11 +8,12 @@ export async function GET(
 ) {
   try {
     const { slug } = await context.params;
+    const number = normalizeNumber(slug);
 
     const amendment = await prisma.amendment.findFirst({
       where: {
         number: {
-          equals: slug,
+          equals: number,
         },
       },
     });

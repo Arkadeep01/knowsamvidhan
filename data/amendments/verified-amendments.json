@@ -1,0 +1,956 @@
+[
+  {
+    "number": "1st",
+    "year": "1951",
+    "title": "The Constitution (First Amendment) Act, 1951",
+    "summary": "During fifteen months of the Constitution's working, judicial decisions created difficulties over fundamental rights; the Bill proposed amending article 19, inserting provisions securing zamindari abolition laws under articles 31A and 31B, amplifying article 15(3), and making minor amendments to articles 341, 342, 372 and 376.",
+    "sourceUrl": "https://www.legislative.gov.in/static/uploads/2025/07/f3789482ad0dfee795e54fb88c0401e6.pdf",
+    "sourceNotes": "Legislative Department PDF; SOR dated 10 May 1951, Act dated 18 June 1951.",
+    "referencedArticles": ["13", "15", "19", "29", "31", "31A", "31B", "46", "85", "87", "174", "176", "341", "342", "372", "376"]
+  },
+  {
+    "number": "2nd",
+    "year": "1952",
+    "title": "The Constitution (Second Amendment) Act, 1952",
+    "summary": "SOR states that article 81(1)(b) prescribed population limits for allotting House of the People seats and that 1951 census figures made those limits unworkable for delimitation. The Act omits from sub-clause (b) of clause (1) of article 81 the words requiring not less than one member for every 750,000 of the population.",
+    "sourceUrl": "https://www.legislative.gov.in/static/uploads/2025/07/38ef0247f825a631d62ae585a9bf529c.pdf",
+    "sourceNotes": "Legislative Department PDF; SOR dated 19 May 1952; Act dated 1 May 1953 while title says 1952.",
+    "referencedArticles": ["81", "387"]
+  },
+  {
+    "number": "3rd",
+    "year": "1954",
+    "title": "The Constitution (Third Amendment) Act, 1954",
+    "summary": "The Act substitutes entry 33 of List III in the Seventh Schedule to cover trade and commerce in, and the production, supply and distribution of, products of industries whose Union control is declared expedient in the public interest, foodstuffs, cattle fodder, raw cotton and cotton seeds, and raw jute.",
+    "sourceUrl": "https://www.legislative.gov.in/static/uploads/2025/07/d4b13be535b5e11a6784f227c57cf084.pdf",
+    "sourceNotes": "Legislative Department PDF; embedded SOR is mistakenly that of the Second Amendment Bill, 1952; summary taken from section 2; Act dated 22 February 1955.",
+    "referencedArticles": []
+  },
+  {
+    "number": "4th",
+    "year": "1955",
+    "title": "The Constitution (Fourth Amendment) Act, 1955",
+    "summary": "SOR states the Bill amends articles 31, 31A and 305 and the Ninth Schedule: it re-states the State's compulsory acquisition power, extends article 31A to land reform and other welfare legislation, adds Acts to the Ninth Schedule, and amends article 305 on State monopolies.",
+    "sourceUrl": "https://www.legislative.gov.in/static/uploads/2025/07/68badaa2da25d641c51992f854344773.pdf",
+    "sourceNotes": "Legislative Department PDF; SOR names Fourth Amendment Bill 1954 but says enacted as Act 1954; Act title reads 1955.",
+    "referencedArticles": ["13", "14", "19", "31", "31A", "31B", "301", "303", "304", "305"]
+  },
+  {
+    "number": "5th",
+    "year": "1955",
+    "title": "The Constitution (Fifth Amendment) Act, 1955",
+    "summary": "The Act substitutes the proviso to article 3 so that no Bill for forming new States or altering State areas, boundaries or names may be introduced except on the President's recommendation and, where a Part A or Part B State is affected, after reference to its legislature for its views.",
+    "sourceUrl": "https://www.legislative.gov.in/static/uploads/2025/07/b465c9d672c55778e7701f795e2ce1fb.pdf",
+    "sourceNotes": "Legislative Department one-page PDF; no SOR, summary from section 2; Act dated 24 December 1955.",
+    "referencedArticles": ["3"]
+  },
+  {
+    "number": "6th",
+    "year": "1956",
+    "title": "The Constitution (Sixth Amendment) Act, 1956",
+    "summary": "The Act inserts entry 92A in the Union List and substitutes entry 54 in the State List on taxes on the sale or purchase of goods, and amends articles 269 and 286 to empower Parliament to formulate principles for determining when a sale or purchase occurs in inter-State trade or commerce.",
+    "sourceUrl": "https://www.legislative.gov.in/static/uploads/2025/07/1a2c5f93dab41d00838c0cabe4ec6306.pdf",
+    "sourceNotes": "Legislative Department PDF; no SOR, summary from Act sections; Act dated 11 September 1956.",
+    "referencedArticles": ["269", "286"]
+  },
+  {
+    "number": "7th",
+    "year": "1956",
+    "title": "The Constitution (Seventh Amendment) Act, 1956",
+    "summary": "SOR states the Bill implements States reorganisation from 1 October 1956, abolishing the Part A, B and C State categories and classifying areas as Union territories, with related amendments to High Courts and Judges, Union and State executive power and entries in the legislative lists.",
+    "sourceUrl": "https://www.legislative.gov.in/static/uploads/2025/07/7f6bac8249d681944c3218b11ef4d62a.pdf",
+    "sourceNotes": "Legislative Department PDF; SOR heading mislabels the Bill but names the Seventh Amendment Act, 1956; Act dated 19 October 1956.",
+    "referencedArticles": ["1", "4", "80", "81", "82", "170", "217", "219", "227", "229", "230", "231", "232", "239", "240", "243", "298", "331", "392"]
+  },
+  {
+    "number": "8th",
+    "year": "1959",
+    "title": "The Constitution (Eighth Amendment) Act, 1959",
+    "summary": "The Act amends article 334 of the Constitution by substituting the words 'twenty years' for the words 'ten years'.",
+    "sourceUrl": "https://www.legislative.gov.in/static/uploads/2025/07/0cf16c3f1479074a87011e066396733e.pdf",
+    "sourceNotes": "Legislative Department PDF; embedded SOR is an erroneous copy of the Fourth Amendment SOR; summary from the operative section; Act dated 5 January 1960.",
+    "referencedArticles": ["334"]
+  },
+  {
+    "number": "9th",
+    "year": "1960",
+    "title": "The Constitution (Ninth Amendment) Act, 1960",
+    "summary": "SOR states that agreements between India and Pakistan dated 10 September 1958, 23 October 1959 and 11 January 1960 settled border disputes and proposes amending the First Schedule under article 368 to give effect to the transfer of certain territories to Pakistan.",
+    "sourceUrl": "https://www.legislative.gov.in/static/uploads/2025/07/5aed44b7bcf65d872dfa970df29a9648.pdf",
+    "sourceNotes": "Legislative Department PDF; SOR dated 12 December 1960; Act dated 28 December 1960.",
+    "referencedArticles": ["368"]
+  },
+  {
+    "number": "10th",
+    "year": "1961",
+    "title": "The Constitution (Tenth Amendment) Act, 1961",
+    "summary": "SOR records the request of the people and Varishta Panchayat of Free Dadra and Nagar Haveli for integration with India; the Act adds Dadra and Nagar Haveli to the First Schedule as a Union territory and amends article 240 to enable the President to make regulations for it.",
+    "sourceUrl": "https://www.legislative.gov.in/static/uploads/2025/07/9e2f8aa7cad5798c56d811820d905067.pdf",
+    "sourceNotes": "Legislative Department PDF; PDF also carries a misfiled Sixth Amendment SOR; summary uses the Tenth Amendment SOR; Act dated 16 August 1961.",
+    "referencedArticles": ["240"]
+  },
+  {
+    "number": "11th",
+    "year": "1961",
+    "title": "The Constitution (Eleventh Amendment) Act, 1961",
+    "summary": "SOR proposes amending article 66 so the Vice-President is elected by an electoral college of both Houses rather than at a joint sitting, and amending article 71 to make clear that an election cannot be challenged on account of a vacancy in the electoral college.",
+    "sourceUrl": "https://www.legislative.gov.in/static/uploads/2025/07/2afd30b40699bdea0da82ff187745382.pdf",
+    "sourceNotes": "Legislative Department PDF; SOR dated 24 November 1961; Act dated 19 December 1961.",
+    "referencedArticles": ["54", "66", "71"]
+  },
+  {
+    "number": "12th",
+    "year": "1962",
+    "title": "The Constitution (Twelfth Amendment) Act, 1962",
+    "summary": "SOR states that Goa, Daman and Diu became part of India on 20 December 1961 and were administered as a Union territory, and proposes specifically including them in the First Schedule and amending article 240 to confer on the President power to make regulations for them.",
+    "sourceUrl": "https://www.legislative.gov.in/static/uploads/2025/07/90f537a2f96e5304e088b723b665d426.pdf",
+    "sourceNotes": "Legislative Department PDF; SOR dated 25 August 1962; Act dated 27 March 1962.",
+    "referencedArticles": ["1", "239", "240"]
+  },
+  {
+    "number": "13th",
+    "year": "1962",
+    "title": "The Constitution (Thirteenth Amendment) Act, 1962",
+    "summary": "SOR records the July 1960 agreement with Naga Peoples Convention leaders to form Nagaland as a separate State, with special Governor responsibility for law and order and safeguards for Naga customary law, land and justice; the Act inserts article 371A.",
+    "sourceUrl": "https://www.legislative.gov.in/static/uploads/2025/07/47137a87ca0016acc39e9eb9fe883fad.pdf",
+    "sourceNotes": "Legislative Department PDF; SOR dated 25 August 1962; Act dated 28 December 1962.",
+    "referencedArticles": ["3", "371", "371A"]
+  },
+  {
+    "number": "14th",
+    "year": "1962",
+    "title": "The Constitution (Fourteenth Amendment) Act, 1962",
+    "summary": "SOR states Pondicherry, Karikal, Mahe and Yanam became Indian territories on 16 August 1962 and proposes specifying them as the Union territory of Pondicherry, raising the House of the People limit for Union territories from twenty to twenty-five, and inserting article 239A for local legislatures in certain Union territories.",
+    "sourceUrl": "https://www.legislative.gov.in/static/uploads/2025/07/8280fa9ccf56f067efd5cc9491297db8.pdf",
+    "sourceNotes": "Legislative Department PDF; SOR dated 25 August 1962; Act dated 28 December 1962.",
+    "referencedArticles": ["81", "239", "239A", "240", "368"]
+  },
+  {
+    "number": "15th",
+    "year": "1963",
+    "title": "The Constitution (Fifteenth Amendment) Act, 1963",
+    "summary": "The Act amends provisions on Supreme Court and High Court Judges: article 124 gains a clause on determining a Judge's age, articles 128, 217, 222 and 224 are amended, article 224A is inserted for retired Judges to sit, and articles 226, 297, 311 and 316 and the Seventh Schedule are amended.",
+    "sourceUrl": "https://www.legislative.gov.in/static/uploads/2025/07/e783be6f8c7c01084bd341be7389878b.pdf",
+    "sourceNotes": "Gazette of India Extraordinary PDF on legislative.gov.in; no SOR, summary from Act sections; assent 5 October 1963; OCR text garbled.",
+    "referencedArticles": ["124", "128", "217", "222", "224", "224A", "226", "297", "311", "316"]
+  },
+  {
+    "number": "16th",
+    "year": "1963",
+    "title": "The Constitution (Sixteenth Amendment) Act, 1963",
+    "summary": "SOR implements the Committee on National Integration and Regionalism's recommendation to add 'the sovereignty and integrity of India' as a ground for reasonable restrictions under clauses (2), (3) and (4) of article 19, and to amend articles 84 and 173 and Third Schedule oath forms so candidates and office-holders pledge to uphold it.",
+    "sourceUrl": "https://www.legislative.gov.in/static/uploads/2025/07/44c47a4fe2b7c4b4e9afb4509aeba383.pdf",
+    "sourceNotes": "Legislative Department PDF; SOR dated 18 January 1963; Act dated 5 October 1963.",
+    "referencedArticles": ["19", "84", "173"]
+  },
+  {
+    "number": "17th",
+    "year": "1964",
+    "title": "The Constitution (Seventeenth Amendment) Act, 1964",
+    "summary": "SOR states article 31A protection was limited to estates as on 26 January 1950 and proposes widening 'estate' to include ryotwari lands and other agricultural land, adding a compensation safeguard for personally cultivated land within the ceiling limit, and adding State land-reform Acts to the Ninth Schedule.",
+    "sourceUrl": "https://www.legislative.gov.in/static/uploads/2025/07/070cb7a0edb92c2d1fc0ca634ef60361.pdf",
+    "sourceNotes": "Legislative Department PDF; SOR heading mislabels the Bill; Act dated 20 June 1964.",
+    "referencedArticles": ["14", "19", "31", "31A"]
+  },
+  {
+    "number": "18th",
+    "year": "1966",
+    "title": "The Constitution (Eighteenth Amendment) Act, 1966",
+    "summary": "SOR states that 'State' in article 3 did not include Union territories after the Seventh Amendment, and proposes clarifying that in clauses (a) to (e) of article 3 it includes Union territories (but not in the proviso), and that Parliament may form a new State or Union territory by uniting parts of States or Union territories.",
+    "sourceUrl": "https://www.legislative.gov.in/static/uploads/2025/07/75c9ecd6164365d5816e0de381d33194.pdf",
+    "sourceNotes": "Legislative Department PDF; SOR heading mislabels the Bill; Act dated 27 August 1966.",
+    "referencedArticles": ["3"]
+  },
+  {
+    "number": "19th",
+    "year": "1966",
+    "title": "The Constitution (Nineteenth Amendment) Act, 1966",
+    "summary": "SOR notes the Election Commission's recommendation to abolish election tribunals and have election petitions tried by High Courts, and proposes deleting from clause (1) of article 324 the words providing for appointment of election tribunals.",
+    "sourceUrl": "https://www.legislative.gov.in/static/uploads/2025/07/f6bc00d0cf640e651897539f1538caec.pdf",
+    "sourceNotes": "Legislative Department PDF; SOR heading mislabels the Bill; Act dated 11 December 1966.",
+    "referencedArticles": ["324"]
+  },
+  {
+    "number": "20th",
+    "year": "1966",
+    "title": "The Constitution (Twentieth Amendment) Act, 1966",
+    "summary": "SOR states Supreme Court judgments cast doubt on district judge appointments, postings and transfers in Uttar Pradesh and elsewhere under articles 233 and 235, and proposes validating past appointments and the judgments, decrees, orders and sentences of such judges by inserting article 233A.",
+    "sourceUrl": "https://www.legislative.gov.in/static/uploads/2025/07/f81e5911e7c0855ebbc17420de69acc5.pdf",
+    "sourceNotes": "Legislative Department PDF; SOR heading mislabels the Bill; Act dated 22 December 1966.",
+    "referencedArticles": ["223", "233", "233A", "235"]
+  },
+  {
+    "number": "21st",
+    "year": "1967",
+    "title": "The Constitution (Twenty-first Amendment) Act, 1967",
+    "summary": "SOR records persistent demands from Sindhi-speaking people and the Commissioner for Linguistic Minorities' recommendation to include Sindhi in the Eighth Schedule, noting the Government's decision of 4 November 1966; the Act inserts the entry '12. Sindhi.'",
+    "sourceUrl": "https://www.legislative.gov.in/static/uploads/2025/07/33c21c8515cca2f3b602ff3a765ea035.pdf",
+    "sourceNotes": "Legislative Department PDF; SOR heading mislabels the Bill; Act dated 10 April 1967.",
+    "referencedArticles": []
+  },
+  {
+    "number": "22nd",
+    "year": "1969",
+    "title": "The Constitution (Twenty-second Amendment) Act, 1969",
+    "summary": "SOR states the 11 September 1968 scheme for an autonomous State in Assam from Sixth Schedule tribal areas, and proposes inserting article 244A for a legislature and council of ministers, amending article 275 for special grants, and inserting article 371B for an Assam Assembly committee.",
+    "sourceUrl": "https://www.legislative.gov.in/static/uploads/2025/07/5d6c7ed399a157defd3b146994808380.pdf",
+    "sourceNotes": "Legislative Department PDF; SOR dated 12 November 1968; Act dated 25 September 1969.",
+    "referencedArticles": ["244", "244A", "275", "371A", "371B", "368"]
+  },
+  {
+    "number": "23rd",
+    "year": "1969",
+    "title": "The Constitution (Twenty-third Amendment) Act, 1969",
+    "summary": "SOR proposes continuing SC/ST seat reservation and Anglo-Indian nomination for a further ten years, excluding Scheduled Tribes in Nagaland from reservation under articles 330 and 332, and limiting Anglo-Indian nomination under article 333 to one member.",
+    "sourceUrl": "https://www.legislative.gov.in/static/uploads/2025/07/6421aae09fc09b38fdb9c3bd9a47921c.pdf",
+    "sourceNotes": "Legislative Department PDF; Act title gives 1969 but date line reads 23 January 1970; SOR dated 11 August 1969.",
+    "referencedArticles": ["330", "332", "333", "334"]
+  },
+  {
+    "number": "24th",
+    "year": "1971",
+    "title": "The Constitution (Twenty-fourth Amendment) Act, 1971",
+    "summary": "SOR states the Golak Nath decision denied Parliament power to curtail fundamental rights, and proposes amending article 368 to include Part III within the amending power and require the President's assent, and amending article 13 to make it inapplicable to amendments under article 368.",
+    "sourceUrl": "https://www.legislative.gov.in/static/uploads/2025/07/2a321e3e1deabf4a8e1b878b640414d7.pdf",
+    "sourceNotes": "Legislative Department PDF; SOR dated 22 July 1971; Act dated 5 November 1971.",
+    "referencedArticles": ["13", "368"]
+  },
+  {
+    "number": "25th",
+    "year": "1971",
+    "title": "The Constitution (Twenty-fifth Amendment) Act, 1971",
+    "summary": "SOR states the Bank Nationalization case made compensation justiciable and proposes replacing 'compensation' with 'amount' in article 31(2), making it non-justiciable and payable otherwise than in cash, excluding article 19(1)(f), and inserting article 31C for laws giving effect to article 39(b) and (c).",
+    "sourceUrl": "https://www.legislative.gov.in/static/uploads/2025/07/a9a6ff5abe015dc06b265ecc9485f7a7.pdf",
+    "sourceNotes": "Legislative Department PDF; Act title gives 1971 but date line reads 20 April 1972; SOR dated 22 July 1971.",
+    "referencedArticles": ["13", "14", "19", "30", "31", "31B", "31C", "39"]
+  },
+  {
+    "number": "26th",
+    "year": "1971",
+    "title": "The Constitution (Twenty-sixth Amendment) Act, 1971",
+    "summary": "The Act omits articles 291 and 362, inserts article 363A ending recognition of Rulers and abolishing privy purse, and substitutes clause (2) of article 368 to define 'Ruler'.",
+    "sourceUrl": "https://www.legislative.gov.in/static/uploads/2025/07/c61e222417607ab6e944b07f79b55d1b.pdf",
+    "sourceNotes": "Gazette of India Extraordinary PDF on legislative.gov.in; no SOR, summary from Act sections; OCR masthead has a 1975 typo but Act text gives 1971.",
+    "referencedArticles": ["291", "362", "363", "363A", "368"]
+  },
+  {
+    "number": "27th",
+    "year": "1971",
+    "title": "The Constitution (Twenty-seventh Amendment) Act, 1971",
+    "summary": "SOR states the north-eastern reorganisation scheme requires a legislature and council of ministers for Mizoram, ordinance power for administrators of Union territories with legislatures, continued regulation power for Arunachal Pradesh and Mizoram, and a committee for Manipur Hill Areas; the Act inserts articles 239B and 371C.",
+    "sourceUrl": "https://www.legislative.gov.in/static/uploads/2025/07/5eecdd73586cdaabe3ffc54ed2ab10f8.pdf",
+    "sourceNotes": "Legislative Department PDF; SOR dated 12 December 1971; Act dated 30 December 1971.",
+    "referencedArticles": ["239A", "239B", "240", "356", "357", "371B", "371C"]
+  },
+  {
+    "number": "28th",
+    "year": "1972",
+    "title": "The Constitution (Twenty-eighth Amendment) Act, 1972",
+    "summary": "SOR states that article 314 guaranteed persons appointed to the civil service of the Crown in India the same conditions of service, and that a class of officers with immutable conditions of service was incompatible with the changed social order. The Act deletes article 314 and inserts article 312A, empowering Parliament to vary or revoke by law the conditions of service of such officers.",
+    "sourceUrl": "https://www.legislative.gov.in/static/uploads/2025/07/1143f441527d1adf5744e7e0ccf35a47.pdf",
+    "sourceNotes": "Official PDF text from search index; SOR appended to Constitution (Thirty-first Amendment) Bill, 1972.",
+    "referencedArticles": ["312A", "314"]
+  },
+  {
+    "number": "29th",
+    "year": "1972",
+    "title": "The Constitution (Twenty-ninth Amendment) Act, 1972",
+    "summary": "SOR records that the Kerala Land Reforms Act, 1963 was in the Ninth Schedule but was extensively amended in 1969 and 1971, and that crucial provisions were struck down or challenged, creating uncertainty. The Act inserts the Kerala Land Reforms (Amendment) Acts, 1969 and 1971 in the Ninth Schedule for protection under article 31B.",
+    "sourceUrl": "https://www.legislative.gov.in/static/uploads/2025/07/32c2b9a302c83703871e081351af5f49.pdf",
+    "sourceNotes": "Official PDF fetched via proxy; SOR appended to Constitution (Thirty-second Amendment) Bill, 1972.",
+    "referencedArticles": ["31B"]
+  },
+  {
+    "number": "30th",
+    "year": "1972",
+    "title": "The Constitution (Thirtieth Amendment) Act, 1972",
+    "summary": "SOR states the Bill gives effect to Law Commission recommendations that clauses (a) and (b) of article 133(1) be omitted so that an appeal lies to the Supreme Court only if the High Court certifies that the case involves a substantial question of law of general importance needing decision by the Supreme Court.",
+    "sourceUrl": "https://www.legislative.gov.in/static/uploads/2025/07/d6970667d71b0cdaad2ad22b9d44d39c.pdf",
+    "sourceNotes": "Official PDF text from search index; registry published year 22 February 1973 differs from Act title year 1972.",
+    "referencedArticles": ["133"]
+  },
+  {
+    "number": "31st",
+    "year": "1973",
+    "title": "The Constitution (Thirty-first Amendment) Act, 1973",
+    "summary": "SOR states that seats allotted to States exceeded the 500 limit in article 81 after the North-Eastern Areas (Reorganisation) Act, 1971, and that readjustment could reduce States' representation. The Act raises the State limit to 525, lowers the Union territory limit to 20, and amends articles 330 and 332 for predominantly tribal units.",
+    "sourceUrl": "https://www.legislative.gov.in/static/uploads/2025/07/03eeedc70a4dad36292b05d64bc8ddd4.pdf",
+    "sourceNotes": "Official PDF text from search index; SOR appended to Constitution (Thirty-first Amendment) Bill, 1973.",
+    "referencedArticles": ["81", "82", "330", "332"]
+  },
+  {
+    "number": "32nd",
+    "year": "1973",
+    "title": "The Constitution (Thirty-second Amendment) Act, 1973",
+    "summary": "SOR states that safeguards for the Telangana area under article 371(1) and the Public Employment (Requirement as to Residence) Act, 1957 gave rise to dissatisfaction, and that leaders proposed a Six-Point Formula for equitable opportunities in education and public employment. The Act omits article 371(1) and inserts articles 371D and 371E.",
+    "sourceUrl": "https://www.legislative.gov.in/static/uploads/2025/07/86861e79e41f499cf994f1f13da1df46.pdf",
+    "sourceNotes": "Official PDF text from search index; registry published year 3 May 1974 differs from Act title year 1973; SOR appended to Thirty-third Amendment Bill, 1973.",
+    "referencedArticles": ["371", "371C", "371D", "371E"]
+  },
+  {
+    "number": "33rd",
+    "year": "1974",
+    "title": "The Constitution (Thirty-third Amendment) Act, 1974",
+    "summary": "SOR states that coercive measures had been used to compel members of Legislative Assemblies to resign, and proposes requiring acceptance of a resignation by the Speaker or Chairman, who may refuse it if satisfied it is not voluntary or genuine. The Act amends articles 101 and 190.",
+    "sourceUrl": "https://www.legislative.gov.in/static/uploads/2025/07/3562bb99bdcf20112f8341cc8562d308.pdf",
+    "sourceNotes": "Official PDF text from search index; SOR appended to Constitution (Thirty-fifth Amendment) Bill, 1974.",
+    "referencedArticles": ["101", "190"]
+  },
+  {
+    "number": "34th",
+    "year": "1974",
+    "title": "The Constitution (Thirty-fourth Amendment) Act, 1974",
+    "summary": "SOR states that the Chief Ministers' Conference of 23 July 1972 suggested reducing land ceilings and withdrawing exemptions, and that revised ceiling laws should have protection under article 31B. The Act inserts revised ceiling laws and two Acts abolishing intermediary tenures in the Ninth Schedule.",
+    "sourceUrl": "https://www.legislative.gov.in/static/uploads/2025/07/edc7f592dbf84a7300fc91819278c8af.pdf",
+    "sourceNotes": "Official PDF text from search index; SOR Bill number matches the Act.",
+    "referencedArticles": ["31B"]
+  },
+  {
+    "number": "35th",
+    "year": "1974",
+    "title": "The Constitution (Thirty-fifth Amendment) Act, 1974",
+    "summary": "SOR states that following the 8 May 1973 agreement and Sikkim Assembly resolutions, the people of Sikkim sought association with India and representation in Parliament. The Act provides for Sikkim's association with the Union on terms in a new Tenth Schedule, with one seat each in the Council of States and the House of the People.",
+    "sourceUrl": "https://www.legislative.gov.in/static/uploads/2025/07/c7c27cef78844056fc4033c78c1131ea.pdf",
+    "sourceNotes": "Official PDF text from search index; registry published year 22 February 1975 differs from Act title year 1974; SOR appended to Thirty-sixth Amendment Bill, 1974.",
+    "referencedArticles": ["2A", "80", "81"]
+  },
+  {
+    "number": "36th",
+    "year": "1975",
+    "title": "The Constitution (Thirty-sixth Amendment) Act, 1975",
+    "summary": "SOR states that the Sikkim Assembly resolved on 10 April 1975 to abolish the institution of the Chogyal and make Sikkim a constituent unit of India, approved in a 14 April 1975 opinion poll. The Act includes Sikkim as a full-fledged State in the First Schedule, allots it one seat in each House, and inserts article 371F.",
+    "sourceUrl": "https://www.legislative.gov.in/static/uploads/2025/07/2a875dab390ddae1419f7f050ccd6ed0.pdf",
+    "sourceNotes": "Official PDF fetched via proxy; SOR appended to Thirty-eighth Amendment Bill, 1975.",
+    "referencedArticles": ["2A", "80", "81", "143", "172", "371E", "371F"]
+  },
+  {
+    "number": "37th",
+    "year": "1975",
+    "title": "The Constitution (Thirty-seventh Amendment) Act, 1975",
+    "summary": "SOR states that Arunachal Pradesh was administered through a Chief Commissioner with an advisory Pradesh Council, and proposes replacing the Council by a Legislative Assembly and a Council of Ministers by including it in article 239A. The Act also amends article 240 so the President's regulation-making power is exercised only when the Assembly is dissolved or its functioning suspended.",
+    "sourceUrl": "https://www.legislative.gov.in/static/uploads/2025/07/e758d6fb56d08150e4359287a75266c1.pdf",
+    "sourceNotes": "Official PDF fetched via proxy; SOR Bill number matches the Act.",
+    "referencedArticles": ["239A", "240"]
+  },
+  {
+    "number": "38th",
+    "year": "1975",
+    "title": "The Constitution (Thirty-eighth Amendment) Act, 1975",
+    "summary": "SOR states the Bill amends articles 123, 213, 239B, 352, 356, 359 and 360 to make the satisfaction of the President, Governor or Administrator final and conclusive and not justiciable, to allow different Proclamations on different grounds, and to align article 359 with article 358.",
+    "sourceUrl": "https://www.legislative.gov.in/static/uploads/2025/07/bca8d0b507a4ddeadc5f7152f6c91193.pdf",
+    "sourceNotes": "Official PDF text from search index; SOR appended to Constitution (Thirty-ninth Amendment) Bill, 1975.",
+    "referencedArticles": ["19", "123", "213", "239B", "352", "356", "358", "359", "360"]
+  },
+  {
+    "number": "39th",
+    "year": "1975",
+    "title": "The Constitution (Thirty-ninth Amendment) Act, 1975",
+    "summary": "SOR states that disputes about the election of the President, Vice-President, Prime Minister and Speaker should not go before courts but to a forum determined by parliamentary law, and that pending proceedings should be null and void. It also proposes including certain enactments in the Ninth Schedule for protection under article 31B. The Act substitutes a new article 71.",
+    "sourceUrl": "https://www.legislative.gov.in/static/uploads/2025/07/023c05a84523bce30bca92bd293625c5.pdf",
+    "sourceNotes": "Official PDF text from search index; SOR appended to Constitution (Fortieth Amendment) Bill, 1975.",
+    "referencedArticles": ["31B", "71"]
+  },
+  {
+    "number": "40th",
+    "year": "1976",
+    "title": "The Constitution (Fortieth Amendment) Act, 1976",
+    "summary": "SOR states that under article 297 ocean resources in territorial waters and the continental shelf vest in the Union, and proposes extending this to the exclusive economic zone with limits specified by Parliament by law. It also proposes Ninth Schedule protection under article 31B for certain State and Central laws. The Act substitutes a new article 297.",
+    "sourceUrl": "https://www.legislative.gov.in/static/uploads/2025/07/33631a9257ad901c974cb48e870372e1.pdf",
+    "sourceNotes": "Official PDF fetched via proxy; SOR appended to Constitution (Forty-second Amendment) Bill, 1976.",
+    "referencedArticles": ["31B", "297"]
+  },
+  {
+    "number": "41st",
+    "year": "1976",
+    "title": "The Constitution (Forty-first Amendment) Act, 1976",
+    "summary": "SOR states that under article 316(2) the Chairman and Members of State Public Service Commissions retired at 60 while High Court Judges retired at 62, and that the retirement age of government employees and University Professors had risen, making Commission membership less attractive. The Act raises the retirement age under article 316 to 62.",
+    "sourceUrl": "https://www.legislative.gov.in/static/uploads/2025/07/c6953501ff9bdbbffcd0fe0a6cc0cb8e.pdf",
+    "sourceNotes": "Official PDF text from search index; SOR appended to Constitution (Forty-third Amendment) Bill, 1976.",
+    "referencedArticles": ["316"]
+  },
+  {
+    "number": "42nd",
+    "year": "1976",
+    "title": "The Constitution (Forty-second Amendment) Act, 1976",
+    "summary": "SOR states the Bill was intended to remove impediments to socio-economic revolution, spell out socialism, secularism and national integrity, give directive principles precedence over certain fundamental rights, specify fundamental duties, and deal with anti-national activities. It also proposed changes to the amending power under article 368, judicial review and tribunals.",
+    "sourceUrl": "https://www.legislative.gov.in/static/uploads/2025/07/9f820a53b6e6840a459bde27eb5d24e5.pdf",
+    "sourceNotes": "Official PDF text from search index; SOR appended to Constitution (Forty-fourth Amendment) Bill, 1976 (Bill No. 91 of 1976); registry records split commencement across three dates.",
+    "referencedArticles": ["32", "32A", "39A", "51A", "136", "144A", "226", "368"]
+  },
+  {
+    "number": "43rd",
+    "year": "1977",
+    "title": "The Constitution (Forty-third Amendment) Act, 1977",
+    "summary": "SOR states that articles 32A, 131A, 144A, 226A and 228A, inserted by the Forty-second Amendment, curtailed court jurisdiction and caused hardship and delay. The Act omits those articles and article 31D, and makes consequential amendments to articles 145, 228 and 366.",
+    "sourceUrl": "https://www.legislative.gov.in/static/uploads/2025/07/92ab0775a464da9f13fa816c402823f8.pdf",
+    "sourceNotes": "Official PDF fetched via proxy; SOR appended to Constitution (Forty-fourth Amendment) Bill, 1977.",
+    "referencedArticles": ["31D", "32", "32A", "131A", "139A", "144A", "145", "226", "226A", "228", "228A", "366"]
+  },
+  {
+    "number": "44th",
+    "year": "1978",
+    "title": "The Constitution (Forty-fourth Amendment) Act, 1978",
+    "summary": "SOR states that fundamental rights could be taken away by a transient majority and proposes safeguards, including a referendum requirement under article 368 for changes impairing secular or democratic character or fundamental rights. The Act omits article 31, makes property a legal right under new article 300A, and amends the Emergency provisions in articles 352 and 356.",
+    "sourceUrl": "https://www.legislative.gov.in/static/uploads/2025/07/376b37bf0ae18f1d9276ce226d0e67a1.pdf",
+    "sourceNotes": "Official PDF fetched via proxy; SOR appended to Constitution (Forty-fifth Amendment) Bill, 1978; registry published year differs from Act title year; split commencement.",
+    "referencedArticles": ["19", "31", "31A", "31C", "300A", "329A", "352", "356", "358", "359", "360", "368"]
+  },
+  {
+    "number": "45th",
+    "year": "1980",
+    "title": "The Constitution (Forty-fifth Amendment) Act, 1980",
+    "summary": "SOR states that article 334 provided for reservation of seats for Scheduled Castes and Scheduled Tribes and nomination of Anglo-Indians to cease after thirty years, but the reasons for those provisions had not ceased to exist. The Act extends the period from thirty to forty years.",
+    "sourceUrl": "https://www.legislative.gov.in/static/uploads/2025/07/62194c761da541335c5e1d8b4da03aab.pdf",
+    "sourceNotes": "Official PDF text from search index; SOR appended to Constitution (Forty-fifth Amendment) Bill, 1980; Act deemed in force from 25 January 1980.",
+    "referencedArticles": ["334"]
+  },
+  {
+    "number": "46th",
+    "year": "1982",
+    "title": "The Constitution (Forty-sixth Amendment) Act, 1982",
+    "summary": "SOR states that Supreme Court decisions following Gannon Dunkerley held various transactions resembling sales not liable to sales tax, creating scope for avoidance. The Act inserts clause (29A) in article 366 defining tax on the sale or purchase of goods, amends articles 269 and 286, adds entry 92B to the Union List, and validates certain taxes.",
+    "sourceUrl": "https://www.legislative.gov.in/static/uploads/2025/07/45675709264e657076d95506afb1da2a.pdf",
+    "sourceNotes": "Official PDF fetched via proxy; SOR names Forty-sixth Amendment Bill, 1981 while Act title year is 1982; registry date is a re-upload.",
+    "referencedArticles": ["269", "286", "366"]
+  },
+  {
+    "number": "47th",
+    "year": "1984",
+    "title": "The Constitution (Forty-seventh Amendment) Act, 1984",
+    "summary": "SOR states that article 31B protects enactments in the Ninth Schedule but not amendments made to them after inclusion, and that several States suggested including land reform Acts. The Act inserts additional State land reform entries after entry 188 in the Ninth Schedule.",
+    "sourceUrl": "https://www.legislative.gov.in/static/uploads/2025/07/b13ee4d9fe904587911afadf86379838.pdf",
+    "sourceNotes": "Official PDF text from search index; SOR appended to Constitution (Forty-eighth Amendment) Bill, 1983.",
+    "referencedArticles": ["31B"]
+  },
+  {
+    "number": "48th",
+    "year": "1984",
+    "title": "The Constitution (Forty-eighth Amendment) Act, 1984",
+    "summary": "SOR states that the Proclamation under article 356 issued on 6 October 1983 for Punjab could not continue beyond one year unless the conditions in clause (5) were met, and that continuance beyond 5 October 1984 might be necessary. The Act inserts a proviso to clause (5) construing one year as two years for that Proclamation.",
+    "sourceUrl": "https://www.legislative.gov.in/static/uploads/2025/07/1b65d89d6107c526d5dc2102f3dcf479.pdf",
+    "sourceNotes": "Official PDF text from search index; SOR appended to Constitution (Fiftieth Amendment) Bill, 1984.",
+    "referencedArticles": ["356"]
+  },
+  {
+    "number": "49th",
+    "year": "1984",
+    "title": "The Constitution (Forty-ninth Amendment) Act, 1984",
+    "summary": "SOR states that the Tripura Legislative Assembly urged application of the Sixth Schedule to the State's tribal areas and that an autonomous District Council already functioning under the Tripura Tribal Areas Autonomous District Council Act, 1979 needed constitutional sanctity. The Act amends article 244 and the Fifth and Sixth Schedules to include Tripura.",
+    "sourceUrl": "https://www.legislative.gov.in/static/uploads/2025/07/63e45ad1fb67b3ca83fd83935e5d39b3.pdf",
+    "sourceNotes": "Official PDF text from search index; SOR appended to Constitution (Fifty-first Amendment) Bill, 1984.",
+    "referencedArticles": ["244"]
+  },
+  {
+    "number": "50th",
+    "year": "1984",
+    "title": "The Constitution (Fiftieth Amendment) Act, 1984",
+    "summary": "SOR states that article 33 empowers Parliament to restrict or abrogate Part III rights for the Armed Forces and forces charged with maintaining public order, and proposes extending it to forces protecting State property, intelligence or counter-intelligence personnel and telecommunications staff. The Act substitutes a new article 33.",
+    "sourceUrl": "https://www.legislative.gov.in/static/uploads/2025/07/92a0a27dfea67d7e6117a833aeff0da9.pdf",
+    "sourceNotes": "Official PDF fetched via proxy; SOR appended to Constitution (Fifty-second Amendment) Bill, 1984.",
+    "referencedArticles": ["33"]
+  },
+  {
+    "number": "51st",
+    "year": "1984",
+    "title": "The Constitution (Fifty-first Amendment) Act, 1984",
+    "summary": "SOR states that the Meghalaya Legislative Assembly sought reservation of seats for Scheduled Tribes in the State Assembly and the House of the People, a proposal supported by Nagaland, Arunachal Pradesh and Mizoram. The Act amends articles 330 and 332 to provide for such reservation.",
+    "sourceUrl": "https://www.legislative.gov.in/static/uploads/2025/07/a0285cd36e42bf42aceb90f882f486ec.pdf",
+    "sourceNotes": "Official PDF fetched via proxy; SOR appended to Constitution (Fifty-third Amendment) Bill, 1984.",
+    "referencedArticles": ["330", "332"]
+  },
+  {
+    "number": "52nd",
+    "year": "1985",
+    "title": "The Constitution (Fifty-second Amendment) Act, 1985",
+    "summary": "SOR states that political defection was a matter of national concern and the Bill was meant to outlaw it, disqualifying members who relinquish party membership, vote or abstain against party directions, are expelled, or independents who join a party. The Act amends articles 102 and 191 and adds a Tenth Schedule.",
+    "sourceUrl": "https://www.legislative.gov.in/static/uploads/2025/07/2d3bb2cbee87a8e7ede010fe0ca27655.pdf",
+    "sourceNotes": "Official PDF text from search index; SOR appended to Constitution (Fifty-second Amendment) Bill, 1985.",
+    "referencedArticles": ["99", "102", "188", "191"]
+  },
+  {
+    "number": "53rd",
+    "year": "1986",
+    "title": "The Constitution (Fifty-third Amendment) Act, 1986",
+    "summary": "SOR states that the 30 June 1986 Memorandum of Settlement on Mizoram envisaged statehood and that provisions on Mizo religious or social practices, customary law, justice, land, and a minimum of forty Assembly members had to be made in the Constitution. The Act inserts article 371G after article 371F.",
+    "sourceUrl": "https://www.legislative.gov.in/static/uploads/2025/07/f1b620ba6a4d19f4fc9b83bb1d892160.pdf",
+    "sourceNotes": "Official PDF text from search index; SOR appended to Constitution (Fifty-third Amendment) Bill, 1986.",
+    "referencedArticles": ["2", "371F", "371G"]
+  },
+  {
+    "number": "54th",
+    "year": "1986",
+    "title": "The Constitution (Fifty-fourth Amendment) Act, 1986",
+    "summary": "Citing the recommendation of the Joint Conference of Chief Justices, Chief Ministers and Law Ministers, the Act raises Judges' salaries by amending Part D of the Second Schedule. It adds enabling provisions in articles 125 and 221 for Parliament to determine future salary changes by law.",
+    "sourceUrl": "https://www.legislative.gov.in/static/uploads/2025/07/10490cf8cc0117c5dfab227ad228f6fc.pdf",
+    "sourceNotes": "Official Legislative Department PDF text from search index; assent 14 March 1987.",
+    "referencedArticles": ["125", "221"]
+  },
+  {
+    "number": "55th",
+    "year": "1986",
+    "title": "The Constitution (Fifty-fifth Amendment) Act, 1986",
+    "summary": "To give effect to the proposal to confer statehood on the Union territory of Arunachal Pradesh, the Act inserts article 371H. It gives the Governor special responsibility for law and order, exercisable in his individual judgment, and provides that the new State's Legislative Assembly shall have not less than thirty members.",
+    "sourceUrl": "https://www.legislative.gov.in/static/uploads/2025/07/de89f6e3d1d78cd9ce5fc456597278f2.pdf",
+    "sourceNotes": "Official Legislative Department PDF text from search index; SOR dated 1 December 1986.",
+    "referencedArticles": ["2", "371G", "371H"]
+  },
+  {
+    "number": "56th",
+    "year": "1987",
+    "title": "The Constitution (Fifty-sixth Amendment) Act, 1987",
+    "summary": "To enable the formation of the State of Goa out of the Goa district of Goa, Daman and Diu, the Act inserts article 371-I. It provides that the Legislative Assembly of the State of Goa shall consist of not less than thirty members, using the existing Assembly as the provisional Assembly.",
+    "sourceUrl": "https://www.legislative.gov.in/static/uploads/2025/07/04e04860c93f704a1f6a80b1a3f245c3.pdf",
+    "sourceNotes": "Official Legislative Department PDF text from search index; assent and commencement 23 May 1987.",
+    "referencedArticles": ["371H"]
+  },
+  {
+    "number": "57th",
+    "year": "1987",
+    "title": "The Constitution (Fifty-seventh Amendment) Act, 1987",
+    "summary": "The Act further amends article 332 to make a temporary provision for reserving Scheduled Tribe seats in the Legislative Assemblies of Arunachal Pradesh, Meghalaya, Mizoram and Nagaland until the first census after 2000 and re-adjustment of seats under article 170 takes effect.",
+    "sourceUrl": "https://www.legislative.gov.in/static/uploads/2025/07/3b8f890171e2000fd23d21d261d5d0a3.pdf",
+    "sourceNotes": "Official Legislative Department PDF text from search index; assent 15 September 1987.",
+    "referencedArticles": ["51", "170", "330", "332"]
+  },
+  {
+    "number": "58th",
+    "year": "1987",
+    "title": "The Constitution (Fifty-eighth Amendment) Act, 1987",
+    "summary": "The Act empowers the President to publish under his authority an authoritative Hindi translation of the Constitution, incorporating amendments made before publication, and translations of every future amendment made in English. It inserts article 394A and adds 'AUTHORITATIVE TEXT IN HINDI' to the heading of Part XXII.",
+    "sourceUrl": "https://www.legislative.gov.in/static/uploads/2025/07/12a318771c5670cf827c0a68ebf4c731.pdf",
+    "sourceNotes": "Official Legislative Department PDF text from search index; assent 9 December 1987.",
+    "referencedArticles": ["394", "394A"]
+  },
+  {
+    "number": "59th",
+    "year": "1988",
+    "title": "The Constitution (Fifty-ninth Amendment) Act, 1988",
+    "summary": "In view of the disturbed situation in Punjab, the Act amends article 356 to allow the Proclamation of 11 May 1987 to continue beyond one year, up to three years, and inserts article 359A. It also adjusts articles 352, 358 and 359 so that internal disturbance in Punjab can ground an Emergency, with those changes limited to two years.",
+    "sourceUrl": "https://www.legislative.gov.in/static/uploads/2025/07/3756888f4fb9ffa8e456c1a94e3eaf2f.pdf",
+    "sourceNotes": "Official Legislative Department PDF text from search index; assent 30 March 1988.",
+    "referencedArticles": ["19", "20", "352", "356", "358", "359", "359A"]
+  },
+  {
+    "number": "60th",
+    "year": "1988",
+    "title": "The Constitution (Sixtieth Amendment) Act, 1988",
+    "summary": "The Act amends clause (2) of article 276 to raise the ceiling on taxes on professions, trades, callings and employments from two hundred and fifty rupees to two thousand and five hundred rupees per annum, and omits the existing proviso.",
+    "sourceUrl": "https://www.legislative.gov.in/static/uploads/2025/07/1f71451452256d6fa3063c5678d7f8a9.pdf",
+    "sourceNotes": "Official Legislative Department PDF text from search index; assent 20 December 1988.",
+    "referencedArticles": ["276"]
+  },
+  {
+    "number": "61st",
+    "year": "1988",
+    "title": "The Constitution (Sixty-first Amendment) Act, 1988",
+    "summary": "The Act amends article 326 to reduce the voting age for elections to the House of the People and State Legislative Assemblies from twenty-one to eighteen years, giving unrepresented youth a part in the political process.",
+    "sourceUrl": "https://www.legislative.gov.in/static/uploads/2025/07/8446eabf82b28598535e8c5f1ef65508.pdf",
+    "sourceNotes": "Official Legislative Department PDF text from search index; assent 28 March 1989.",
+    "referencedArticles": ["326"]
+  },
+  {
+    "number": "62nd",
+    "year": "1989",
+    "title": "The Constitution (Sixty-second Amendment) Act, 1989",
+    "summary": "The Act amends article 334 to extend, for a further ten years, the reservation of seats for Scheduled Castes and Scheduled Tribes and the representation of Anglo-Indians by nomination in the Lok Sabha and State Legislative Assemblies.",
+    "sourceUrl": "https://www.legislative.gov.in/static/uploads/2025/07/ba766f1db4f622e4241ebcd8124838dc.pdf",
+    "sourceNotes": "Official Legislative Department PDF text from search index; assent 25 January 1990.",
+    "referencedArticles": ["334"]
+  },
+  {
+    "number": "63rd",
+    "year": "1989",
+    "title": "The Constitution (Sixty-third Amendment) Act, 1989",
+    "summary": "The Act repeals the special Punjab provisions of the Fifty-ninth Amendment: it omits the proviso to clause (5) of article 356 and omits article 359A, following the Government's reconsideration that those special powers were no longer needed.",
+    "sourceUrl": "https://www.legislative.gov.in/static/uploads/2025/07/b5ab483885454d08a510dbb34b72c3f5.pdf",
+    "sourceNotes": "Official Legislative Department PDF fetched in full; printed title says 1989 but appended SOR says enacted as Act of 1990; assent 6 January 1990.",
+    "referencedArticles": ["356", "359A"]
+  },
+  {
+    "number": "64th",
+    "year": "1990",
+    "title": "The Constitution (Sixty-fourth Amendment) Act, 1990",
+    "summary": "The Act amends clauses (4) and (5) of article 356 to extend the Proclamation of 11 May 1987 in Punjab up to a total of three years and six months, since conditions for holding free and peaceful Assembly elections were not favourable.",
+    "sourceUrl": "https://www.legislative.gov.in/static/uploads/2025/07/a82862d726c4ce4102d23cc814693051.pdf",
+    "sourceNotes": "Official Legislative Department PDF text from search index; assent 16 April 1990.",
+    "referencedArticles": ["356"]
+  },
+  {
+    "number": "65th",
+    "year": "1990",
+    "title": "The Constitution (Sixty-fifth Amendment) Act, 1990",
+    "summary": "The Act substitutes a high-level National Commission for Scheduled Castes and Scheduled Tribes under article 338 for the single Special Officer, elaborates its functions to investigate safeguards and report to the President, and requires its reports to be laid before Parliament and State Legislatures.",
+    "sourceUrl": "https://www.legislative.gov.in/static/uploads/2025/07/17b7a09c7b1fbb07df2a26209e631d7b.pdf",
+    "sourceNotes": "Official Legislative Department PDF fetched in full; assent 7 June 1990.",
+    "referencedArticles": ["338"]
+  },
+  {
+    "number": "66th",
+    "year": "1990",
+    "title": "The Constitution (Sixty-sixth Amendment) Act, 1990",
+    "summary": "The Act inserts entries 203 to 257 in the Ninth Schedule to the Constitution. The new entries list State land-reform enactments and regulations from Andhra Pradesh, Bihar, Gujarat, Himachal Pradesh, Karnataka, Kerala, Madhya Pradesh, Maharashtra, Orissa, Rajasthan, Tamil Nadu, West Bengal and Pondicherry.",
+    "sourceUrl": "https://www.legislative.gov.in/static/uploads/2025/07/ea709c4d92276c96a05a4a72b4f032c9.pdf",
+    "sourceNotes": "Official eGazette PDF fetched in full; no SOR, summary from section 2; OCR garbles short title; assent 7 June 1990.",
+    "referencedArticles": []
+  },
+  {
+    "number": "67th",
+    "year": "1990",
+    "title": "The Constitution (Sixty-seventh Amendment) Act, 1990",
+    "summary": "The Act amends clause (4) of article 356 to extend the Punjab Proclamation of 11 May 1987 from three years and six months to a total of four years, as prevailing circumstances still did not permit free and peaceful elections to the State Legislative Assembly.",
+    "sourceUrl": "https://www.legislative.gov.in/static/uploads/2025/07/3d081c80a5358ff987eb6dbd74c32f69.pdf",
+    "sourceNotes": "Official Legislative Department PDF text from search index; assent 4 October 1990.",
+    "referencedArticles": ["356"]
+  },
+  {
+    "number": "68th",
+    "year": "1991",
+    "title": "The Constitution (Sixty-eighth Amendment) Act, 1991",
+    "summary": "The Act amends clause (4) of article 356 to extend the Punjab Proclamation of 11 May 1987 from four years to a total of five years, because terrorist violence continued and holding elections to the State Legislative Assembly was not considered conducive.",
+    "sourceUrl": "https://www.legislative.gov.in/static/uploads/2025/07/d27d3702f6ba11b069b74f3d42c8bf4e.pdf",
+    "sourceNotes": "Official Legislative Department PDF text from search index; assent 12 March 1991.",
+    "referencedArticles": ["356"]
+  },
+  {
+    "number": "69th",
+    "year": "1991",
+    "title": "The Constitution (Sixty-ninth Amendment) Act, 1991",
+    "summary": "The Act inserts articles 239AA and 239AB after article 239A. It renames the Union territory of Delhi as the National Capital Territory of Delhi, provides for a Legislative Assembly, a Council of Ministers headed by a Chief Minister and a Lieutenant Governor, and allows the President to suspend the arrangement.",
+    "sourceUrl": "https://www.legislative.gov.in/static/uploads/2025/07/cb901ee7998206ee9f74849dff237ade.pdf",
+    "sourceNotes": "Official eGazette PDF fetched in full; no SOR, summary from Act sections; OCR heavily garbled; assent 21 December 1991.",
+    "referencedArticles": ["239", "239A", "239AA", "239AB", "239B"]
+  },
+  {
+    "number": "70th",
+    "year": "1992",
+    "title": "The Constitution (Seventieth Amendment) Act, 1992",
+    "summary": "The Act inserts an Explanation in article 54 so that 'State' in articles 54 and 55 includes the National Capital Territory of Delhi and the Union territory of Pondicherry for the Presidential electoral college. It also adds a sub-clause to article 239AA clarifying that laws made under it are not amendments for article 368.",
+    "sourceUrl": "https://www.legislative.gov.in/static/uploads/2025/07/6bdc9fcb7696dd93c5d1c71c41e1b969.pdf",
+    "sourceNotes": "Official Legislative Department PDF text from search index; registry notes section 3 in force from 21 December 1991 and section 2 yet to be notified.",
+    "referencedArticles": ["54", "55", "239A", "239AA", "368"]
+  },
+  {
+    "number": "71st",
+    "year": "1992",
+    "title": "The Constitution (Seventy-first Amendment) Act, 1992",
+    "summary": "The Act includes Konkani, Manipuri and Nepali languages in the Eighth Schedule to the Constitution. The Statement of Objects and Reasons notes that Nepali is also known as Gorkha Bhasa in some areas and that other names have been used in Census operations.",
+    "sourceUrl": "https://www.legislative.gov.in/static/uploads/2025/07/87042b42e6fd5757797be6d2250a7e32.pdf",
+    "sourceNotes": "Official Legislative Department PDF text from search index; assent 31 August 1992; SOR refers to the Seventy-eighth Amendment Bill, 1992.",
+    "referencedArticles": []
+  },
+  {
+    "number": "72nd",
+    "year": "1992",
+    "title": "The Constitution (Seventy-second Amendment) Act, 1992",
+    "summary": "The Act inserts clause (3B) in article 332 of the Constitution. Until re-adjustment of seats takes effect on the basis of the first census after 2000 under article 170, Scheduled Tribe seats in the Tripura Legislative Assembly must bear a proportion not less than the ST members in the existing Assembly.",
+    "sourceUrl": "https://www.legislative.gov.in/static/uploads/2025/07/5767a4c1cfd857e2b9521046e3681b6d.pdf",
+    "sourceNotes": "Official eGazette PDF fetched in full; no SOR, summary from section 2; assent 4 December 1992.",
+    "referencedArticles": ["170", "332"]
+  },
+  {
+    "number": "73rd",
+    "year": "1992",
+    "title": "The Constitution (Seventy-third Amendment) Act, 1992",
+    "summary": "Citing the weaknesses of Panchayati Raj institutions, the Act adds Part IX on the Panchayats, providing for Gram Sabhas, Panchayats at village, intermediate and district levels, direct elections, reservation for Scheduled Castes, Scheduled Tribes and women, five-year tenure, Finance Commissions and an Eleventh Schedule.",
+    "sourceUrl": "https://www.legislative.gov.in/static/uploads/2025/07/d6e04624ef8b6b869af003909507cfe6.pdf",
+    "sourceNotes": "Official Legislative Department PDF text from search index; assent 20 April 1993; SOR refers to the Seventy-second Amendment Bill, 1991.",
+    "referencedArticles": ["40", "243", "243A", "243B", "243C", "243D", "243E", "243G", "243K", "243M", "243N", "244", "334"]
+  },
+  {
+    "number": "74th",
+    "year": "1992",
+    "title": "The Constitution (Seventy-fourth Amendment) Act, 1992",
+    "summary": "Citing weak and ineffective urban local bodies, the Act adds Part IXA on Municipalities, providing for Nagar Panchayats, Municipal Councils and Municipal Corporations, direct elections, reservations for Scheduled Castes, Scheduled Tribes and women, five-year tenure, Finance Commissions and a Twelfth Schedule. It also amends article 280.",
+    "sourceUrl": "https://www.legislative.gov.in/static/uploads/2025/07/8e3828fa91baa94f3aaa74cdc4152cf2.pdf",
+    "sourceNotes": "Official Legislative Department PDF fetched in full; SOR and Act sections; assent 20 April 1993; SOR refers to the Seventy-third Amendment Bill, 1991.",
+    "referencedArticles": ["244", "280", "334", "243B", "243P", "243Q", "243R", "243S", "243T", "243U", "243V", "243W", "243X", "243Y", "243Z", "243ZA", "243ZB", "243ZC", "243ZD", "243ZE", "243ZF", "243ZG"]
+  },
+  {
+    "number": "75th",
+    "year": "1993",
+    "title": "The Constitution (Seventy-fifth Amendment) Act, 1993",
+    "summary": "The Act amends clause (2) of article 323B to insert sub-clause (h) covering 'rent, its regulation and control and tenancy issues including the right, title and interest of landlords and tenants' among the matters for which Tribunals may be provided.",
+    "sourceUrl": "https://www.legislative.gov.in/static/uploads/2025/07/fda338a4ec06555ee424f9ea10759d0d.pdf",
+    "sourceNotes": "Official eGazette PDF fetched in full; no SOR, summary from section 2; assent 5 February 1994.",
+    "referencedArticles": ["323B"]
+  },
+  {
+    "number": "76th",
+    "year": "1994",
+    "title": "The Constitution (Seventy-sixth Amendment) Act, 1994",
+    "summary": "The Act inserts entry 257A in the Ninth Schedule for the Tamil Nadu Backward Classes, Scheduled Castes and Scheduled Tribes (Reservation of Seats in Educational Institution and of Appointments or Posts in the Services under the State) Act, 1993 (Tamil Nadu Act 45 of 1994), to preserve the State's 69 per cent reservation after the Supreme Court held reservations under article 16(4) should not exceed 50 per cent.",
+    "sourceUrl": "https://www.legislative.gov.in/static/uploads/2025/07/f3b4ae82cc697454c66a98b610225f34.pdf",
+    "sourceNotes": "Official Legislative Department PDF text from search index; assent 31 August 1994; SOR refers to the Eighty-fifth Amendment Bill, 1994.",
+    "referencedArticles": ["14", "15", "16", "19", "31B", "31C", "38", "39", "46"]
+  },
+  {
+    "number": "77th",
+    "year": "1995",
+    "title": "The Constitution (Seventy-seventh Amendment) Act, 1995",
+    "summary": "The Act inserts clause (4A) in article 16 to allow the State to provide for reservation in promotions in favour of Scheduled Castes and Scheduled Tribes not adequately represented in the services. The SOR cites the Supreme Court's Indra Sawhney ruling that article 16(4) covered only initial appointment.",
+    "sourceUrl": "https://www.legislative.gov.in/static/uploads/2025/07/a6d304fce13d42d83222daab59e01415.pdf",
+    "sourceNotes": "Official Legislative Department PDF text from search index; assent 17 June 1995; SOR refers to the Eighty-sixth Amendment Bill, 1995.",
+    "referencedArticles": ["16"]
+  },
+  {
+    "number": "78th",
+    "year": "1995",
+    "title": "The Constitution (Seventy-eighth Amendment) Act, 1995",
+    "summary": "The Act inserts entries 258 to 284 in the Ninth Schedule, adding land-reform and ceiling laws of Bihar, Karnataka, Kerala, Orissa, Rajasthan, Tamil Nadu and West Bengal, including amending Acts. The SOR states this gives them immunity from legal challenge under article 31B.",
+    "sourceUrl": "https://www.legislative.gov.in/static/uploads/2025/07/545b0ff2c61d1a6972905f0b50188a95.pdf",
+    "sourceNotes": "Official Legislative Department PDF fetched in full; SOR and section 2; assent 30 August 1995; SOR refers to the Eighty-first Amendment Bill, 1994.",
+    "referencedArticles": ["31B"]
+  },
+  {
+    "number": "79th",
+    "year": "1999",
+    "title": "The Constitution (Seventy-ninth Amendment) Act, 1999",
+    "summary": "The Act amends article 334 of the Constitution, substituting 'sixty years' for 'fifty years'. It was ratified by the Legislatures of not less than one-half of the States, received the President's assent on 21 January 2000 and came into force on 25 January 2000.",
+    "sourceUrl": "https://www.legislative.gov.in/static/uploads/2025/07/f44bc2266c00bac19672e503dcf056a2.pdf",
+    "sourceNotes": "Official eGazette PDF fetched in full; no SOR, summary from Act sections; printed title year 1999, assent and Gazette date 2000.",
+    "referencedArticles": ["334"]
+  },
+  {
+    "number": "80th",
+    "year": "1999",
+    "title": "The Constitution (Eightieth Amendment) Act, 1999",
+    "summary": "Implementing the Tenth Finance Commission's alternative tax-sharing scheme, the Act substitutes new provisions in articles 269 and 270 and omits article 272, bringing central taxes and duties such as Corporation tax and Customs duties into the Union-State sharing arrangement.",
+    "sourceUrl": "https://www.legislative.gov.in/static/uploads/2025/07/e87cb6624f9c380b43c396c1979342cf.pdf",
+    "sourceNotes": "Official Legislative Department PDF fetched in full; heading says 1999 while short title and registry say 2000; assent 9 June 2000.",
+    "referencedArticles": ["268", "269", "270", "271", "272", "279", "280"]
+  },
+  {
+    "number": "81st",
+    "year": "2000",
+    "title": "The Constitution (Eighty-first Amendment) Act, 2000",
+    "summary": "The Statement of Objects and Reasons explains that unfilled reserved vacancies were treated as backlog and excluded from the 50% ceiling before 29 August 1997. Section 2 inserts clause (4B) in article 16 so such vacancies form a separate class in succeeding years without counting toward the 50% ceiling.",
+    "sourceUrl": "https://www.legislative.gov.in/static/uploads/2025/07/cfb3fbce2387ec465a8e6529647512ad.pdf",
+    "sourceNotes": "Legislative Department PDF fetched in full; SOR refers to the Constitution (Ninetieth Amendment) Bill, 2000.",
+    "referencedArticles": ["16"]
+  },
+  {
+    "number": "82nd",
+    "year": "2000",
+    "title": "The Constitution (Eighty-second Amendment) Act, 2000",
+    "summary": "The Statement of Objects and Reasons cites Supreme Court rulings that relaxations in reservation in promotion were impermissible under article 16(4) read with article 335, leading to their withdrawal in 1997. Section 2 inserts a proviso to article 335 allowing relaxation in qualifying marks and lowering of evaluation standards for Scheduled Castes and Scheduled Tribes in promotion.",
+    "sourceUrl": "https://www.legislative.gov.in/static/uploads/2025/07/163d821e39b1891f0321d008fea81e50.pdf",
+    "sourceNotes": "Legislative Department PDF fetched in full; PDF prints assent date with a typo; SOR appended to Eighty Eighth Amendment Bill 1999.",
+    "referencedArticles": ["16", "335"]
+  },
+  {
+    "number": "83rd",
+    "year": "2000",
+    "title": "The Constitution (Eighty-third Amendment) Act, 2000",
+    "summary": "Article 243D provides Panchayat seat reservation for Scheduled Castes, but Arunachal Pradesh has no Scheduled Castes and a casteless tribal society. Section 2 inserts clause (3A) in article 243M exempting Arunachal Pradesh from article 243D's reservation of seats for Scheduled Castes in Panchayats.",
+    "sourceUrl": "https://www.legislative.gov.in/static/uploads/2025/07/de0ef6f8f469f9a4b7d5421de25dfc2b.pdf",
+    "sourceNotes": "Legislative Department PDF fetched in full; SOR appended to the Constitution (Eighty Sixth Amendment) Bill 1999.",
+    "referencedArticles": ["243D", "243M"]
+  },
+  {
+    "number": "84th",
+    "year": "2002",
+    "title": "The Constitution (Eighty-fourth Amendment) Act, 2002",
+    "summary": "Provisos to articles 82 and 170(3) barred fresh delimitation until the first census after 2000. Citing the National Population Policy, the SOR proposes extending the freeze to 2026 and readjusting constituencies on 1991 figures; sections 2-7 substitute 2026/1991 in articles 55, 81, 82, 170, 330 and 332.",
+    "sourceUrl": "https://www.legislative.gov.in/static/uploads/2025/07/879abe65ba0eac1dbfffa83ba5cd0438.pdf",
+    "sourceNotes": "Legislative Department PDF fetched in full; SOR heading says Ninty First Amendment Bill, 2000.",
+    "referencedArticles": ["55", "81", "82", "170", "330", "332"]
+  },
+  {
+    "number": "85th",
+    "year": "2001",
+    "title": "The Constitution (Eighty-fifth Amendment) Act, 2001",
+    "summary": "The SOR states that Supreme Court judgments and the O.M. of 30 January 1997 adversely affected consequential seniority of Scheduled Caste/Scheduled Tribe employees promoted by reservation. Section 2 substitutes 'in matters of promotion, with consequential seniority' in article 16(4A), deemed in force from 17 June 1995.",
+    "sourceUrl": "https://www.legislative.gov.in/static/uploads/2025/07/0306241a215c6aafe8bee67f6a9fe894.pdf",
+    "sourceNotes": "Legislative Department PDF fetched in full; title year 2001, Act date 4 January 2002, deemed effective from 17 June 1995.",
+    "referencedArticles": ["16"]
+  },
+  {
+    "number": "86th",
+    "year": "2002",
+    "title": "The Constitution (Eighty-sixth Amendment) Act, 2002",
+    "summary": "The SOR notes that article 45's goal of free compulsory education remained unfulfilled and proposes making it a fundamental right. The Act inserts article 21A (free compulsory education for ages 6-14), substitutes article 45 (early childhood care) and adds clause (k) to article 51A on parental obligation.",
+    "sourceUrl": "https://www.legislative.gov.in/static/uploads/2025/07/16970eb1a68d4fe46ac40acd783a6c34.pdf",
+    "sourceNotes": "Legislative Department PDF fetched in full; SOR refers to the Eighty-third Amendment Bill, 1997 and Ninety-third Amendment Bill, 2001.",
+    "referencedArticles": ["21", "21A", "45", "51A"]
+  },
+  {
+    "number": "87th",
+    "year": "2003",
+    "title": "The Constitution (Eighty-seventh Amendment) Act, 2003",
+    "summary": "The SOR records the Delimitation Commission's view that delimitation after thirty years should not use 1991 figures and an all-party meeting favouring the 2001 census. Sections 2-5 substitute '2001' for '1991' in articles 81, 82, 170 and 330.",
+    "sourceUrl": "https://www.legislative.gov.in/static/uploads/2025/07/ba763f8738d9c5a13e212e9ea4cc6aaa.pdf",
+    "sourceNotes": "Legislative Department PDF fetched in full; PDF also carries an unrelated corrigendum.",
+    "referencedArticles": ["81", "82", "170", "330"]
+  },
+  {
+    "number": "88th",
+    "year": "2003",
+    "title": "The Constitution (Eighty-eighth Amendment) Act, 2003",
+    "summary": "The SOR notes taxes on services were not specifically enumerated and States sought power to collect and appropriate such tax. Section 2 inserts article 268A, section 3 amends article 270, and section 4 adds entry 92C 'Taxes on services' to the Union List of the Seventh Schedule.",
+    "sourceUrl": "https://www.legislative.gov.in/static/uploads/2025/07/1488ce649fee8ec56a270137b2cb2e55.pdf",
+    "sourceNotes": "Legislative Department PDF fetched in full; title year 2003, assent/commencement date printed 15 January 2004.",
+    "referencedArticles": ["268", "268A", "269", "270"]
+  },
+  {
+    "number": "89th",
+    "year": "2003",
+    "title": "The Constitution (Eighty-ninth Amendment) Act, 2003",
+    "summary": "The SOR proposes bifurcating the National Commission for Scheduled Castes and Scheduled Tribes into separate commissions. Section 2 amends article 338 (renamed National Commission for Scheduled Castes) and section 3 inserts article 338A (National Commission for Scheduled Tribes).",
+    "sourceUrl": "https://www.legislative.gov.in/static/uploads/2025/07/0c2366570aee86b57258a378ddf6dbc1.pdf",
+    "sourceNotes": "Legislative Department PDF fetched in full; SOR's member counts differ from enacted section 3 text.",
+    "referencedArticles": ["338", "338A"]
+  },
+  {
+    "number": "90th",
+    "year": "2003",
+    "title": "The Constitution (Ninetieth Amendment) Act, 2003",
+    "summary": "Article 332(6) bars non-Scheduled Tribe members from Assam autonomous district constituencies. Pursuant to the 10 February 2003 Memorandum of Settlement with Bodo Liberation Tigers, section 2 inserts a proviso to article 332(6) maintaining existing Scheduled Tribe and non-Scheduled Tribe representation in Bodoland Territorial Areas District constituencies.",
+    "sourceUrl": "https://www.legislative.gov.in/static/uploads/2025/07/4af6a31f7c56bdd0b93dbaaae0362190.pdf",
+    "sourceNotes": "Legislative Department PDF fetched in full; assent 28 September 2003; SOR dated 7 May 2003.",
+    "referencedArticles": ["332"]
+  },
+  {
+    "number": "91st",
+    "year": "2003",
+    "title": "The Constitution (Ninety-first Amendment) Act, 2003",
+    "summary": "Sections 2 and 3 add clauses to articles 75 and 164 capping Ministers at fifteen per cent of the House/Assembly and disqualifying defectors under the Tenth Schedule from ministerial appointment. Section 4 inserts article 361B barring such members from remunerative political posts; section 5 amends the Tenth Schedule and omits paragraph 3.",
+    "sourceUrl": "https://www.legislative.gov.in/static/uploads/2025/07/1bc0ff014a6cd9946d181eb268f1259b.pdf",
+    "sourceNotes": "Gazette PDF fetched in full; title year 2003, assent 1 January 2004.",
+    "referencedArticles": ["75", "164", "361A", "361B"]
+  },
+  {
+    "number": "92nd",
+    "year": "2003",
+    "title": "The Constitution (Ninety-second Amendment) Act, 2003",
+    "summary": "Section 2 amends the Eighth Schedule, inserting Bodo, Dogri, Maithili and Santhali as entries 3, 4, 10 and 18, renumbering existing entries 4-7 as 6-9, entry 8 as 11, entries 9-14 as 12-17, entry 15 as 19 and entries 16-18 as 20-22.",
+    "sourceUrl": "https://www.legislative.gov.in/static/uploads/2025/07/2e3c0925d75850f85cafbf34aa72eb31.pdf",
+    "sourceNotes": "Gazette PDF fetched in full; title year 2003, assent 7 January 2004; no constitutional article named.",
+    "referencedArticles": []
+  },
+  {
+    "number": "93rd",
+    "year": "2005",
+    "title": "The Constitution (Ninety-third Amendment) Act, 2005",
+    "summary": "The SOR proposes promoting educational advancement of socially and educationally backward classes, Scheduled Castes and Scheduled Tribes in unaided institutions other than minority institutions under article 30. Section 2 inserts clause (5) in article 15 enabling special provisions for admission, including in private unaided institutions.",
+    "sourceUrl": "https://www.legislative.gov.in/static/uploads/2025/07/aa777da5ac292230760bcc5778f5e0cc.pdf",
+    "sourceNotes": "Gazette PDF fetched in full; title year 2005, assent 20 January 2006; article 15(5) was later struck down by the Supreme Court, but the PDF text is as enacted.",
+    "referencedArticles": ["15", "19", "30"]
+  },
+  {
+    "number": "94th",
+    "year": "2006",
+    "title": "The Constitution (Ninety-fourth Amendment) Act, 2006",
+    "summary": "The SOR notes Chhattisgarh and Jharkhand were carved out of Madhya Pradesh and Bihar with scheduled areas transferred, while Bihar has no scheduled areas and an ST population of 0.9%. Section 2 substitutes 'Chhattisgarh, Jharkhand' for 'Bihar' in the proviso to article 164(1).",
+    "sourceUrl": "https://cdnbbsr.s3waas.gov.in/s380537a945c7aaa788ccfcdf1b99b5d8f/uploads/2023/03/2023030212.pdf",
+    "sourceNotes": "Official Gazette PDF located via search index; extraction empty; full text corroborated by Legislative Department SOR PDF.",
+    "referencedArticles": ["164"]
+  },
+  {
+    "number": "95th",
+    "year": "2009",
+    "title": "The Constitution (Ninety-fifth Amendment) Act, 2009",
+    "summary": "Section 1(2) brings the Act into force on 25 January 2010. Section 2 substitutes 'seventy years' for 'sixty years' in article 334. The Gazette records ratification by the Legislatures of not less than one-half of the States and assent on 18 January 2010.",
+    "sourceUrl": "https://cdnbbsr.s3waas.gov.in/s380537a945c7aaa788ccfcdf1b99b5d8f/uploads/2023/03/2023030236.pdf",
+    "sourceNotes": "Official Gazette PDF fetched in full; printed heading lacks a space before 2009.",
+    "referencedArticles": ["334"]
+  },
+  {
+    "number": "96th",
+    "year": "2011",
+    "title": "The Constitution (Ninety-sixth Amendment) Act, 2011",
+    "summary": "Section 2 amends the Eighth Schedule, substituting 'Odia' for 'Oriya' in entry 15. The Act received the President's assent on 23 September 2011 and was published the same day.",
+    "sourceUrl": "https://cdnbbsr.s3waas.gov.in/s380537a945c7aaa788ccfcdf1b99b5d8f/uploads/2023/03/2023030222.pdf",
+    "sourceNotes": "Official Gazette PDF located via search index; extraction empty; full text corroborated by other official Gazette PDFs.",
+    "referencedArticles": []
+  },
+  {
+    "number": "97th",
+    "year": "2011",
+    "title": "The Constitution (Ninety Seventh Amendment) Act, 2011",
+    "summary": "The SOR calls for reforms for autonomous, democratic and professional management of cooperatives. Section 2 inserts 'or co-operative societies' in article 19(1)(c), section 3 inserts article 43B, and section 4 inserts Part IXB (The Co-operative Societies).",
+    "sourceUrl": "https://www.legislative.gov.in/static/uploads/2025/07/4499315a6ffd7121c68adacbf1ad8dc9.pdf",
+    "sourceNotes": "Legislative Department PDF located via search index; title year 2011, assent 12 January 2012.",
+    "referencedArticles": ["19", "43A", "43B", "239", "243ZH", "243ZI", "243ZJ", "243ZQ", "243ZT"]
+  },
+  {
+    "number": "98th",
+    "year": "2012",
+    "title": "The Constitution (Ninety-eighth Amendment) Act, 2012",
+    "summary": "Section 2 inserts article 371J after article 371-I, providing for a separate Hyderabad-Karnataka development board, equitable allocation of funds and opportunities in public employment, education and vocational training, with reservation of seats and posts for persons of that region by birth or domicile.",
+    "sourceUrl": "https://www.legislative.gov.in/static/uploads/2025/07/543af8337b820982df352f2ecacfbb23.pdf",
+    "sourceNotes": "Legislative Department PDF located via search index only; extraction empty; assent 1 January 2013; OCR prints 371-1 for 371-I.",
+    "referencedArticles": ["371J"]
+  },
+  {
+    "number": "99th",
+    "year": "2014",
+    "title": "The Constitution (Ninety-ninth Amendment) Act, 2014",
+    "summary": "Section 2 amends article 124 to provide for appointment of Supreme Court judges on the recommendation of the National Judicial Appointments Commission, which section 3 inserts as article 124A. Further sections amend articles 217, 222, 224, 224A and 231, with commencement left to a Gazette notification.",
+    "sourceUrl": "https://www.legislative.gov.in/static/uploads/2025/07/09c2097e2e34183043e9e3f6afc3753d.pdf",
+    "sourceNotes": "Legislative Department PDF located via search index; official Legislative Department Constitution PDF records that these NJAC provisions were struck down by the Supreme Court on 16 October 2015.",
+    "referencedArticles": ["124", "124A", "217", "222", "224", "224A", "231"]
+  },
+  {
+    "number": "100th",
+    "year": "2015",
+    "title": "The Constitution (One Hundredth Amendment) Act, 2015",
+    "summary": "The long title states the Act gives effect to acquiring territories by India and transferring territories to Bangladesh under the India-Bangladesh agreement and protocol. Section 2 defines acquired territory, transferred territory, appointed day and the agreement; section 3 amends the First Schedule entries for Assam, West Bengal, Meghalaya and Tripura.",
+    "sourceUrl": "https://www.legislative.gov.in/static/uploads/2025/07/3b5b640b91d58f470aff54278d6d969b.pdf",
+    "sourceNotes": "Legislative Department PDF fetched in full; no constitutional article number is named.",
+    "referencedArticles": []
+  },
+  {
+    "number": "101st",
+    "year": "2016",
+    "title": "The Constitution (One Hundred and First Amendment) Act, 2016",
+    "summary": "Section 2 inserts article 246A giving Parliament and State Legislatures power to make laws on goods and services tax; sections 3-11 amend or omit articles 248, 249, 250, 268, 268A, 269, 269A, 270 and 271; section 12 inserts article 279A constituting the GST Council; sections 13-15 amend articles 286, 366 and 368.",
+    "sourceUrl": "https://www.legislative.gov.in/static/uploads/2025/07/a4250c5ad613af2f4f9347ef45add1db.pdf",
+    "sourceNotes": "Legislative Department PDF located via search index; manuscript notes partial commencement notifications dated 29 August, 12 September and 16 September 2016.",
+    "referencedArticles": ["246", "246A", "248", "249", "250", "254", "268", "268A", "269", "269A", "270", "271", "279", "279A", "286", "366", "368"]
+  },
+  {
+    "number": "102nd",
+    "year": "2018",
+    "title": "The Constitution (One Hundred and Second Amendment) Act, 2018",
+    "summary": "Section 2 omits from article 338(10) the words empowering the President to specify other backward classes on a Commission's report. Section 3 inserts article 338B (National Commission for Backward Classes), section 4 inserts article 342A, and section 5 adds clause (26C) to article 366 defining socially and educationally backward classes.",
+    "sourceUrl": "https://www.legislative.gov.in/static/uploads/2025/07/8c366f8ebe268d1bee2992bfb4ae9db1.pdf",
+    "sourceNotes": "Legislative Department PDF located via search index; full Gazette text fetched from National Commission for Backward Classes official PDF.",
+    "referencedArticles": ["338", "338A", "338B", "340", "342", "342A", "366"]
+  },
+  {
+    "number": "103rd",
+    "year": "2019",
+    "title": "The Constitution (One Hundred and Third Amendment) Act, 2019",
+    "summary": "Section 2 inserts clause (6) in article 15 enabling special provisions for economically weaker sections, including admission to private unaided institutions other than minority institutions, up to ten per cent. Section 3 inserts clause (6) in article 16 for reservation in appointments or posts up to ten per cent.",
+    "sourceUrl": "https://www.legislative.gov.in/static/uploads/2025/07/1e84d2ca7394641dfb2653b0a5ef0e86.pdf",
+    "sourceNotes": "Gazette PDF located via search index; manuscript note records notification S.O. 292(E), dated 14 January 2019.",
+    "referencedArticles": ["15", "16", "19", "29", "30"]
+  },
+  {
+    "number": "104th",
+    "year": "2019",
+    "title": "The Constitution (One Hundred and Fourth Amendment) Act, 2019",
+    "summary": "Section 1(2) fixes commencement on 25 January 2020. Section 2 substitutes the marginal heading of article 334 and, in the long line, replaces 'seventy years' with 'eighty years in respect of clause (a) and seventy years in respect of clause (b)'. The Gazette records ratification by half the States and assent on 21 January 2020.",
+    "sourceUrl": "https://www.legislative.gov.in/static/uploads/2025/07/e8e83c0faf01f4dc4fdad9ef4d37f556.pdf",
+    "sourceNotes": "Gazette PDF fetched in full; title year 2019 but assent 21 January 2020 and commencement 25 January 2020.",
+    "referencedArticles": ["334"]
+  },
+  {
+    "number": "105th",
+    "year": "2021",
+    "title": "The Constitution (One Hundred and Fifth Amendment) Act, 2021",
+    "summary": "Section 2 inserts a proviso in article 338B(9) stating that nothing in that clause applies for the purposes of article 342A(3). Sections 3 and 4 amend article 342A and insert clause (26C) in article 366 defining 'socially and educationally backward classes' for the Central Government or the State/Union territory.",
+    "sourceUrl": "https://www.legislative.gov.in/static/uploads/2025/07/f98100221cb33fa76e84162532b48d56.pdf",
+    "sourceNotes": "Gazette PDF located via search index; assent printed as 18 August 2021, commencement left to notification.",
+    "referencedArticles": ["338B", "342A", "366"]
+  },
+  {
+    "number": "106th",
+    "year": "2023",
+    "title": "The Constitution (One Hundred and Sixth Amendment) Act, 2023",
+    "summary": "Sections 2-5 insert clauses (ba)-(bc) in article 239AA and new articles 330A, 332A and 334A reserving, as nearly as may be, one-third of seats for women in the Delhi Assembly, the House of the People and State Assemblies after delimitation, for fifteen years. Section 1(2) left commencement to a Gazette notification.",
+    "sourceUrl": "https://www.legislative.gov.in/static/uploads/2025/08/415c4ac11019eeed37d4e87e4e8a6831.pdf",
+    "sourceNotes": "Gazette PDF fetched in full; assent 28 September 2023; commencement verified by S.O. 1922(E), 16 April 2026, at https://egazette.gov.in/WriteReadData/2026/271834.pdf.",
+    "referencedArticles": ["239AA", "330", "330A", "332", "332A", "334", "334A"]
+  }
+]

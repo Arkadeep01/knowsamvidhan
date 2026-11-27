@@ -569,7 +569,7 @@ export default function Hero() {
             <div style={{ display: "flex", justifyContent: "center", alignItems: "center", flexShrink: 0 }}>
               <div
                 style={{ position: "relative", cursor: "pointer" }}
-                onClick={() => openModal({ title: "The Constitution of India", badge: "About the Document", content: "The Constitution of India is the supreme law of the land. Adopted on 26 November 1949, it is the world's longest written national constitution with 395 Articles, 12 Schedules, 22 Parts, and 106 Amendments." })}
+                onClick={() => openModal({ title: "The Constitution of India", badge: "About the Document", content: `The Constitution of India is the supreme law of the land. Adopted on 26 November 1949, it is the world's longest written national constitution with 395 Articles, 12 Schedules, 22 Parts, and ${amendments.length > 0 ? amendments.length : 106} Amendments.` })}
               >
                 <div style={{ position: "absolute", inset: -32, zIndex: -1, filter: "blur(48px)", borderRadius: "50%", background: "radial-gradient(ellipse at 60% 50%, rgba(251,191,36,0.22) 0%, rgba(244,186,100,0.12) 40%, transparent 70%)" }} />
                 <div style={{ position: "absolute", bottom: 0, left: "50%", transform: "translateX(-50%)", width: "75%", height: 32, filter: "blur(24px)", borderRadius: "50%", zIndex: -1, background: "rgba(120,80,10,0.18)" }} />

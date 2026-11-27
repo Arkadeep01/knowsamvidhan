@@ -101,7 +101,7 @@ model Schedule {
 
 model Amendment {
   id              String   @id @default(uuid())
-  number          String
+  number          String   @unique
   year            String
   title           String
   summary         String

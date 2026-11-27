@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
 import { sanitizeInput, createSecurityMiddleware } from "@/lib/security";
 import { recordSecurityAudit } from "@/lib/security-engine";
+import { ordinalValue } from "@/lib/amendments/validation.mjs";
 
 const securityMiddleware = createSecurityMiddleware();
 
@@ -34,8 +35,10 @@ export async function GET(req: NextRequest) {
   }
 
   try {
-    const amendments = await prisma.amendment.findMany({
-      orderBy: { createdAt: "asc" },
+    const amendments = await prisma.amendment.findMany();
+    amendments.sort((a, b) => {
+      const ordinalDifference = ordinalValue(a.number) - ordinalValue(b.number);
+      return ordinalDifference !== 0 ? ordinalDifference : a.year.localeCompare(b.year);
     });
     return NextResponse.json(amendments);
   } catch (error) {
