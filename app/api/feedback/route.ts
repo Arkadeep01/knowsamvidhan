@@ -8,7 +8,7 @@ export async function POST(
   try {
     const session = await getUserSession();
     const body = await req.json();
-    const { conversationId, rating, category, comment } = body;
+    const { conversationId, rating, comment } = body;
 
     // Validate required fields
     if (rating === undefined || rating === null) {
@@ -18,26 +18,10 @@ export async function POST(
       );
     }
 
-    if (category === undefined || category === null) {
-      return NextResponse.json(
-        { error: "Category is required" },
-        { status: 400 }
-      );
-    }
-
     // Rating must be 1-5
     if (rating < 1 || rating > 5) {
       return NextResponse.json(
         { error: "Rating must be between 1 and 5" },
-        { status: 400 }
-      );
-    }
-
-    // Category must be a valid option
-    const validCategories = ["general", "quality", "correctness", "helpfulness", "privacy"];
-    if (!validCategories.includes(category)) {
-      return NextResponse.json(
-        { error: "Invalid category" },
         { status: 400 }
       );
     }
@@ -62,7 +46,6 @@ export async function POST(
       data: {
         userId,
         rating,
-        category,
         comment: comment || null,
         conversationId,
       },
